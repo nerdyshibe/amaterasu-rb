@@ -1,3 +1,0 @@
-module Spinel
-  VERSION: String
-end
