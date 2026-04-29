@@ -5,6 +5,7 @@ module Akane
     class Cpu
       def initialize
         @registers = Cpu::Registers.new
+        @ime = false
       end
     end
   end

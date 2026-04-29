@@ -1,0 +1,24 @@
+module Akane
+  module Gameboy
+    class Interrupts
+      TYPES: Hash[Symbol, Integer]
+      VECTORS: Hash[Symbol, Integer]
+
+      def initialize: (?skip_boot_rom: bool) -> void
+
+      def if_register: () -> Integer
+      def ie_register: () -> Integer
+      def if_register=: (Integer value) -> void
+      def ie_register=: (Integer value) -> void
+
+      def any_pending?: () -> bool
+      def highest_pending: () -> Symbol?
+      def request: (Symbol type) -> void
+      def service: (Symbol type) -> void
+
+      private
+
+      def pending?: (Symbol type) -> bool
+    end
+  end
+end
