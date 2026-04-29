@@ -1,0 +1,20 @@
+module Akane
+  module Gameboy
+    class Ram
+      def initialize: (Integer size) -> void
+
+      def read_byte: (Integer offset) -> Integer
+      def write_byte: (Integer offset, Integer value) -> void
+      def read_backup: (Integer offset) -> Integer
+      def disk_size: () -> String
+      def save_data: () -> void
+      def restore_data: () -> void
+      def wipe_data: () -> void
+      def wipe_backup: () -> void
+
+      private
+
+      def in_bounds?: (Integer offset) -> bool
+    end
+  end
+end
