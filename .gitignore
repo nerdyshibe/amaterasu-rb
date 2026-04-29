@@ -1,9 +1,9 @@
 .idea
+.tool-versions
 .vscode/
 .ruby-lsp/
 coverage/
 docs/
+rdoc/
 roms/
 tmp/
-
-.tool-versions
