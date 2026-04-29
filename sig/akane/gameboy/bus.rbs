@@ -1,0 +1,10 @@
+module Akane
+  module Gameboy
+    class Bus
+      def initialize: () -> void
+
+      def read_byte: (Integer address) -> Integer
+      def write_byte: (Integer address, Integer value) -> void
+    end
+  end
+end

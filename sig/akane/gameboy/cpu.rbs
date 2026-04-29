@@ -1,0 +1,7 @@
+module Akane
+  module Gameboy
+    class Cpu
+      def initialize: () -> void
+    end
+  end
+end
