@@ -9,8 +9,23 @@ Style/FrozenStringLiteralComment:
   Enabled: true
   EnforcedStyle: always
 
+Style/ComparableBetween:
+  Enabled: false
+
+Style/EmptyLiteral:
+  Enabled: false
+
 Metrics/ClassLength:
   Max: 120
+
+Metrics/MethodLength:
+  Max: 15
+
+Metrics/CyclomaticComplexity:
+  Max: 15
+
+Metrics/PerceivedComplexity:
+  Max: 15
 
 RSpec/ExampleLength:
   Max: 15
