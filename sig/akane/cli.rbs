@@ -1,0 +1,5 @@
+module Akane
+  class CLI
+    def self.run: (Array[String] arguments) -> void
+  end
+end
