@@ -42,7 +42,7 @@ module Akane
         #
         # - The values can change based on the Boot ROM implementation.
         # - If the Boot ROM is not skipped, all values should start as 0.
-        def initialize(skip_boot_rom = true)
+        def initialize(skip_boot_rom: true)
           @a = skip_boot_rom ? 0x01 : 0x00
           @f = skip_boot_rom ? 0b10110000 : 0b00000000
           @b = 0x00
@@ -119,7 +119,7 @@ module Akane
         # - Lower byte is set into the F register.
         # - CPU ignores bits 0-3 of the F register.
         def af=(value)
-          value = value & 0xFFFF
+          value &= 0xFFFF
           @a = (value >> 8) & 0xFF
           @f = value & 0xF0
         end
@@ -129,7 +129,7 @@ module Akane
         # - Higher byte is set into the B register.
         # - Lower byte is set into the C register.
         def bc=(value)
-          value = value & 0xFFFF
+          value &= 0xFFFF
           @b = (value >> 8) & 0xFF
           @c = value & 0xFF
         end
@@ -139,7 +139,7 @@ module Akane
         # - Higher byte is set into the D register.
         # - Lower byte is set into the E register.
         def de=(value)
-          value = value & 0xFFFF
+          value &= 0xFFFF
           @d = (value >> 8) & 0xFF
           @e = value & 0xFF
         end
@@ -149,7 +149,7 @@ module Akane
         # - Higher byte is set into the H register.
         # - Lower byte is set into the L register.
         def hl=(value)
-          value = value & 0xFFFF
+          value &= 0xFFFF
           @h = (value >> 8) & 0xFF
           @l = value & 0xFF
         end
@@ -160,7 +160,7 @@ module Akane
         # - If something is pushed into the Stack, the SP is decreased
         # - If something is popped from the Stack, the SP is increased
         def sp=(value)
-          @sp = (value & 0xFFFF)
+          @sp = value & 0xFFFF
         end
 
         # Sets the value of the PC (Program Counter) register.
@@ -169,7 +169,7 @@ module Akane
         # Every time a instruction is fetched and executed,
         # the PC is incremented to fetch the next one.
         def pc=(value)
-          @pc = (value & 0xFFFF)
+          @pc = value & 0xFFFF
         end
 
         # Returns a 16-bit value stored in the combined AF register.

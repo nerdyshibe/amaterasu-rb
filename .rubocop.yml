@@ -1,0 +1,16 @@
+plugins:
+  - rubocop-performance
+  - rubocop-rspec
+
+AllCops:
+  NewCops: enable
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+Metrics/ClassLength:
+  Max: 120
+
+RSpec/ExampleLength:
+  Max: 15
