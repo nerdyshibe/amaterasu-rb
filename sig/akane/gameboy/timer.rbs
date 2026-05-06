@@ -1,0 +1,30 @@
+module Akane
+  module Gameboy
+    class Timer
+      T_CYCLES: Integer
+      COUNTER_BITS_TO_WATCH: Array[Integer]
+
+      attr_reader tima: Integer
+      attr_reader tma: Integer
+      attr_reader tac: Integer
+
+      def initialize: (Interrupts interrupts) -> void
+
+      def div: () -> Integer
+      def div=: (Integer value) -> void
+      def tima=: (Integer value) -> void
+      def tma=: (Integer value) -> void
+      def tac=: (Integer value) -> void
+
+      def tick: () -> void
+
+      private
+
+      def increment_tima?: (Integer previous_counter) -> bool
+      def tac_enable: () -> Integer
+      def tac_clock_select: () -> Integer
+      def clock_bit_position: () -> Integer
+      def falling_edge?: (Integer previous_counter) -> bool
+    end
+  end
+end
