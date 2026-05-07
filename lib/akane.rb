@@ -6,6 +6,9 @@ require_relative 'akane/gameboy/cpu'
 require_relative 'akane/gameboy/cpu/registers'
 require_relative 'akane/gameboy/interrupts'
 require_relative 'akane/gameboy/ram'
+require_relative 'akane/gameboy/serial'
+require_relative 'akane/gameboy/timer'
 
+# Base container for all Library modules and classes
 module Akane
 end

@@ -1,0 +1,21 @@
+module Akane
+  module Gameboy
+    class Serial
+      attr_reader sb: Integer
+      attr_reader message_buffer: Array[Integer]
+
+      def initialize: (Interrupts interrupts) -> void
+
+      def sc: () -> Integer
+      def sb=: (Integer value) -> void
+      def sc=: (Integer value) -> void
+
+      private
+
+      def transfer_enabled?: () -> bool
+      def clock_bit: () -> Integer
+      def start_transfer: () -> void
+      def complete_transfer: () -> void
+    end
+  end
+end
