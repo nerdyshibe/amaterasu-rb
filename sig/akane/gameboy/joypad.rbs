@@ -1,0 +1,25 @@
+module Akane
+  module Gameboy
+    class Joypad
+      FACE_BUTTONS: Hash[Symbol, Integer]
+      DPAD_BUTTONS: Hash[Symbol, Integer]
+
+      def initialize: (Interrupts interrupts) -> void
+
+      def p1: () -> Integer
+      def p1=: (Integer value) -> void
+
+      def press_dpad: (Symbol button) -> void
+      def release_dpad: (Symbol button) -> void
+      def press_face: (Symbol button) -> void
+      def release_face: (Symbol button) -> void
+
+      private
+
+      def request_interrupt: () -> void
+      def dpad_selected?: () -> bool
+      def buttons_selected?: () -> bool
+      def buttons_state: () -> Integer
+    end
+  end
+end
