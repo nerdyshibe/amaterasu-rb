@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 describe Akane::Gameboy::Timer do
-  let(:interrupts) { Akane::Gameboy::Interrupts.new }
   subject(:timer) { described_class.new(interrupts, skip_boot_rom: false) }
+
+  let(:interrupts) { Akane::Gameboy::Interrupts.new }
 
   let(:t_cycles_per_tick) { 4 }
   let(:div_increment_ticks) { 2**8 / t_cycles_per_tick }

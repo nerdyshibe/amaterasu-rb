@@ -29,3 +29,6 @@ Metrics/PerceivedComplexity:
 
 RSpec/ExampleLength:
   Max: 15
+
+RSpec/NestedGroups:
+  Max: 4
