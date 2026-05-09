@@ -68,6 +68,7 @@ module Akane
         elsif address >= 0xFE00 && address <= 0xFE9F
           @ppu.write_oam(address - 0xFE00, value)
         elsif address >= 0xFEA0 && address <= 0xFEFF
+          nil
         elsif address >= 0xFF00 && address <= 0xFF7F
           write_io(address, value)
         elsif address >= 0xFF80 && address <= 0xFFFE
