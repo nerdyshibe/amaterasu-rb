@@ -1,10 +1,15 @@
 module Akane
   module Gameboy
     class Bus
-      def initialize: () -> void
+      def initialize: (cartridge: Cartridge, ppu: Ppu, wram: Ram, hram: Ram, interrupts: Interrupts, timer: Timer, serial: Serial, joypad: Joypad) -> void
 
       def read_byte: (Integer address) -> Integer
       def write_byte: (Integer address, Integer value) -> void
+
+      private
+
+      def read_io: (Integer address) -> Integer
+      def write_io: (Integer address, Integer value) -> void
     end
   end
 end

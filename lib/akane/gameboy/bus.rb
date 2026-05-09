@@ -13,76 +13,101 @@ module Akane
     # | 0xFF80-0xFFFE | 127 B | High RAM (HRAM) | Fast RAM, accessible during DMA |
     # | 0xFFFF | 1 B | IE Register | Interrupt Enable |
     class Bus
-      def initialize
-        # @cartridge = cartridge
-        # @ppu = ppu
-        # @wram = wram
-        # @io
-        # @hram = hram
-        # @interrupts = interrupts
+      def initialize(cartridge:, ppu:, wram:, hram:, interrupts:, timer:, serial:, joypad:)
+        @cartridge = cartridge
+        @ppu = ppu
+        @wram = wram
+        @hram = hram
+        @interrupts = interrupts
+        @timer = timer
+        @serial = serial
+        @joypad = joypad
       end
 
+      # Delegates the read to the proper component based on the address
+      # and returns the 8-bit value that was stored there.
       def read_byte(address)
-        if address >= 0x0000 && address <= 0x7FFF
-          0xFF
-          # @cartridge.read_rom(address)
+        if address <= 0x7FFF
+          @cartridge.read_rom(address)
         elsif address >= 0x8000 && address <= 0x9FFF
-          0xFF
-          # @ppu.read_vram(address)
+          @ppu.read_vram(address - 0x8000)
         elsif address >= 0xA000 && address <= 0xBFFF
-          0xFF
-          # @cartridge.read_ram(address)
+          @cartridge.read_ram(address - 0xA000)
         elsif address >= 0xC000 && address <= 0xDFFF
-          0xFF
-          # @wram.read_byte(address)
+          @wram.read_byte(address - 0xC000)
         elsif address >= 0xE000 && address <= 0xFDFF
-          0xFF
-          # @wram.read_byte(address - 0x2000)
+          @wram.read_byte(address - 0xE000)
         elsif address >= 0xFE00 && address <= 0xFE9F
-          0xFF
-          # @ppu.read_oam(address)
+          @ppu.read_oam(address - 0xFE00)
         elsif address >= 0xFEA0 && address <= 0xFEFF
           0xFF
         elsif address >= 0xFF00 && address <= 0xFF7F
-          0xFF
-          # @io.read_registers(address)
+          read_io(address)
         elsif address >= 0xFF80 && address <= 0xFFFE
-          0xFF
-          # @hram.read_byte(address)
+          @hram.read_byte(address - 0xFF80)
         elsif address == 0xFFFF
-          0xFF
-          # @interrupts.ie
+          @interrupts.ie_register
         else
-          # create a custom error class?
-          # raise MemoryOutOfBounds
+          raise 'MemoryOutOfBounds error'
+        end
+      end
+
+      # Delegates the write to the proper component based on the address
+      # and stores a 8-bit value at that location.
+      def write_byte(address, value)
+        if address <= 0x7FFF
+          @cartridge.write_rom(address, value)
+        elsif address >= 0x8000 && address <= 0x9FFF
+          @ppu.write_vram(address - 0x8000, value)
+        elsif address >= 0xA000 && address <= 0xBFFF
+          @cartridge.write_ram(address - 0xA000, value)
+        elsif address >= 0xC000 && address <= 0xDFFF
+          @wram.write_byte(address - 0xC000, value)
+        elsif address >= 0xE000 && address <= 0xFDFF
+          @wram.write_byte(address - 0xE000, value)
+        elsif address >= 0xFE00 && address <= 0xFE9F
+          @ppu.write_oam(address - 0xFE00, value)
+        elsif address >= 0xFEA0 && address <= 0xFEFF
+        elsif address >= 0xFF00 && address <= 0xFF7F
+          write_io(address, value)
+        elsif address >= 0xFF80 && address <= 0xFFFE
+          @hram.write_byte(address - 0xFF80, value)
+        elsif address == 0xFFFF
+          @interrupts.ie_register = value
+        else
+          raise 'MemoryOutOfBounds error'
+        end
+      end
+
+      private
+
+      # Extracts the IO registers read logic for organization.
+      def read_io(address)
+        case address
+        when 0xFF00 then @joypad.p1
+        when 0xFF01 then @serial.sb
+        when 0xFF02 then @serial.sc
+        when 0xFF04 then @timer.div
+        when 0xFF05 then @timer.tima
+        when 0xFF06 then @timer.tma
+        when 0xFF07 then @timer.tac
+        when 0xFF0F then @interrupts.if_register
+        else
           0xFF
         end
       end
 
-      def write_byte(address, value)
-        if address >= 0x0000 && address <= 0x7FFF
-          # @cartridge.write_rom(address, value)
-        elsif address >= 0x8000 && address <= 0x9FFF
-          # @ppu.write_vram(address, value)
-        elsif address >= 0xA000 && address <= 0xBFFF
-          # @cartridge.write_ram(address, value)
-        elsif address >= 0xC000 && address <= 0xDFFF
-          # @wram.write_byte(address, value)
-        elsif address >= 0xE000 && address <= 0xFDFF
-          # @wram.write_byte(address - 0x2000, value)
-        elsif address >= 0xFE00 && address <= 0xFE9F
-          # @ppu.write_oam(address, value)
-        elsif address >= 0xFEA0 && address <= 0xFEFF
-        elsif address >= 0xFF00 && address <= 0xFF7F
-          # @io.write_registers(address, value)
-        elsif address >= 0xFF80 && address <= 0xFFFE
-          # @hram.write_byte(address, value)
-        elsif address == 0xFFFF
-          # @interrupts.ie = value
-        else
-          # create a custom error class?
-          # raise MemoryOutOfBounds
-          raise StandardError, 'memory out of bounds'
+      # Extracts the IO registers write logic for organization.
+      def write_io(address, value)
+        case address
+        when 0xFF00 then @joypad.p1 = value
+        when 0xFF01 then @serial.sb = value
+        when 0xFF02 then @serial.sc = value
+        when 0xFF04 then @timer.div = value
+        when 0xFF05 then @timer.tima = value
+        when 0xFF06 then @timer.tma = value
+        when 0xFF07 then @timer.tac = value
+        when 0xFF0F then @interrupts.if_register = value
         end
       end
     end
