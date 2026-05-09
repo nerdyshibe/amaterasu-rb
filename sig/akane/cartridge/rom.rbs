@@ -1,0 +1,29 @@
+module Akane
+  class Cartridge
+    class Rom
+      CARTRIDGE_TYPES: Hash[Integer, Symbol]
+      ROM_SIZES: Hash[Integer, Integer]
+      RAM_SIZES: Hash[Integer, Integer]
+
+      def self.from_file: (String file_path) -> Rom
+
+      def initialize: (Array[Integer] data) -> void
+
+      def read_byte: (Integer offset) -> Integer
+      def header: () -> Array[Integer]
+      def title: () -> String
+      def manufacturer_code: () -> Array[Integer]
+      def cgb_flag: () -> Integer
+      def new_licensee_code: () -> Array[Integer]
+      def sgb_flag: () -> Integer
+      def cartridge_type: () -> Symbol
+      def rom_size: () -> Integer
+      def ram_size: () -> Integer
+      def destination_code: () -> Integer
+      def old_licensee_code: () -> Integer
+      def mask_rom_version: () -> Integer
+      def header_checksum: () -> Integer
+      def valid_checksum?: () -> bool
+    end
+  end
+end

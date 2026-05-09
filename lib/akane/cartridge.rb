@@ -7,12 +7,9 @@ module Akane
     def self.load_rom(file_path)
       rom = Akane::Cartridge::Rom.from_file(file_path)
 
-      case rom.cartridge_type
-      when :rom_only
-        new(rom: rom)
-      else
-        raise "#{rom.cartridge_type} not implemented yet"
-      end
+      raise "#{rom.cartridge_type} not implemented yet" unless rom.cartridge_type == :rom_only
+
+      new(rom: rom)
     end
 
     # Creates a cartridge object based on the cartridge type.

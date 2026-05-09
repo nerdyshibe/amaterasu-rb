@@ -1,0 +1,5 @@
+module Akane
+  class Emulator
+    def self.start: (String file_path) -> void
+  end
+end

@@ -1,7 +1,23 @@
 module Akane
   module Gameboy
     class Cpu
-      def initialize: () -> void
+      INSTRUCTIONS: Hash[Integer, Proc]
+      CB_INSTRUCTIONS: Hash[Integer, Proc]
+
+      def initialize: (Bus bus, Interrupts interrupts, Proc advance_components) -> void
+
+      def run: () -> void
+
+      private
+
+      def handle_interrupts: () -> void
+      def fetch_opcode: () -> void
+      def decode_opcode: () -> void
+      def execute_instruction: () -> void
+      def bus_read: (Integer address) -> Integer
+      def bus_write: (Integer address, Integer value) -> void
+      def internal_processing: () -> void
+      def advance_cycles: (Integer cycles) -> void
     end
   end
 end

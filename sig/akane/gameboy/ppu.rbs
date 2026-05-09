@@ -1,0 +1,12 @@
+module Akane
+  module Gameboy
+    class Ppu
+      def initialize: (Interrupts interrupts) -> void
+
+      def read_vram: (Integer offset) -> Integer
+      def write_vram: (Integer offset, Integer value) -> void
+      def read_oam: (Integer offset) -> Integer
+      def write_oam: (Integer offset, Integer value) -> void
+    end
+  end
+end
