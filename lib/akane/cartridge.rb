@@ -23,11 +23,20 @@ module Akane
     end
 
     # Delegates the read byte to either the ROM or the MBC (Not implemented yet).
-    def read_byte(address)
+    def read_rom(address)
       @rom.read_byte(address)
     end
 
     # Delegates the read byte to the MBC (Not implemented yet).
-    def write_byte(address, value); end
+    def write_rom(address, value); end
+
+    def read_ram(address)
+      return 0xFF if @ram.nil?
+
+      @ram.read_byte(address)
+    end
+
+    # Delegates the read byte to the MBC (Not implemented yet).
+    def write_ram(address, value); end
   end
 end
