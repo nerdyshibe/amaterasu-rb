@@ -7,7 +7,7 @@ module Akane
       rom_path = arguments.first.split('=').last
       puts "Arguments used: #{arguments}"
 
-      Akane::Emulator.start(rom_path)
+      Emulator.start(rom_path)
     end
   end
 end

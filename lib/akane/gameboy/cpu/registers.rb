@@ -59,58 +59,58 @@ module Akane
         # Stores a 8-bit value into the A (Accumulator) register.
         #
         # - CPU ignores any value larger than 255 (0xFF).
-        def a=(byte)
-          @a = byte & 0xFF
+        def a=(value)
+          @a = value & 0xFF
         end
 
         # Stores a 8-bit value into the F (Flags) register.
         #
         # - CPU ignores any value larger than 255 (0xFF).
         # - The lower nibble is always ignored by the CPU.
-        def f=(byte)
-          @f = byte & 0b11110000
+        def f=(value)
+          @f = value & 0b11110000
         end
 
         # Stores a 8-bit value into the B register.
         #
         # - CPU ignores any value larger than 255 (0xFF).
-        def b=(byte)
-          @b = byte & 0xFF
+        def b=(value)
+          @b = value & 0xFF
         end
 
         # Stores a 8-bit value into the C register.
         #
         # - CPU ignores any value larger than 255 (0xFF).
-        def c=(byte)
-          @c = byte & 0xFF
+        def c=(value)
+          @c = value & 0xFF
         end
 
         # Stores a 8-bit value into the D register.
         #
         # - CPU ignores any value larger than 255 (0xFF).
-        def d=(byte)
-          @d = byte & 0xFF
+        def d=(value)
+          @d = value & 0xFF
         end
 
         # Stores a 8-bit value into the E register.
         #
         # - CPU ignores any value larger than 255 (0xFF).
-        def e=(byte)
-          @e = byte & 0xFF
+        def e=(value)
+          @e = value & 0xFF
         end
 
         # Stores a 8-bit value into the H register.
         #
         # - CPU ignores any value larger than 255 (0xFF).
-        def h=(byte)
-          @h = byte & 0xFF
+        def h=(value)
+          @h = value & 0xFF
         end
 
         # Stores a 8-bit value into the L register.
         #
         # - CPU ignores any value larger than 255 (0xFF).
-        def l=(byte)
-          @l = byte & 0xFF
+        def l=(value)
+          @l = value & 0xFF
         end
 
         # Sets the value of the AF combined 16-bit register.

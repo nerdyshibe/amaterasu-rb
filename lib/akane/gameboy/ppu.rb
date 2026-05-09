@@ -4,7 +4,9 @@ module Akane
   module Gameboy
     # Models the PPU behavior from the Game Boy.
     class Ppu
-      def initialize
+      def initialize(interrupts)
+        @interrupts = interrupts
+
         @vram = Ram.new(8_192)
         @oam = Ram.new(160)
       end
