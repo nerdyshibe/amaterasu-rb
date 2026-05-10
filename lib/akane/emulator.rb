@@ -3,8 +3,8 @@
 module Akane
   # Handles the core emulation loop.
   class Emulator
-    def self.start(file_path)
-      cartridge = Cartridge.load_rom(file_path)
+    def self.start(options)
+      cartridge = Cartridge.load_rom(options[:rom])
       wram = Gameboy::Ram.new(8192)
       hram = Gameboy::Ram.new(127)
       apu = Gameboy::Apu.new

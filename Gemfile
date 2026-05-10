@@ -20,8 +20,8 @@ group :development do
   gem 'rubocop-performance'
   gem 'rubocop-rspec'
   gem 'stackprof'
-  gem 'steep'
-  gem 'vernier'
+  gem 'steep', require: false
+  gem 'vernier', require: false
 end
 
 group :test do
