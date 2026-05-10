@@ -1,18 +1,12 @@
 # frozen_string_literal: true
 
+require 'debug'
+
 module Akane
   module Gameboy
     # Models the CPU behavior from the Game Boy.
     class Cpu
-      INSTRUCTIONS = {
-        0x00 => -> { puts '$00 executed' },
-        0x01 => -> { puts '$01 executed' }
-      }.freeze
-
-      CB_INSTRUCTIONS = {
-        0x00 => -> { puts '$CB $00 executed' },
-        0x01 => -> { puts '$CB $01 executed' }
-      }.freeze
+      include Instructions
 
       def initialize(bus, interrupts, advance_components)
         @bus = bus
@@ -20,9 +14,13 @@ module Akane
         @advance_components = advance_components
 
         @registers = Registers.new
+        @instructions = Array.new(256)
+        # @cb_instructions = Instructions.wire_cb_opcodes
         @ime = false
         @opcode = nil
         @instruction = nil
+
+        wire_instructions
       end
 
       # Core CPU loop:
@@ -34,9 +32,11 @@ module Akane
       def run
         handle_interrupts if @ime && @interrupts.any_pending?
 
-        fetch_opcode
-        decode_opcode
+        old_pc = @registers.pc
+        @opcode = fetch_byte
+        decode_instruction
         execute_instruction
+        log(old_pc, @instruction)
       end
 
       private
@@ -47,20 +47,22 @@ module Akane
       end
 
       # Special read that gets the byte pointed to by the Program Counter.
-      def fetch_opcode
-        @opcode = bus_read(@registers.pc)
+      def fetch_byte
+        byte = bus_read(@registers.pc)
         @registers.pc += 1
+
+        byte
       end
 
       # Determines which instruction should be executed for each Opcode.
-      def decode_opcode
-        @instruction = INSTRUCTIONS[@opcode]
-        raise "Opcode not implemented yet: #{@opcode}" if @instruction.nil?
+      def decode_instruction
+        @instruction = @instructions[@opcode]
+        raise "Opcode not implemented yet: #{format('$%02X', @opcode)}" if @instruction.nil?
       end
 
       # Executes the logic for the current instruction.
       def execute_instruction
-        @instruction.call
+        @instruction.execute.call
       end
 
       # Reads a byte from the Bus at a given address.
@@ -85,6 +87,18 @@ module Akane
       # Syncs all components after each M-cycle.
       def advance_cycles(t_cycles)
         @advance_components.call(t_cycles)
+      end
+
+      def log(old_pc, instruction)
+        puts "#{format('$%04X', old_pc)}  |  " \
+             "#{instruction.mnemonic}  |  " \
+             "#{format('$%02X', bus_read(old_pc))} " \
+             "#{format('$%02X', bus_read(old_pc + 1))} " \
+             "#{format('$%02X', bus_read(old_pc + 1))}  |  " \
+             "AF: $#{format('%04X', @registers.af)}  |  " \
+             "BC: $#{format('%04X', @registers.bc)}  |  " \
+             "DE: $#{format('%04X', @registers.de)}  |  " \
+             "HL: $#{format('%04X', @registers.hl)}  |  "
       end
     end
   end
