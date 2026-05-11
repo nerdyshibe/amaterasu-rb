@@ -147,6 +147,7 @@ GEM
     unicode-emoji (4.2.0)
     uri (1.1.1)
     vernier (1.10.0)
+    yard (0.9.43)
 
 PLATFORMS
   aarch64-linux-gnu
@@ -176,6 +177,7 @@ DEPENDENCIES
   stackprof
   steep
   vernier
+  yard
 
 CHECKSUMS
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
@@ -252,6 +254,7 @@ CHECKSUMS
   unicode-emoji (4.2.0) sha256=519e69150f75652e40bf736106cfbc8f0f73aa3fb6a65afe62fefa7f80b0f80f
   uri (1.1.1) sha256=379fa58d27ffb1387eaada68c749d1426738bd0f654d812fcc07e7568f5c57c6
   vernier (1.10.0) sha256=5b1dc57012e08ed23e14f4d2943540140d454aa8434c7c35e7eb97befd4969bf
+  yard (0.9.43) sha256=cf8733a8f0485df2a162927e9b5f182215a61f6d22de096b8f402c726a1c5821
 
 RUBY VERSION
   ruby 4.0.3

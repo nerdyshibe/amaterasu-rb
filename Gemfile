@@ -22,6 +22,7 @@ group :development do
   gem 'stackprof'
   gem 'steep', require: false
   gem 'vernier', require: false
+  gem 'yard', require: false
 end
 
 group :test do
