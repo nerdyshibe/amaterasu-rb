@@ -13,12 +13,13 @@ module Akane
     # | 0xFF80-0xFFFE | 127 B | High RAM (HRAM) | Fast RAM, accessible during DMA |
     # | 0xFFFF | 1 B | IE Register | Interrupt Enable |
     class Bus
-      def initialize(cartridge:, ppu:, wram:, hram:, interrupts:, timer:, serial:, joypad:)
+      def initialize(cartridge:, ppu:, wram:, hram:, interrupts:, apu:, timer:, serial:, joypad:)
         @cartridge = cartridge
         @ppu = ppu
         @wram = wram
         @hram = hram
         @interrupts = interrupts
+        @apu = apu
         @timer = timer
         @serial = serial
         @joypad = joypad
