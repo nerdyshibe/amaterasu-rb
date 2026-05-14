@@ -15,13 +15,16 @@ Style/ComparableBetween:
 Style/EmptyLiteral:
   Enabled: false
 
+Metrics/AbcSize:
+  Enabled: false
+
 Metrics/ClassLength:
   Max: 120
 
-Metrics/MethodLength:
+Metrics/CyclomaticComplexity:
   Max: 15
 
-Metrics/CyclomaticComplexity:
+Metrics/MethodLength:
   Max: 15
 
 Metrics/PerceivedComplexity:
