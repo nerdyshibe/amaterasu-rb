@@ -18,18 +18,23 @@ module Akane
           private
 
           def define_logic(target, source)
-            return load_into_a(source) if target == :a
-            return load_into_b(source) if target == :b
-            return load_into_c(source) if target == :c
-            return load_into_d(source) if target == :d
-            return load_into_e(source) if target == :e
-            return load_into_h(source) if target == :h
-            return load_into_l(source) if target == :l
-
-            load_into_mem_hl(source)
+            case target
+            when :a       then load_a(source)
+            when :b       then load_b(source)
+            when :c       then load_c(source)
+            when :d       then load_d(source)
+            when :e       then load_e(source)
+            when :h       then load_h(source)
+            when :l       then load_l(source)
+            when :mem_hl  then load_mem_hl(source)
+            when :mem_hli then load_mem_hli
+            when :mem_hld then load_mem_hld
+            else
+              raise 'NotImplementedError'
+            end
           end
 
-          def load_into_a(source)
+          def load_a(source)
             case source
             when :a      then -> {}
             when :b      then -> { @registers.a = @registers.b }
@@ -39,11 +44,21 @@ module Akane
             when :h      then -> { @registers.a = @registers.h }
             when :l      then -> { @registers.a = @registers.l }
             when :imm8   then -> { @registers.a = @cpu.fetch_next_byte }
-            when :mem_hl then -> { @registers.a = @cpu.bus_read(@registers.hl) }
+            when :mem_hl then -> { @registers.a = @cpu.bus_read(address: @registers.hl) }
+            when :mem_hli
+              lambda do
+                @registers.a = @cpu.bus_read(address: @registers.hl)
+                @registers.hl += 1
+              end
+            when :mem_hld
+              lambda do
+                @registers.a = @cpu.bus_read(address: @registers.hl)
+                @registers.hl -= 1
+              end
             end
           end
 
-          def load_into_b(source)
+          def load_b(source)
             case source
             when :a      then -> { @registers.b = @registers.a }
             when :b      then -> {}
@@ -53,11 +68,11 @@ module Akane
             when :h      then -> { @registers.b = @registers.h }
             when :l      then -> { @registers.b = @registers.l }
             when :imm8   then -> { @registers.b = @cpu.fetch_next_byte }
-            when :mem_hl then -> { @registers.b = @cpu.bus_read(@registers.hl) }
+            when :mem_hl then -> { @registers.b = @cpu.bus_read(address: @registers.hl) }
             end
           end
 
-          def load_into_c(source)
+          def load_c(source)
             case source
             when :a      then -> { @registers.c = @registers.a }
             when :b      then -> { @registers.c = @registers.b }
@@ -67,11 +82,11 @@ module Akane
             when :h      then -> { @registers.c = @registers.h }
             when :l      then -> { @registers.c = @registers.l }
             when :imm8   then -> { @registers.c = @cpu.fetch_next_byte }
-            when :mem_hl then -> { @registers.c = @cpu.bus_read(@registers.hl) }
+            when :mem_hl then -> { @registers.c = @cpu.bus_read(address: @registers.hl) }
             end
           end
 
-          def load_into_d(source)
+          def load_d(source)
             case source
             when :a      then -> { @registers.d = @registers.a }
             when :b      then -> { @registers.d = @registers.b }
@@ -81,11 +96,11 @@ module Akane
             when :h      then -> { @registers.d = @registers.h }
             when :l      then -> { @registers.d = @registers.l }
             when :imm8   then -> { @registers.d = @cpu.fetch_next_byte }
-            when :mem_hl then -> { @registers.d = @cpu.bus_read(@registers.hl) }
+            when :mem_hl then -> { @registers.d = @cpu.bus_read(address: @registers.hl) }
             end
           end
 
-          def load_into_e(source)
+          def load_e(source)
             case source
             when :a      then -> { @registers.e = @registers.a }
             when :b      then -> { @registers.e = @registers.b }
@@ -95,11 +110,11 @@ module Akane
             when :h      then -> { @registers.e = @registers.h }
             when :l      then -> { @registers.e = @registers.l }
             when :imm8   then -> { @registers.e = @cpu.fetch_next_byte }
-            when :mem_hl then -> { @registers.e = @cpu.bus_read(@registers.hl) }
+            when :mem_hl then -> { @registers.e = @cpu.bus_read(address: @registers.hl) }
             end
           end
 
-          def load_into_h(source)
+          def load_h(source)
             case source
             when :a      then -> { @registers.h = @registers.a }
             when :b      then -> { @registers.h = @registers.b }
@@ -109,11 +124,11 @@ module Akane
             when :h      then -> {}
             when :l      then -> { @registers.h = @registers.l }
             when :imm8   then -> { @registers.h = @cpu.fetch_next_byte }
-            when :mem_hl then -> { @registers.h = @cpu.bus_read(@registers.hl) }
+            when :mem_hl then -> { @registers.h = @cpu.bus_read(address: @registers.hl) }
             end
           end
 
-          def load_into_l(source)
+          def load_l(source)
             case source
             when :a      then -> { @registers.l = @registers.a }
             when :b      then -> { @registers.l = @registers.b }
@@ -123,11 +138,11 @@ module Akane
             when :h      then -> { @registers.l = @registers.h }
             when :l      then -> {}
             when :imm8   then -> { @registers.l = @cpu.fetch_next_byte }
-            when :mem_hl then -> { @registers.l = @cpu.bus_read(@registers.hl) }
+            when :mem_hl then -> { @registers.l = @cpu.bus_read(address: @registers.hl) }
             end
           end
 
-          def load_into_mem_hl(source)
+          def load_mem_hl(source)
             case source
             when :a    then -> { @cpu.bus_write(address: @registers.hl, value: @registers.a) }
             when :b    then -> { @cpu.bus_write(address: @registers.hl, value: @registers.b) }
@@ -137,6 +152,20 @@ module Akane
             when :h    then -> { @cpu.bus_write(address: @registers.hl, value: @registers.h) }
             when :l    then -> { @cpu.bus_write(address: @registers.hl, value: @registers.l) }
             when :imm8 then -> { @cpu.bus_write(address: @registers.hl, value: @cpu.fetch_next_byte) }
+            end
+          end
+
+          def load_mem_hli
+            lambda do
+              @cpu.bus_write(address: @registers.hl, value: @registers.a)
+              @registers.hl += 1
+            end
+          end
+
+          def load_mem_hld
+            lambda do
+              @cpu.bus_write(address: @registers.hl, value: @registers.a)
+              @registers.hl -= 1
             end
           end
         end

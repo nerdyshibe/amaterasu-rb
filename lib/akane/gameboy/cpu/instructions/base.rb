@@ -20,9 +20,12 @@ module Akane
           private
 
           def format_operand(operand)
-            return 'n8'   if operand == :imm8
-            return 'n16'  if operand == :imm16
-            return '[HL]' if operand == :mem_hl
+            return ''      if operand.nil?
+            return 'n8'    if operand == :imm8
+            return 'n16'   if operand == :imm16
+            return '[HL]'  if operand == :mem_hl
+            return '[HL+]' if operand == :mem_hli
+            return '[HL-]' if operand == :mem_hld
 
             operand.upcase
           end
