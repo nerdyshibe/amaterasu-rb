@@ -6,27 +6,25 @@ module Akane
   module Gameboy
     # Models the CPU behavior from the Game Boy.
     class Cpu
-      Instruction = Data.define(:mnemonic, :steps_proc) do
-        def execute
-          steps_proc.call
-        end
-      end
-
       include Instructions
 
-      def initialize(bus, interrupts, advance_components)
+      attr_reader :registers, :m_cycles
+
+      def initialize(bus, interrupts, advance_components, verbose)
         @bus = bus
         @interrupts = interrupts
         @advance_components = advance_components
+        @verbose = verbose
 
         @registers = Registers.new
-        @instructions = load_base_instructions
-        @cb_instructions = load_cb_instructions
         @ime = false
         @opcode = nil
         @instruction = nil
 
         @m_cycles = 0
+
+        @instructions = load_base_instructions
+        @cb_instructions = load_cb_instructions
       end
 
       # Core CPU loop:
@@ -39,21 +37,14 @@ module Akane
         handle_interrupts if @ime && @interrupts.any_pending?
 
         old_pc = @registers.pc
-        @opcode = fetch_byte
+        @opcode = fetch_next_byte
         decode_instruction
         execute_instruction
         log(old_pc, @instruction)
       end
 
-      private
-
-      # Checks if any interrupt is enabled and requested to service.
-      def handle_interrupts
-        puts 'Interrupts handled'
-      end
-
       # Fetches the next immediate byte from memory pointed to by the Program Counter.
-      def fetch_byte
+      def fetch_next_byte
         byte = bus_read(@registers.pc)
         @registers.pc += 1
 
@@ -65,16 +56,24 @@ module Akane
       # - The Game Boy uses little endian format.
       # - This means that the first byte fetched is the least significant one.
       # - So if the memory has these next 2 bytes: $50 $01, the word is: $0150
-      def fetch_word
-        lower_byte = fetch_byte
-        higher_byte = fetch_byte
+      def fetch_next_word
+        lsb = fetch_next_byte
+        msb = fetch_next_byte
 
-        (higher_byte << 8) | lower_byte
+        (msb << 8) | lsb
       end
 
-      def jump_to(address)
+      # Jumps execution to a given address by setting the address value into the PC.
+      def jump_to(address:)
         @registers.pc = address
         internal_processing
+      end
+
+      private
+
+      # Checks if any interrupt is enabled and requested to service.
+      def handle_interrupts
+        puts 'Interrupts handled'
       end
 
       # Determines which instruction should be executed for each Opcode.
@@ -97,7 +96,7 @@ module Akane
       end
 
       # Requests a Bus write at a given address with a given value.
-      def bus_write(address, value)
+      def bus_write(address:, value:)
         @bus.write_byte(address, value)
         advance_cycles(4)
       end
@@ -114,16 +113,31 @@ module Akane
       end
 
       def log(old_pc, instruction)
-        puts "#{format('%04d', @m_cycles)}    |  " \
-             "#{format('$%04X', old_pc)}  |  " \
-             "#{instruction.mnemonic}          |  " \
-             "#{format('$%02X', @bus.read_byte(old_pc))} " \
-             "#{format('$%02X', @bus.read_byte(old_pc + 1))} " \
-             "#{format('$%02X', @bus.read_byte(old_pc + 2))}  |  " \
-             "AF: $#{format('%04X', @registers.af)}  |  " \
-             "BC: $#{format('%04X', @registers.bc)}  |  " \
-             "DE: $#{format('%04X', @registers.de)}  |  " \
-             "HL: $#{format('%04X', @registers.hl)}  |  "
+        return unless @verbose
+
+        $stdout.printf(
+          '%<cycles>04d | $%<pc>04X | %<im>-12s (took %<ic>d) | $%<b1>02X $%<b2>02X $%<b3>02X | ' \
+          "AF: $%<af>04X BC: $%<bc>04X DE: $%<de>04X HL: $%<hl>04X\n",
+          cycles: @m_cycles,
+          pc: old_pc,
+          im: instruction.mnemonic,
+          ic: instruction.m_cycles,
+          b1: @bus.read_byte(old_pc),
+          b2: @bus.read_byte(old_pc + 1),
+          b3: @bus.read_byte(old_pc + 2),
+          af: @registers.af,
+          bc: @registers.bc,
+          de: @registers.de,
+          hl: @registers.hl
+        )
+      end
+
+      # Custom inspect method to facilitate debugging, prevents circular references
+      # since all instructions hold the Cpu object and the Cpu holds instruction objects.
+      def inspect
+        "#<Akane::Gameboy::Cpu @pc=$#{@registers.pc} " \
+          "@instructions_size=#{@instructions.compact.size} " \
+          "@cb_instructions_size=#{@cb_instructions.compact.size}"
       end
     end
   end

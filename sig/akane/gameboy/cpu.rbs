@@ -11,7 +11,7 @@ module Akane
       private
 
       def handle_interrupts: () -> void
-      def fetch_byte: () -> void
+      def fetch_next_byte: () -> void
       def decode_instruction: () -> void
       def execute_instruction: () -> void
       def bus_read: (Integer address) -> Integer

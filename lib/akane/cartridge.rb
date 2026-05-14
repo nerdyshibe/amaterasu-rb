@@ -5,7 +5,7 @@ module Akane
   class Cartridge
     # Loads a Rom from a file path.
     def self.load_rom(file_path)
-      rom = Akane::Cartridge::Rom.from_file(file_path)
+      rom = Rom.from_file(file_path)
 
       raise "#{rom.cartridge_type} not implemented yet" unless rom.cartridge_type == :rom_only
 

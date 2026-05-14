@@ -9,21 +9,21 @@ module Akane
       options = { verbose: false, audio: nil, video: nil }
 
       opt_parser = OptionParser.new do |parser|
-        parser.banner = "Usage: akane [options] ROM_PATH"
+        parser.banner = 'Usage: akane [options] ROM_PATH'
 
-        parser.on("-l", "--logs", "Enable verbose mode") do
+        parser.on('-l', '--logs', 'Enable verbose mode') do
           options[:verbose] = true
         end
 
-        parser.on("-a", "--audio=AUDIO", "Define the audio backend") do |audio|
+        parser.on('-a', '--audio=AUDIO', 'Define the audio backend') do |audio|
           options[:audio] = audio
         end
 
-        parser.on("-r", "--rom=ROM_PATH", "path/to/the/rom.gb file") do |rom|
+        parser.on('-r', '--rom=ROM_PATH', 'path/to/the/rom.gb file') do |rom|
           options[:rom] = rom
         end
 
-        parser.on("-v", "--video=VIDEO", "Define the video backend") do |video|
+        parser.on('-v', '--video=VIDEO', 'Define the video backend') do |video|
           options[:video] = video
         end
       end

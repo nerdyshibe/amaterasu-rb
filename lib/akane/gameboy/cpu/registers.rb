@@ -251,6 +251,11 @@ module Akane
         def c_flag=(bit)
           @f = bit.zero? ? (@f & 0b11101111) : (@f | 0b00010000)
         end
+
+        # Clears all 4 flags.
+        def clear_flags
+          @f = 0x00
+        end
       end
     end
   end
