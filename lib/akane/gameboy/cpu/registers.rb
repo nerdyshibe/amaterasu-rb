@@ -8,6 +8,8 @@ module Akane
       # - Contains 8 8-bit core registers.
       # - 8-bit registers can be combined into 16-bit register pair.
       class Registers
+        using Akane::Utils::BitOperations
+
         # Returns the 8-bit value stored in the A (Accumulator) register.
         attr_reader :a
 
@@ -206,50 +208,50 @@ module Akane
 
         # Returns the current value of the Zero bit flag.
         #
-        # - The Zero flag is Bit7 of the Flags register.
+        # - The Zero flag is Bit 7 of the Flags register.
         def z_flag
-          (@f >> 7) & 1
+          @f.bit(7)
         end
 
         # Returns the current value of the Subtraction bit flag.
         #
-        # - The Subtraction flag is Bit6 of the Flags register.
+        # - The Subtraction flag is Bit 6 of the Flags register.
         def n_flag
-          (@f >> 6) & 1
+          @f.bit(6)
         end
 
         # Returns the current value of the Half Carry bit flag.
         #
-        # - The Half Carry flag is Bit5 of the Flags register.
+        # - The Half Carry flag is Bit 5 of the Flags register.
         def h_flag
-          (@f >> 5) & 1
+          @f.bit(5)
         end
 
         # Returns the current value of the Carry bit flag.
         #
-        # - The Carry flag is Bit4 of the Flags register.
+        # - The Carry flag is Bit 4 of the Flags register.
         def c_flag
-          (@f >> 4) & 1
+          @f.bit(4)
         end
 
-        # Either sets or clears the value of the Zero flag.
-        def z_flag=(bit)
-          @f = bit.zero? ? (@f & 0b01111111) : (@f | 0b10000000)
+        # Either sets or clears the value of the Zero flag (Bit 7).
+        def z_flag=(set)
+          @f = set ? @f.set_bit(7) : @f.clear_bit(7)
         end
 
-        # Either sets or clears the value of the Subtraction flag.
-        def n_flag=(bit)
-          @f = bit.zero? ? (@f & 0b10111111) : (@f | 0b01000000)
+        # Either sets or clears the value of the Subtraction flag (Bit 6).
+        def n_flag=(set)
+          @f = set ? @f.set_bit(6) : @f.clear_bit(6)
         end
 
-        # Either sets or clears the value of the Half Carry flag.
-        def h_flag=(bit)
-          @f = bit.zero? ? (@f & 0b11011111) : (@f | 0b00100000)
+        # Either sets or clears the value of the Half Carry flag (Bit 5).
+        def h_flag=(set)
+          @f = set ? @f.set_bit(5) : @f.clear_bit(5)
         end
 
-        # Either sets or clears the value of the Carry flag.
-        def c_flag=(bit)
-          @f = bit.zero? ? (@f & 0b11101111) : (@f | 0b00010000)
+        # Either sets or clears the value of the Carry flag (Bit 4).
+        def c_flag=(set)
+          @f = set ? @f.set_bit(4) : @f.clear_bit(4)
         end
 
         # Clears all 4 flags.
