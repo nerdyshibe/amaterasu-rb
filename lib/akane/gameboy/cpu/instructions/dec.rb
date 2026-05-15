@@ -26,6 +26,10 @@ module Akane
             when :e      then -> { @registers.e = dec(@registers.e) }
             when :h      then -> { @registers.h = dec(@registers.h) }
             when :l      then -> { @registers.l = dec(@registers.l) }
+            when :bc     then -> { @registers.bc = dec16(@registers.bc) }
+            when :de     then -> { @registers.de = dec16(@registers.de) }
+            when :hl     then -> { @registers.hl = dec16(@registers.hl) }
+            when :sp     then -> { @registers.sp = dec16(@registers.sp) }
             when :mem_hl
               lambda {
                 value_at_mem_hl = @cpu.bus_read(address: @registers.hl)
@@ -34,6 +38,8 @@ module Akane
             end
           end
 
+          # M-cycle 1: Decrements a 8-bit value, sets the flags.
+          #
           def dec(value)
             result = value - 1
 
@@ -42,6 +48,14 @@ module Akane
             @registers.h_flag = value.nobits?(0x0F)
 
             result
+          end
+
+          # M-cycle 1: Decrements a 16-bit register value.
+          # M-cycle 2: Internal processing due to the 16-bit subtraction.
+          # ---------  Flags are untouched in the dec16.
+          #
+          def dec16(reg16)
+            @cpu.sub16(reg16, 1)
           end
         end
       end
