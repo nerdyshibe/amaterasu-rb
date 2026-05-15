@@ -39,7 +39,7 @@ module Akane
 
           # Opcodes 0x20 - 0x2F
           instructions[0x20] = Jr.new(cpu: self, condition: :nz)
-          instructions[0x21] = Load16.new(cpu: self, target: :hl, source: :imm16)
+          instructions[0x21] = Ld16.new(cpu: self, target: :hl, source: :imm16)
           instructions[0x22] = Load8.new(cpu: self, target: :mem_hli, source: :a)
           instructions[0x23] = Inc.new(cpu: self, operand: :hl)
           instructions[0x24] = Inc.new(cpu: self, operand: :h)
