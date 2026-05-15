@@ -203,36 +203,71 @@ module Akane
           instructions[0xBF] = Cp.new(cpu: self, source: :a)
 
           # Opcodes 0xC0 - 0xCF
+          instructions[0xC0] = Ret.new(cpu: self, condition: :nz)
+          instructions[0xC1] = Pop.new(cpu: self, reg16: :bc)
+
           instructions[0xC3] = Jump.new(cpu: self, location: :imm16)
-
+          instructions[0xC4] = Call.new(cpu: self, condition: :nz)
+          instructions[0xC5] = Push.new(cpu: self, reg16: :bc)
           instructions[0xC6] = Add8.new(cpu: self, source: :imm8)
+          instructions[0xC7] = Rst.new(cpu: self, vector: 0x00)
+          instructions[0xC8] = Ret.new(cpu: self, condition: :z)
+          instructions[0xC9] = Ret.new(cpu: self)
 
+          instructions[0xCC] = Call.new(cpu: self, condition: :z)
+          instructions[0xCD] = Call.new(cpu: self)
           instructions[0xCE] = Adc.new(cpu: self, source: :imm8)
+          instructions[0xCF] = Rst.new(cpu: self, vector: 0x08)
 
           # Opcodes 0xD0 - 0xDF
+          instructions[0xD0] = Ret.new(cpu: self, condition: :nc)
+          instructions[0xD1] = Pop.new(cpu: self, reg16: :de)
+
+          instructions[0xD3] = nil # not implemented in the Game Boy
+          instructions[0xD4] = Call.new(cpu: self, condition: :nc)
+          instructions[0xD5] = Push.new(cpu: self, reg16: :de)
           instructions[0xD6] = Sub.new(cpu: self, source: :imm8)
+          instructions[0xD7] = Rst.new(cpu: self, vector: 0x10)
+          instructions[0xD8] = Ret.new(cpu: self, condition: :c)
+          instructions[0xD9] = Ret.new(cpu: self, enable_ime: true)
+
+          instructions[0xDB] = nil # not implemented in the Game Boy
+          instructions[0xDC] = Call.new(cpu: self, condition: :c)
+          instructions[0xDD] = nil # not implemented in the Game Boy
+
+          instructions[0xDF] = Rst.new(cpu: self, vector: 0x18)
 
           # Opcodes 0xE0 - 0xEF
           instructions[0xE0] = Ldh.new(cpu: self, target: :mem_unsig8, source: :a)
-
+          instructions[0xE1] = Pop.new(cpu: self, reg16: :hl)
           instructions[0xE2] = Ldh.new(cpu: self, target: :mem_c, source: :a)
-
+          instructions[0xE3] = nil # not implemented in the Game Boy
+          instructions[0xE4] = nil # not implemented in the Game Boy
+          instructions[0xE5] = Push.new(cpu: self, reg16: :hl)
           instructions[0xE6] = And.new(cpu: self, source: :imm8)
+          instructions[0xE7] = Rst.new(cpu: self, vector: 0x20)
 
+          instructions[0xEB] = nil # not implemented in the Game Boy
+          instructions[0xEC] = nil # not implemented in the Game Boy
+          instructions[0xED] = nil # not implemented in the Game Boy
           instructions[0xEE] = Xor.new(cpu: self, source: :imm8)
+          instructions[0xEF] = Rst.new(cpu: self, vector: 0x28)
 
           # Opcodes 0xF0 - 0xFF
           instructions[0xF0] = Ldh.new(cpu: self, target: :a, source: :mem_unsig8)
-
+          instructions[0xF1] = Pop.new(cpu: self, reg16: :af)
           instructions[0xF2] = Ldh.new(cpu: self, target: :a, source: :mem_c)
-
           instructions[0xF3] = Di.new(cpu: self)
-
+          instructions[0xF4] = nil # not implemented in the Game Boy
+          instructions[0xF5] = Push.new(cpu: self, reg16: :af)
           instructions[0xF6] = Or.new(cpu: self, source: :imm8)
+          instructions[0xF7] = Rst.new(cpu: self, vector: 0x30)
 
           instructions[0xFB] = Ei.new(cpu: self)
-
+          instructions[0xFC] = nil # not implemented in the Game Boy
+          instructions[0xFD] = nil # not implemented in the Game Boy
           instructions[0xFE] = Cp.new(cpu: self, source: :imm8)
+          instructions[0xFF] = Rst.new(cpu: self, vector: 0x38)
 
           instructions.freeze
         end

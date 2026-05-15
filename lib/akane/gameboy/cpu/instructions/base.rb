@@ -26,6 +26,8 @@ module Akane
             return '[HL]'  if operand == :mem_hl
             return '[HL+]' if operand == :mem_hli
             return '[HL-]' if operand == :mem_hld
+            return '[C]'   if operand == :mem_c
+            return '[a8]'  if operand == :mem_unsig8
 
             operand.upcase
           end
