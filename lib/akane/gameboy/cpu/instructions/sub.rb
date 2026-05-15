@@ -16,8 +16,6 @@ module Akane
             super(cpu:)
 
             @mnemonic = "SUB A, #{format_operand(source)}"
-            @bytes    = 1 + fetch_cost(source)
-            @m_cycles = 1 + memory_cost(source)
             @logic    = define_logic(source)
           end
 
@@ -34,7 +32,7 @@ module Akane
             when :e      then -> { sub_a(@registers.e) }
             when :h      then -> { sub_a(@registers.h) }
             when :l      then -> { sub_a(@registers.l) }
-            when :mem_hl then -> { sub_a(@cpu.bus_read(@registers.hl)) }
+            when :mem_hl then -> { sub_a(@cpu.bus_read(address: @registers.hl)) }
             when :imm8   then -> { sub_a(@cpu.fetch_next_byte) }
             end
           end
@@ -49,7 +47,7 @@ module Akane
             acc = @registers.a
             result = @registers.a - value
 
-            @registers.z_flag = result.zero?
+            @registers.z_flag = result.nobits?(0xFF)
             @registers.n_flag = true
             @registers.h_flag = (acc & 0x0F) < (value & 0x0F)
             @registers.c_flag = acc < value

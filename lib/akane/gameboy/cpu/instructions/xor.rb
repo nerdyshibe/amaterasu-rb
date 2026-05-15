@@ -16,14 +16,7 @@ module Akane
             super(cpu:)
 
             @mnemonic = define_mnemonic(source)
-            @bytes    = define_bytes(source)
-            @m_cycles = define_m_cycles(source)
             @logic    = define_logic(source)
-          end
-
-          # Interface for the CPU to execute the logic.
-          def execute
-            @logic.call
           end
 
           private
@@ -36,14 +29,6 @@ module Akane
             end
           end
 
-          def define_bytes(source)
-            source == :imm8 ? 2 : 1
-          end
-
-          def define_m_cycles(source)
-            %i[imm8 mem_hl].include?(source) ? 2 : 1
-          end
-
           def define_logic(source)
             case source
             when :a      then -> { xor_a(@registers.a) }
@@ -53,7 +38,7 @@ module Akane
             when :e      then -> { xor_a(@registers.e) }
             when :h      then -> { xor_a(@registers.h) }
             when :l      then -> { xor_a(@registers.l) }
-            when :mem_hl then -> { xor_a(@cpu.bus_read(@registers.hl)) }
+            when :mem_hl then -> { xor_a(@cpu.bus_read(address: @registers.hl)) }
             when :imm8   then -> { xor_a(@cpu.fetch_next_byte) }
             end
           end
@@ -62,7 +47,7 @@ module Akane
             result = @registers.a ^ value
 
             @registers.clear_flags
-            @registers.z_flag = 1 if result.zero?
+            @registers.z_flag = result.nobits?(0xFF)
 
             @registers.a = result
           end

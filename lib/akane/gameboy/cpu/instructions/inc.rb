@@ -41,7 +41,7 @@ module Akane
           def inc(value)
             result = value + 1
 
-            @registers.z_flag = result.zero?
+            @registers.z_flag = result.nobits?(0xFF)
             @registers.n_flag = false
             @registers.h_flag = value.allbits?(0x0F)
 

@@ -16,8 +16,6 @@ module Akane
             super(cpu:)
 
             @mnemonic = "AND A, #{source}"
-            @bytes    = 1 + fetch_cost(source)
-            @m_cycles = 1 + memory_cost(source)
             @logic    = define_logic(source)
           end
 
@@ -34,7 +32,7 @@ module Akane
             when :e      then -> { and_a(@registers.e) }
             when :h      then -> { and_a(@registers.h) }
             when :l      then -> { and_a(@registers.l) }
-            when :mem_hl then -> { and_a(@cpu.bus_read(@registers.hl)) }
+            when :mem_hl then -> { and_a(@cpu.bus_read(address: @registers.hl)) }
             when :imm8   then -> { and_a(@cpu.fetch_next_byte) }
             end
           end
@@ -48,7 +46,7 @@ module Akane
           def and_a(value)
             result = @registers.a & value
 
-            @registers.z_flag = result.zero?
+            @registers.z_flag = result.nobits?(0xFF)
             @registers.n_flag = false
             @registers.h_flag = true
             @registers.c_flag = false

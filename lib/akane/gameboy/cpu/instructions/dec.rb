@@ -10,8 +10,6 @@ module Akane
             super(cpu:)
 
             @mnemonic = "DEC #{format_operand(operand)}"
-            @bytes    = 1 + fetch_cost(operand)
-            @m_cycles = 1 + memory_cost(operand)
             @logic    = define_logic(operand)
           end
 
@@ -43,7 +41,7 @@ module Akane
           def dec(value)
             result = value - 1
 
-            @registers.z_flag = result.zero?
+            @registers.z_flag = result.nobits?(0xFF)
             @registers.n_flag = true
             @registers.h_flag = value.nobits?(0x0F)
 

@@ -16,8 +16,6 @@ module Akane
             super(cpu:)
 
             @mnemonic = "SBC A, #{source}"
-            @bytes    = 1 + fetch_cost(source)
-            @m_cycles = 1 + memory_cost(source)
             @logic    = define_logic(source)
           end
 
@@ -34,7 +32,7 @@ module Akane
             when :e      then -> { sbc_a(@registers.e) }
             when :h      then -> { sbc_a(@registers.h) }
             when :l      then -> { sbc_a(@registers.l) }
-            when :mem_hl then -> { sbc_a(@cpu.bus_read(@registers.hl)) }
+            when :mem_hl then -> { sbc_a(@cpu.bus_read(address: @registers.hl)) }
             when :imm8   then -> { sbc_a(@cpu.fetch_next_byte) }
             end
           end
@@ -50,7 +48,7 @@ module Akane
             carry_in = @registers.c_flag
             result = @registers.a - (value + carry_in)
 
-            @registers.z_flag = result.zero?
+            @registers.z_flag = result.nobits?(0xFF)
             @registers.n_flag = true
             @registers.h_flag = (acc & 0x0F) < (value & 0x0F) + carry_in
             @registers.c_flag = acc < value + carry_in
