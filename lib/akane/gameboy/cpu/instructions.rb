@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/MethodLength
+# rubocop:disable Metrics/MethodLength, Metrics/ModuleLength
 module Akane
   module Gameboy
     class Cpu
@@ -14,18 +14,22 @@ module Akane
           # Opcodes 0x00 - 0x0F
           instructions[0x00] = Nop.new(cpu: self)
 
+          instructions[0x04] = Inc.new(cpu: self, operand: :b)
           instructions[0x05] = Dec.new(cpu: self, operand: :b)
           instructions[0x06] = Load8.new(cpu: self, target: :b, source: :imm8)
 
+          instructions[0x0C] = Inc.new(cpu: self, operand: :c)
           instructions[0x0D] = Dec.new(cpu: self, operand: :c)
           instructions[0x0E] = Load8.new(cpu: self, target: :c, source: :imm8)
 
           # Opcodes 0x10 - 0x1F
+          instructions[0x14] = Inc.new(cpu: self, operand: :d)
           instructions[0x15] = Dec.new(cpu: self, operand: :d)
           instructions[0x16] = Load8.new(cpu: self, target: :d, source: :imm8)
 
           instructions[0x18] = Jr.new(cpu: self)
 
+          instructions[0x1C] = Inc.new(cpu: self, operand: :e)
           instructions[0x1D] = Dec.new(cpu: self, operand: :e)
           instructions[0x1E] = Load8.new(cpu: self, target: :e, source: :imm8)
 
@@ -34,6 +38,7 @@ module Akane
           instructions[0x21] = Load16.new(cpu: self, target: :hl, source: :imm16)
           instructions[0x22] = Load8.new(cpu: self, target: :mem_hli, source: :a)
 
+          instructions[0x24] = Inc.new(cpu: self, operand: :h)
           instructions[0x25] = Dec.new(cpu: self, operand: :h)
           instructions[0x26] = Load8.new(cpu: self, target: :h, source: :imm8)
 
@@ -41,6 +46,7 @@ module Akane
 
           instructions[0x2A] = Load8.new(cpu: self, target: :a, source: :mem_hli)
 
+          instructions[0x2C] = Inc.new(cpu: self, operand: :l)
           instructions[0x2D] = Dec.new(cpu: self, operand: :l)
           instructions[0x2E] = Load8.new(cpu: self, target: :l, source: :imm8)
 
@@ -48,13 +54,15 @@ module Akane
           instructions[0x30] = Jr.new(cpu: self, condition: :nc)
           instructions[0x32] = Load8.new(cpu: self, target: :mem_hld, source: :a)
 
-          instructions[0x05] = Dec.new(cpu: self, operand: :mem_hl)
+          instructions[0x34] = Inc.new(cpu: self, operand: :mem_hl)
+          instructions[0x35] = Dec.new(cpu: self, operand: :mem_hl)
           instructions[0x36] = Load8.new(cpu: self, target: :mem_hl, source: :imm8)
 
           instructions[0x38] = Jr.new(cpu: self, condition: :c)
 
           instructions[0x3A] = Load8.new(cpu: self, target: :a, source: :mem_hld)
 
+          instructions[0x3C] = Inc.new(cpu: self, operand: :a)
           instructions[0x3D] = Dec.new(cpu: self, operand: :a)
           instructions[0x3E] = Load8.new(cpu: self, target: :a, source: :imm8)
 
@@ -139,11 +147,34 @@ module Akane
           instructions[0x85] = Add8.new(cpu: self, source: :l)
           instructions[0x86] = Add8.new(cpu: self, source: :mem_hl)
           instructions[0x87] = Add8.new(cpu: self, source: :a)
+          instructions[0x88] = Adc.new(cpu: self, source: :b)
+          instructions[0x89] = Adc.new(cpu: self, source: :c)
+          instructions[0x8A] = Adc.new(cpu: self, source: :d)
+          instructions[0x8B] = Adc.new(cpu: self, source: :e)
+          instructions[0x8C] = Adc.new(cpu: self, source: :h)
+          instructions[0x8D] = Adc.new(cpu: self, source: :l)
+          instructions[0x8E] = Adc.new(cpu: self, source: :mem_hl)
+          instructions[0x8F] = Adc.new(cpu: self, source: :a)
 
           # Opcodes 0x90 - 0x9F
+          instructions[0x90] = Sub.new(cpu: self, source: :b)
+          instructions[0x91] = Sub.new(cpu: self, source: :c)
+          instructions[0x92] = Sub.new(cpu: self, source: :d)
+          instructions[0x93] = Sub.new(cpu: self, source: :e)
+          instructions[0x94] = Sub.new(cpu: self, source: :h)
+          instructions[0x95] = Sub.new(cpu: self, source: :l)
+          instructions[0x96] = Sub.new(cpu: self, source: :mem_hl)
+          instructions[0x97] = Sub.new(cpu: self, source: :a)
 
           # Opcodes 0xA0 - 0xAF
-
+          instructions[0xA0] = And.new(cpu: self, source: :b)
+          instructions[0xA1] = And.new(cpu: self, source: :c)
+          instructions[0xA2] = And.new(cpu: self, source: :d)
+          instructions[0xA3] = And.new(cpu: self, source: :e)
+          instructions[0xA4] = And.new(cpu: self, source: :h)
+          instructions[0xA5] = And.new(cpu: self, source: :l)
+          instructions[0xA6] = And.new(cpu: self, source: :mem_hl)
+          instructions[0xA7] = And.new(cpu: self, source: :a)
           instructions[0xA8] = Xor.new(cpu: self, source: :b)
           instructions[0xA9] = Xor.new(cpu: self, source: :c)
           instructions[0xAA] = Xor.new(cpu: self, source: :d)
@@ -162,18 +193,31 @@ module Akane
           instructions[0xB5] = Or.new(cpu: self, source: :l)
           instructions[0xB6] = Or.new(cpu: self, source: :mem_hl)
           instructions[0xB7] = Or.new(cpu: self, source: :a)
+          instructions[0xB8] = Cp.new(cpu: self, source: :b)
+          instructions[0xB9] = Cp.new(cpu: self, source: :c)
+          instructions[0xBA] = Cp.new(cpu: self, source: :d)
+          instructions[0xBB] = Cp.new(cpu: self, source: :e)
+          instructions[0xBC] = Cp.new(cpu: self, source: :h)
+          instructions[0xBD] = Cp.new(cpu: self, source: :l)
+          instructions[0xBE] = Cp.new(cpu: self, source: :mem_hl)
+          instructions[0xBF] = Cp.new(cpu: self, source: :a)
 
           # Opcodes 0xC0 - 0xCF
           instructions[0xC3] = Jump.new(cpu: self, location: :imm16)
 
           instructions[0xC6] = Add8.new(cpu: self, source: :imm8)
 
+          instructions[0xCE] = Adc.new(cpu: self, source: :imm8)
+
           # Opcodes 0xD0 - 0xDF
+          instructions[0xD6] = Sub.new(cpu: self, source: :imm8)
 
           # Opcodes 0xE0 - 0xEF
           instructions[0xE0] = Ldh.new(cpu: self, target: :mem_unsig8, source: :a)
 
           instructions[0xE2] = Ldh.new(cpu: self, target: :mem_c, source: :a)
+
+          instructions[0xE6] = And.new(cpu: self, source: :imm8)
 
           instructions[0xEE] = Xor.new(cpu: self, source: :imm8)
 
@@ -188,6 +232,8 @@ module Akane
 
           instructions[0xFB] = Ei.new(cpu: self)
 
+          instructions[0xFE] = Cp.new(cpu: self, source: :imm8)
+
           instructions.freeze
         end
 
@@ -199,4 +245,4 @@ module Akane
     end
   end
 end
-# rubocop:enable Metrics/MethodLength
+# rubocop:enable Metrics/MethodLength, Metrics/ModuleLength
