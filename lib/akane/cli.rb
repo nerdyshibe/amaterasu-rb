@@ -19,16 +19,13 @@ module Akane
           options[:audio] = audio
         end
 
-        parser.on('-r', '--rom=ROM_PATH', 'path/to/the/rom.gb file') do |rom|
-          options[:rom] = rom
-        end
-
         parser.on('-v', '--video=VIDEO', 'Define the video backend') do |video|
           options[:video] = video
         end
       end
 
       opt_parser.parse!(arguments)
+      options[:rom_path] = arguments.first
       options
     end
   end

@@ -5,7 +5,7 @@ module Akane
   class Emulator
     def self.start(options)
       verbose = options[:verbose]
-      cartridge = Cartridge.load_rom(options[:rom])
+      cartridge = Cartridge.load_rom(options[:rom_path])
       wram = Gameboy::Ram.new(8192)
       hram = Gameboy::Ram.new(127)
       @apu = Gameboy::Apu.new

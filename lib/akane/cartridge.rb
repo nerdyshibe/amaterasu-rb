@@ -7,7 +7,7 @@ module Akane
     def self.load_rom(file_path)
       rom = Rom.from_file(file_path)
 
-      raise "#{rom.cartridge_type} not implemented yet" unless rom.cartridge_type == :rom_only
+      # raise "#{rom.cartridge_type} not implemented yet" unless rom.cartridge_type == :rom_only
 
       new(rom: rom)
     end
