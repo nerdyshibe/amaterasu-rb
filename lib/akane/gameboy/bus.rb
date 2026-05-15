@@ -94,6 +94,11 @@ module Akane
         when 0xFF06 then @timer.tma
         when 0xFF07 then @timer.tac
         when 0xFF0F then @interrupts.if_register
+        when 0xFF40 then @ppu.lcdc
+        when 0xFF41 then @ppu.stat
+        when 0xFF42 then @ppu.scy
+        when 0xFF43 then @ppu.scx
+        when 0xFF44 then @ppu.ly
         else
           0xFF
         end
@@ -110,6 +115,7 @@ module Akane
         when 0xFF06 then @timer.tma = value
         when 0xFF07 then @timer.tac = value
         when 0xFF0F then @interrupts.if_register = value
+        when 0xFF44 then @ppu.ly = value
         end
       end
     end

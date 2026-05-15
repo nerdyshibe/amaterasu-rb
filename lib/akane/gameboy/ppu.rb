@@ -4,11 +4,23 @@ module Akane
   module Gameboy
     # Models the PPU behavior from the Game Boy.
     class Ppu
+      attr_reader :lcdc, :stat, :scy, :scx, :ly
+
       def initialize(interrupts)
         @interrupts = interrupts
 
-        @vram = Ram.new(8_192)
-        @oam = Ram.new(160)
+        @vram = Ram.new(8192)
+        @oam  = Ram.new(160)
+
+        @lcdc = 0x00
+        @stat = 0x00
+        @scy  = 0x00
+        @scx  = 0x00
+        @ly   = 0x00
+        @lyc  = 0x00
+
+        @wy = 0x00
+        @wx = 0x00
       end
 
       # Returns a 8-bit value stored in VRAM in a given offset.
@@ -32,7 +44,7 @@ module Akane
       end
 
       def tick
-        # tick logic
+        @ly = (@ly + 1) & 0x99
       end
     end
   end
