@@ -4,7 +4,8 @@ module Akane
   module Gameboy
     # Models the PPU behavior from the Game Boy.
     class Ppu
-      attr_reader :lcdc, :stat, :scy, :scx, :ly
+      attr_reader :lcdc, :stat, :scy, :scx
+      attr_accessor :ly
 
       def initialize(interrupts)
         @interrupts = interrupts
@@ -44,7 +45,7 @@ module Akane
       end
 
       def tick
-        @ly = (@ly + 1) & 0x99
+        # l
       end
     end
   end

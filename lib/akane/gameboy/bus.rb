@@ -98,7 +98,8 @@ module Akane
         when 0xFF41 then @ppu.stat
         when 0xFF42 then @ppu.scy
         when 0xFF43 then @ppu.scx
-        when 0xFF44 then @ppu.ly
+        when 0xFF44
+          @ppu.ly += 1
         else
           0xFF
         end
