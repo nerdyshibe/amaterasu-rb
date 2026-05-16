@@ -47,7 +47,7 @@ module Akane
             old_bit7 = @registers.a.bit(7)
 
             @registers.clear_flags
-            @registers.c_flag = old_bit7
+            @registers.c_flag = old_bit7 == 1
 
             @registers.a = (@registers.a << 1) | old_bit7
           end
@@ -67,7 +67,7 @@ module Akane
             old_bit0 = @registers.a.bit(0)
 
             @registers.clear_flags
-            @registers.c_flag = old_bit0
+            @registers.c_flag = old_bit0 == 1
 
             @registers.a = (@registers.a >> 1) | (old_bit0 << 7)
           end
@@ -87,7 +87,7 @@ module Akane
             old_bit7 = @registers.a.bit(7)
 
             @registers.clear_flags
-            @registers.c_flag = old_bit7
+            @registers.c_flag = old_bit7 == 1
 
             @registers.a = (@registers.a << 1) | carry_in
           end
@@ -107,7 +107,7 @@ module Akane
             old_bit0 = @registers.a.bit(0)
 
             @registers.clear_flags
-            @registers.c_flag = old_bit0
+            @registers.c_flag = old_bit0 == 1
 
             @registers.a = (@registers.a >> 1) | (carry_in << 7)
           end

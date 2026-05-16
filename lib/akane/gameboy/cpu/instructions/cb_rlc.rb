@@ -42,7 +42,7 @@ module Akane
 
             @registers.clear_flags
             @registers.z_flag = result.nobits?(0xFF)
-            @registers.c_flag = old_bit7
+            @registers.c_flag = old_bit7 == 1
 
             result
           end
@@ -55,7 +55,7 @@ module Akane
 
             @registers.clear_flags
             @registers.z_flag = result.nobits?(0xFF)
-            @registers.c_flag = old_bit7
+            @registers.c_flag = old_bit7 == 1
 
             @cpu.bus_write(address: @registers.hl, value: result)
           end
