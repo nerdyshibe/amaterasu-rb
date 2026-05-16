@@ -22,10 +22,10 @@ module Akane
             return -> { ret }  if condition.nil?
 
             case condition
-            when :nz then -> { ret(condition: @registers.z_flag.zero?) }
-            when :z  then -> { ret(condition: @registers.z_flag == 1) }
-            when :nc then -> { ret(condition: @registers.c_flag.zero?) }
-            when :c  then -> { ret(condition: @registers.c_flag == 1) }
+            when :nz then -> { ret_cc(condition: @registers.z_flag.zero?) }
+            when :z  then -> { ret_cc(condition: @registers.z_flag == 1) }
+            when :nc then -> { ret_cc(condition: @registers.c_flag.zero?) }
+            when :c  then -> { ret_cc(condition: @registers.c_flag == 1) }
             end
           end
 
@@ -36,10 +36,19 @@ module Akane
           # M-cycle 3: Pops the lsb from the Stack.
           # M-cycle 4: Pops the msb from the Stack.
           # M-cycle 5: Jumps to the return address.
-          def ret(condition: true)
+          def ret_cc(condition: true)
             @cpu.internal_processing
             return unless condition
 
+            return_address = @cpu.stack_pop
+            @cpu.jump_to(address: return_address)
+          end
+
+          # M-cycle 1: Fetches opcode.
+          # M-cycle 3: Pops the lsb from the Stack.
+          # M-cycle 4: Pops the msb from the Stack.
+          # M-cycle 5: Jumps to the return address.
+          def ret
             return_address = @cpu.stack_pop
             @cpu.jump_to(address: return_address)
           end

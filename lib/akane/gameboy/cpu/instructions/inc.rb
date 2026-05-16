@@ -29,10 +29,10 @@ module Akane
             when :hl     then -> { @registers.hl = inc16(@registers.hl) }
             when :sp     then -> { @registers.sp = inc16(@registers.sp) }
             when :mem_hl
-              lambda {
+              lambda do
                 value_at_mem_hl = @cpu.bus_read(address: @registers.hl)
                 @cpu.bus_write(address: @registers.hl, value: inc(value_at_mem_hl))
-              }
+              end
             end
           end
 

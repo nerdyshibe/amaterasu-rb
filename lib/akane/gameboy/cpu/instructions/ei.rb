@@ -10,8 +10,6 @@ module Akane
             super
 
             @mnemonic = 'EI'
-            @bytes    = 1
-            @m_cycles = 1
             @logic    = -> { @cpu.enable_interrupts }
           end
         end

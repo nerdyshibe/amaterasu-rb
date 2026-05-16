@@ -37,13 +37,20 @@ module Akane
                 bcd_correction |= 0x60
                 new_carry = true
               end
+
+              bcd_adjusted = acc + bcd_correction
             else
               bcd_correction |= 0x06 if @registers.h_flag == 1
               bcd_correction |= 0x60 if @registers.c_flag == 1
+
+              bcd_adjusted = acc - bcd_correction
             end
 
+            @registers.z_flag = bcd_adjusted.nobits?(0xFF)
+            @registers.h_flag = false
             @registers.c_flag = new_carry
-            @registers.a = acc + bcd_correction
+
+            @registers.a = bcd_adjusted
           end
         end
       end

@@ -10,8 +10,6 @@ module Akane
             super(cpu:)
 
             @mnemonic = "JR #{format_operand(condition)}, e8"
-            @bytes    = 2
-            @m_cycles = 2
             @logic    = define_logic(condition)
           end
 
@@ -34,12 +32,10 @@ module Akane
           # - If it's a conditional jump, check the condition and return early if it's false.
           # - If the condition is true or there is no condition, jump.
           def jr(cc)
-            @m_cycles = 2
             unsigned_byte = @cpu.fetch_next_byte
             offset = @cpu.sign_value(unsigned_byte)
             return unless cc
 
-            @m_cycles = 3
             @cpu.jump_to(address: @registers.pc + offset)
           end
         end
