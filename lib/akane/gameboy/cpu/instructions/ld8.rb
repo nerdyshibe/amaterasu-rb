@@ -29,13 +29,11 @@ module Akane
             when :h       then load_h(source)
             when :l       then load_l(source)
             when :mem_hl  then load_mem_hl(source)
-            when :mem_hli then load_mem_hli
-            when :mem_hld then load_mem_hld
+            when :mem_hli then -> { load_mem_hli }
+            when :mem_hld then -> { load_mem_hld }
             when :mem_bc  then -> { @cpu.bus_write(address: @registers.bc, value: @registers.a) }
             when :mem_de  then -> { @cpu.bus_write(address: @registers.de, value: @registers.a) }
             when :mem_imm16 then -> { ld_mem_imm16_a }
-            else
-              raise 'NotImplementedError'
             end
           end
 
@@ -161,17 +159,13 @@ module Akane
           end
 
           def load_mem_hli
-            lambda do
-              @cpu.bus_write(address: @registers.hl, value: @registers.a)
-              @registers.hl += 1
-            end
+            @cpu.bus_write(address: @registers.hl, value: @registers.a)
+            @registers.hl += 1
           end
 
           def load_mem_hld
-            lambda do
-              @cpu.bus_write(address: @registers.hl, value: @registers.a)
-              @registers.hl -= 1
-            end
+            @cpu.bus_write(address: @registers.hl, value: @registers.a)
+            @registers.hl -= 1
           end
 
           def ld_mem_imm16_a

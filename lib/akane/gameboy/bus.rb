@@ -13,7 +13,17 @@ module Akane
     # | 0xFF80-0xFFFE | 127 B | High RAM (HRAM) | Fast RAM, accessible during DMA |
     # | 0xFFFF | 1 B | IE Register | Interrupt Enable |
     class Bus
-      def initialize(cartridge:, ppu:, wram:, hram:, interrupts:, apu:, timer:, serial:, joypad:)
+      def initialize( # rubocop:disable Metrics/ParameterLists
+        cartridge:,
+        ppu:,
+        wram:,
+        hram:,
+        interrupts:,
+        apu:,
+        timer:,
+        serial:,
+        joypad:
+      )
         @cartridge = cartridge
         @ppu = ppu
         @wram = wram
@@ -30,21 +40,21 @@ module Akane
       def read_byte(address:)
         if address <= 0x7FFF
           @cartridge.read_rom(address)
-        elsif address >= 0x8000 && address <= 0x9FFF
+        elsif address <= 0x9FFF
           @ppu.read_vram(address - 0x8000)
-        elsif address >= 0xA000 && address <= 0xBFFF
+        elsif address <= 0xBFFF
           @cartridge.read_ram(address - 0xA000)
-        elsif address >= 0xC000 && address <= 0xDFFF
+        elsif address <= 0xDFFF
           @wram.read_byte(address - 0xC000)
-        elsif address >= 0xE000 && address <= 0xFDFF
+        elsif address <= 0xFDFF
           @wram.read_byte(address - 0xE000)
-        elsif address >= 0xFE00 && address <= 0xFE9F
+        elsif address <= 0xFE9F
           @ppu.read_oam(address - 0xFE00)
-        elsif address >= 0xFEA0 && address <= 0xFEFF
+        elsif address <= 0xFEFF
           0xFF
-        elsif address >= 0xFF00 && address <= 0xFF7F
+        elsif address <= 0xFF7F
           read_io(address)
-        elsif address >= 0xFF80 && address <= 0xFFFE
+        elsif address <= 0xFFFE
           @hram.read_byte(address - 0xFF80)
         elsif address == 0xFFFF
           @interrupts.ie_register
@@ -58,21 +68,21 @@ module Akane
       def write_byte(address:, value:)
         if address <= 0x7FFF
           @cartridge.write_rom(address, value)
-        elsif address >= 0x8000 && address <= 0x9FFF
+        elsif address <= 0x9FFF
           @ppu.write_vram(address - 0x8000, value)
-        elsif address >= 0xA000 && address <= 0xBFFF
+        elsif address <= 0xBFFF
           @cartridge.write_ram(address - 0xA000, value)
-        elsif address >= 0xC000 && address <= 0xDFFF
+        elsif address <= 0xDFFF
           @wram.write_byte(address - 0xC000, value)
-        elsif address >= 0xE000 && address <= 0xFDFF
+        elsif address <= 0xFDFF
           @wram.write_byte(address - 0xE000, value)
-        elsif address >= 0xFE00 && address <= 0xFE9F
+        elsif address <= 0xFE9F
           @ppu.write_oam(address - 0xFE00, value)
-        elsif address >= 0xFEA0 && address <= 0xFEFF
+        elsif address <= 0xFEFF
           nil
-        elsif address >= 0xFF00 && address <= 0xFF7F
+        elsif address <= 0xFF7F
           write_io(address, value)
-        elsif address >= 0xFF80 && address <= 0xFFFE
+        elsif address <= 0xFFFE
           @hram.write_byte(address - 0xFF80, value)
         elsif address == 0xFFFF
           @interrupts.ie_register = value

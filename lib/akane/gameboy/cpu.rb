@@ -51,7 +51,7 @@ module Akane
         end
 
         if @halted
-          advance_cycle
+          @m_cycles = @advance_components.call
           return
         end
 
@@ -66,7 +66,7 @@ module Akane
       # Reads a byte from the Bus at a given address.
       def bus_read(address:)
         byte = @bus.read_byte(address:)
-        advance_cycle
+        @m_cycles = @advance_components.call
 
         byte
       end
@@ -74,7 +74,7 @@ module Akane
       # Requests a Bus write at a given address with a given value.
       def bus_write(address:, value:)
         @bus.write_byte(address:, value:)
-        advance_cycle
+        @m_cycles = @advance_components.call
       end
 
       # Fetches the next immediate byte from memory pointed to by the Program Counter.
@@ -158,7 +158,7 @@ module Akane
 
       # Emulates CPU internal processing which advance cycles without Bus access.
       def internal_processing
-        advance_cycle
+        @m_cycles = @advance_components.call
       end
 
       private
@@ -166,8 +166,8 @@ module Akane
       # Is only called if IME and any interrupt is pending.
       # Takes 5 cycles to complete.
       def handle_interrupts
-        advance_cycle
-        advance_cycle
+        @m_cycles = @advance_components.call
+        @m_cycles = @advance_components.call
         @ime = false
         stack_push(value: @registers.pc)
         address_vector = @interrupts.priority_vector
@@ -180,22 +180,14 @@ module Akane
         if @opcode == 0xCB
           @opcode = fetch_next_byte
           @instruction = @cb_instructions[@opcode]
-          raise "CB opcode not implemented yet: $CB #{format('$%02X', @opcode)}" if @instruction.nil?
         else
           @instruction = @instructions[@opcode]
-          raise "Opcode not implemented yet: #{format('$%02X', @opcode)}" if @instruction.nil?
         end
       end
 
       # Executes the logic for the current instruction.
       def execute_instruction
         @instruction.execute
-      end
-
-      # Syncs all components after each M-cycle.
-      def advance_cycle
-        @m_cycles += 1
-        @advance_components.call
       end
 
       def log(old_pc, old_cycles, instruction)

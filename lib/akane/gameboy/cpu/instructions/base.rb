@@ -6,7 +6,7 @@ module Akane
       module Instructions
         # Defines the mnemonic, bytes and logic for the NOP instruction.
         class Base
-          attr_reader :mnemonic, :bytes, :m_cycles
+          attr_reader :mnemonic
 
           def initialize(cpu:)
             @cpu = cpu
@@ -30,21 +30,6 @@ module Akane
             return '[a8]'  if operand == :mem_unsig8
 
             operand.upcase
-          end
-
-          def fetch_cost(operand)
-            return 1 if operand == :imm8
-            return 2 if operand == :imm16
-
-            0
-          end
-
-          def memory_cost(operand)
-            return 1 if operand == :imm8
-            return 2 if operand == :imm16
-            return 1 if operand == :mem_hl
-
-            0
           end
         end
       end

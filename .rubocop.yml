@@ -26,6 +26,8 @@ Metrics/CyclomaticComplexity:
 
 Metrics/MethodLength:
   Max: 15
+  Exclude:
+    - 'lib/akane/gameboy/bus.rb'
 
 Metrics/PerceivedComplexity:
   Max: 15

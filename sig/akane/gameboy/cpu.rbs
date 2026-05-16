@@ -17,7 +17,6 @@ module Akane
       def bus_read: (Integer address) -> Integer
       def bus_write: (Integer address, Integer value) -> void
       def internal_processing: () -> void
-      def advance_cycle: () -> void
     end
   end
 end

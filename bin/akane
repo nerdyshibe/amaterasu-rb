@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 
 require_relative '../lib/akane'
-require 'stackprof'
+
+
 
 options = Akane::CLI.parse(ARGV)
 

@@ -33,7 +33,7 @@ module Akane
         joypad: joypad
       )
 
-      cpu = Gameboy::Cpu.new(bus, interrupts, advance_components, options[:verbose])
+      cpu = Gameboy::Cpu.new(bus, interrupts, -> { advance_components }, options[:verbose])
 
       if options[:iterations]
         i = 0
@@ -57,13 +57,11 @@ module Akane
     end
 
     def self.advance_components
-      lambda do
-        @timer.tick
-        @ppu.tick
-        @apu.tick
+      @timer.tick
+      @ppu.tick
+      @apu.tick
 
-        @cycles += 1
-      end
+      @cycles += 1
     end
   end
 end
