@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
 
 require_relative '../lib/akane'
+require 'stackprof'
 
 options = Akane::CLI.parse(ARGV)
-Akane::Emulator.start(**options)
+
+StackProf.run(mode: :object, out: 'tmp/stackprof-object.dump') do
+  Akane::Emulator.start(**options)
+end
