@@ -30,6 +30,7 @@ module Akane
           instructions[0x0F] = Rotate.new(cpu: self, operation: :rrca)
 
           # Opcodes 0x10 - 0x1F
+          instructions[0x10] = Stop.new(cpu: self)
           instructions[0x11] = Ld16.new(cpu: self, target: :de, source: :imm16)
           instructions[0x12] = Ld8.new(cpu: self, target: :mem_de, source: :a)
           instructions[0x13] = Inc.new(cpu: self, operand: :de)
@@ -54,7 +55,7 @@ module Akane
           instructions[0x24] = Inc.new(cpu: self, operand: :h)
           instructions[0x25] = Dec.new(cpu: self, operand: :h)
           instructions[0x26] = Ld8.new(cpu: self, target: :h, source: :imm8)
-
+          instructions[0x27] = Daa.new(cpu: self)
           instructions[0x28] = Jr.new(cpu: self, condition: :z)
           instructions[0x29] = Add16.new(cpu: self, source: :hl, target: :hl)
           instructions[0x2A] = Ld8.new(cpu: self, target: :a, source: :mem_hli)
@@ -62,6 +63,7 @@ module Akane
           instructions[0x2C] = Inc.new(cpu: self, operand: :l)
           instructions[0x2D] = Dec.new(cpu: self, operand: :l)
           instructions[0x2E] = Ld8.new(cpu: self, target: :l, source: :imm8)
+          instructions[0x2F] = Misc.new(cpu: self, operation: :cpl)
 
           # Opcodes 0x30 - 0x3F
           instructions[0x30] = Jr.new(cpu: self, condition: :nc)
@@ -71,7 +73,7 @@ module Akane
           instructions[0x34] = Inc.new(cpu: self, operand: :mem_hl)
           instructions[0x35] = Dec.new(cpu: self, operand: :mem_hl)
           instructions[0x36] = Ld8.new(cpu: self, target: :mem_hl, source: :imm8)
-
+          instructions[0x37] = Misc.new(cpu: self, operation: :scf)
           instructions[0x38] = Jr.new(cpu: self, condition: :c)
           instructions[0x09] = Add16.new(cpu: self, source: :hl, target: :sp)
           instructions[0x3A] = Ld8.new(cpu: self, target: :a, source: :mem_hld)
@@ -79,6 +81,7 @@ module Akane
           instructions[0x3C] = Inc.new(cpu: self, operand: :a)
           instructions[0x3D] = Dec.new(cpu: self, operand: :a)
           instructions[0x3E] = Ld8.new(cpu: self, target: :a, source: :imm8)
+          instructions[0x3F] = Misc.new(cpu: self, operation: :ccf)
 
           # Opcodes 0x40 - 0x4F
           instructions[0x40] = Ld8.new(cpu: self, target: :b, source: :b)
@@ -236,7 +239,7 @@ module Akane
           instructions[0xC8] = Ret.new(cpu: self, condition: :z)
           instructions[0xC9] = Ret.new(cpu: self)
           instructions[0xCA] = Jp.new(cpu: self, location: :imm16, condition: :z)
-
+          # instructions[0xCB] => Handled in the cpu decode_instruction.
           instructions[0xCC] = Call.new(cpu: self, condition: :z)
           instructions[0xCD] = Call.new(cpu: self)
           instructions[0xCE] = Adc.new(cpu: self, source: :imm8)
