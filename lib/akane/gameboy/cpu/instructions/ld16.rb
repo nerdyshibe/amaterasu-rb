@@ -28,7 +28,14 @@ module Akane
                 lambda do
                   unsigned_byte = @cpu.fetch_next_byte
                   signed_value = @cpu.sign_value(unsigned_byte)
-                  @registers.hl = @cpu.add16(@registers.sp, signed_value)
+                  sp = @registers.sp
+                  result = @cpu.add16(@registers.sp, signed_value)
+
+                  @registers.clear_flags
+                  @registers.h_flag = (sp & 0x0F) + (unsigned_byte & 0x0F) > 0x0F
+                  @registers.c_flag = (sp & 0xFF) + (unsigned_byte & 0xFF) > 0xFF
+
+                  @registers.hl = result
                 end
               end
             when :sp
