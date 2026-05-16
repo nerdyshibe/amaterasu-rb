@@ -28,14 +28,18 @@ module Akane
           #
           def build_logic(bit_pos, target)
             case target
+            when :a      then -> { @registers.a = set(bit_pos, @registers.a) }
             when :b      then -> { @registers.b = set(bit_pos, @registers.b) }
             when :c      then -> { @registers.c = set(bit_pos, @registers.c) }
             when :d      then -> { @registers.d = set(bit_pos, @registers.d) }
             when :e      then -> { @registers.e = set(bit_pos, @registers.e) }
             when :h      then -> { @registers.h = set(bit_pos, @registers.h) }
             when :l      then -> { @registers.l = set(bit_pos, @registers.l) }
-            when :mem_hl then -> { @registers.b = set(bit_pos, @cpu.bus_read(address: @registers.hl)) }
-            when :a      then -> { @registers.a = set(bit_pos, @registers.a) }
+            when :mem_hl
+              lambda do
+                result = set(bit_pos, @cpu.bus_read(address: @registers.hl))
+                @cpu.bus_write(address: @registers.hl, value: result)
+              end
             end
           end
 

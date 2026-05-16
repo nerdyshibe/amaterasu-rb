@@ -39,7 +39,7 @@ module Akane
           def rr_reg8(reg8)
             carry_in = @registers.c_flag
             old_bit0 = reg8.bit(0)
-            result = (carry_in << 7) | (reg8 << 1)
+            result = (carry_in << 7) | (reg8 >> 1)
 
             @registers.clear_flags
             @registers.z_flag = result.nobits?(0xFF)
@@ -53,7 +53,7 @@ module Akane
             byte = @cpu.bus_read(address: @registers.hl)
             carry_in = @registers.c_flag
             old_bit0 = byte.bit(0)
-            result = (carry_in << 7) | (byte << 1)
+            result = (carry_in << 7) | (byte >> 1)
 
             @registers.clear_flags
             @registers.z_flag = result.nobits?(0xFF)

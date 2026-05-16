@@ -38,7 +38,7 @@ module Akane
           #
           def rrc_reg8(reg8)
             old_bit0 = reg8.bit(0)
-            result = (old_bit0 << 7) | (reg8 << 1)
+            result = (old_bit0 << 7) | (reg8 >> 1)
 
             @registers.clear_flags
             @registers.z_flag = result.nobits?(0xFF)
@@ -51,7 +51,7 @@ module Akane
           def rrc_mem_hl
             byte = @cpu.bus_read(address: @registers.hl)
             old_bit0 = byte.bit(0)
-            result = (old_bit0 << 7) | (byte << 1)
+            result = (old_bit0 << 7) | (byte >> 1)
 
             @registers.clear_flags
             @registers.z_flag = result.nobits?(0xFF)
