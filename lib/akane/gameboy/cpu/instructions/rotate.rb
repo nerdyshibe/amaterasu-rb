@@ -69,7 +69,7 @@ module Akane
             @registers.clear_flags
             @registers.c_flag = old_bit0 == 1
 
-            @registers.a = (@registers.a >> 1) | (old_bit0 << 7)
+            @registers.a = (old_bit0 << 7) | (@registers.a >> 1)
           end
 
           # Rotate Left Through Carry.
@@ -109,7 +109,7 @@ module Akane
             @registers.clear_flags
             @registers.c_flag = old_bit0 == 1
 
-            @registers.a = (@registers.a >> 1) | (carry_in << 7)
+            @registers.a = (carry_in << 7) | (@registers.a >> 1)
           end
         end
       end

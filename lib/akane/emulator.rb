@@ -4,7 +4,6 @@ module Akane
   # Handles the core emulation loop.
   class Emulator
     def self.start(options)
-      verbose = options[:verbose]
       cartridge = Cartridge.load_rom(options[:rom_path])
       wram = Gameboy::Ram.new(8192)
       hram = Gameboy::Ram.new(127)
@@ -13,7 +12,7 @@ module Akane
 
       @ppu = Gameboy::Ppu.new(interrupts)
       @timer = Gameboy::Timer.new(interrupts)
-      serial = Gameboy::Serial.new(interrupts)
+      serial = Gameboy::Serial.new(interrupts, options[:debug])
       joypad = Gameboy::Joypad.new(interrupts)
 
       bus = Gameboy::Bus.new(
@@ -28,11 +27,16 @@ module Akane
         joypad: joypad
       )
 
-      cpu = Gameboy::Cpu.new(bus, interrupts, advance_components, verbose)
+      cpu = Gameboy::Cpu.new(bus, interrupts, advance_components, options[:verbose])
 
-      Kernel.loop do
+      i = 0
+      while i < 100_000_000
         cpu.step
+        i += 1
       end
+      # Kernel.loop do
+      #   cpu.step
+      # end
     end
 
     def self.advance_components

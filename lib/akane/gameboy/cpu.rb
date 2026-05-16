@@ -36,19 +36,23 @@ module Akane
       # - Decodes which instruction based on the Opcode fetched.
       # - Executes the instruction.
       def step
-        handle_interrupts
+        if @halted
+          advance_cycles(4)
 
-        if @ime_scheduled
-          @ime = true
-          @ime_scheduled = false
+          @halted = false if @interrupts.any_pending?
+
+          if @ime_scheduled
+            @ime = true
+            @ime_scheduled = false
+          end
+        else
+          old_pc = @registers.pc
+          old_cycles = @m_cycles
+          @opcode = fetch_next_byte
+          decode_instruction
+          execute_instruction
+          log(old_pc, old_cycles, @instruction)
         end
-
-        old_pc = @registers.pc
-        old_cycles = @m_cycles
-        @opcode = fetch_next_byte
-        decode_instruction
-        execute_instruction
-        log(old_pc, old_cycles, @instruction)
       end
 
       # Reads a byte from the Bus at a given address.
