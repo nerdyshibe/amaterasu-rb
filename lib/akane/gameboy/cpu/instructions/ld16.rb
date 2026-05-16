@@ -41,7 +41,11 @@ module Akane
             when :sp
               case source
               when :imm16 then -> { @registers.sp = @cpu.fetch_next_word }
-              when :hl    then -> { @registers.sp = @registers.hl }
+              when :hl
+                lambda do
+                  @cpu.internal_processing
+                  @registers.sp = @registers.hl
+                end
               end
             end
           end
