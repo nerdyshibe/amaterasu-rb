@@ -29,14 +29,17 @@ module Akane
 
       cpu = Gameboy::Cpu.new(bus, interrupts, advance_components, options[:verbose])
 
-      i = 0
-      while i < 100_000_000
-        cpu.step
-        i += 1
+      if options[:cycles]
+        i = 0
+        while i < options[:cycles]
+          cpu.step
+          i += 1
+        end
+      else
+        Kernel.loop do
+          cpu.step
+        end
       end
-      # Kernel.loop do
-      #   cpu.step
-      # end
     end
 
     def self.advance_components

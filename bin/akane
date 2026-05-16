@@ -5,6 +5,14 @@ require 'stackprof'
 
 options = Akane::CLI.parse(ARGV)
 
-StackProf.run(mode: :object, out: 'tmp/stackprof-object.dump') do
+if options[:profile]
+  require 'stackprof'
+
+  results = StackProf.run(mode: options[:profile]) do
+    Akane::Emulator.start(**options)
+  end
+
+  StackProf::Report.new(results).print_text
+else
   Akane::Emulator.start(**options)
 end

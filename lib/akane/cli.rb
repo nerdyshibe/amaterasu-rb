@@ -6,7 +6,14 @@ module Akane
   # Handles arguments parsing when launching the emulator.
   class CLI
     def self.parse(arguments)
-      options = { verbose: false, debug: false, audio: nil, video: nil }
+      options = {
+        verbose: false,
+        debug: false,
+        profile: nil,
+        cycles: nil,
+        audio: nil,
+        video: nil
+      }
 
       opt_parser = OptionParser.new do |parser|
         parser.banner = 'Usage: akane [options] ROM_PATH'
@@ -17,6 +24,14 @@ module Akane
 
         parser.on('-l', '--logs', 'Enable verbose mode') do
           options[:verbose] = true
+        end
+
+        parser.on('-p', '--profile=MODE', 'Enable Stackprof profiling') do |mode|
+          options[:profile] = mode.to_sym
+        end
+
+        parser.on('-c', '--cycles=n', Integer, 'Enable Stackprof profiling') do |n|
+          options[:cycles] = n
         end
 
         parser.on('-a', '--audio=AUDIO', 'Define the audio backend') do |audio|
