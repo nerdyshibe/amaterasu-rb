@@ -7,45 +7,40 @@ module Akane
   class CLI
     def self.parse(arguments)
       options = {
-        verbose: false,
+        audio: nil,
+        cycles: nil,
         debug: false,
         profile: nil,
-        iterations: nil,
         steps: nil,
-        cycles: nil,
-        audio: nil,
+        trace: nil,
         video: nil
       }
 
       opt_parser = OptionParser.new do |parser|
         parser.banner = 'Usage: akane [options] ROM_PATH'
 
+        parser.on('-a', '--audio=AUDIO', 'Define the audio backend') do |audio|
+          options[:audio] = audio
+        end
+
         parser.on('-c', '--cycles=n', Integer, 'Amount of dots to tick') do |n|
           options[:cycles] = n
         end
 
-        parser.on('-s', '--steps=n', Integer, 'Amount of CPU steps to run') do |n|
-          options[:steps] = n
-        end
-
-        parser.on('-d', '--debug', 'Enable debug mode') do
+        parser.on('-d', '--debug', 'Enable debug mode for serial port output') do
           options[:debug] = true
-        end
-
-        parser.on('-l', '--logs', 'Enable verbose mode') do
-          options[:verbose] = true
         end
 
         parser.on('-p', '--profile=MODE', 'Enable Stackprof profiling') do |mode|
           options[:profile] = mode.to_sym
         end
 
-        parser.on('-i', '--iterations=n', Integer, 'How many iterations to step the Cpu') do |n|
-          options[:iterations] = n
+        parser.on('-s', '--steps=n', Integer, 'Amount of CPU steps to run') do |n|
+          options[:steps] = n
         end
 
-        parser.on('-a', '--audio=AUDIO', 'Define the audio backend') do |audio|
-          options[:audio] = audio
+        parser.on('-t', '--trace=COMPONENTS', 'Enable logging for specific components') do |values|
+          options[:trace] = values.split(',')
         end
 
         parser.on('-v', '--video=VIDEO', 'Define the video backend') do |video|

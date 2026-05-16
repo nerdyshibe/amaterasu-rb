@@ -7,6 +7,7 @@ module Akane
 
     def self.start(options)
       @cycles = 0
+      @steps = 0
       @stop_cycles = options[:cycles] if options[:cycles]
 
       @start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -34,19 +35,13 @@ module Akane
         joypad: joypad
       )
 
-      cpu = Gameboy::Cpu.new(bus, interrupts, -> { advance_components }, options[:verbose])
+      trace_cpu = options[:trace].include?('cpu')
+      cpu = Gameboy::Cpu.new(bus, interrupts, -> { advance_components }, trace_cpu)
 
-      @steps = 0
       if options[:steps]
         while @steps < options[:steps]
           cpu.step
           @steps += 1
-        end
-      elsif options[:iterations]
-        i = 0
-        while i < options[:iterations]
-          cpu.step
-          i += 1
         end
       else
         Kernel.loop do
@@ -74,7 +69,7 @@ module Akane
       frames = @cycles.to_f / 17_556
       fps = frames / @elapsed
 
-      puts "#{@cycles} cycles in #{@elapsed.round(2)}s"
+      puts "#{@steps} steps / #{@cycles} cycles in #{@elapsed.round(2)}s"
       puts "#{fps.round(2)} FPS (Target: 59.73)"
       puts "#{(fps / 59.73).round(2)}x real-time Game Boy"
       exit
