@@ -36,7 +36,12 @@ module Akane
       # - Decodes which instruction based on the Opcode fetched.
       # - Executes the instruction.
       def step
-        handle_interrupts if @ime && @interrupts.any_pending?
+        handle_interrupts
+
+        if @ime_scheduled
+          @ime = true
+          @ime_scheduled = false
+        end
 
         old_pc = @registers.pc
         old_cycles = @m_cycles
@@ -148,8 +153,7 @@ module Akane
 
       # Checks if any interrupt is enabled and requested to service.
       def handle_interrupts
-        @ime = true if @ime_scheduled
-        @ime_scheduled = false
+        #
       end
 
       # Determines which instruction should be executed for each Opcode.
