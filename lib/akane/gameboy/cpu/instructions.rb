@@ -21,7 +21,7 @@ module Akane
           instructions[0x06] = Ld8.new(cpu: self, target: :b, source: :imm8)
           instructions[0x07] = Rotate.new(cpu: self, operation: :rlca)
           instructions[0x08] = Ld16.new(cpu: self, target: :mem_imm16, source: :sp)
-
+          instructions[0x09] = Add16.new(cpu: self, source: :hl, target: :bc)
           instructions[0x0A] = Ld8.new(cpu: self, source: :a, target: :mem_bc)
           instructions[0x0B] = Inc.new(cpu: self, operand: :bc)
           instructions[0x0C] = Inc.new(cpu: self, operand: :c)
@@ -38,7 +38,7 @@ module Akane
           instructions[0x16] = Ld8.new(cpu: self, target: :d, source: :imm8)
           instructions[0x17] = Rotate.new(cpu: self, operation: :rla)
           instructions[0x18] = Jr.new(cpu: self)
-
+          instructions[0x19] = Add16.new(cpu: self, source: :hl, target: :de)
           instructions[0x1A] = Ld8.new(cpu: self, source: :a, target: :mem_de)
           instructions[0x1B] = Inc.new(cpu: self, operand: :de)
           instructions[0x1C] = Inc.new(cpu: self, operand: :e)
@@ -56,7 +56,7 @@ module Akane
           instructions[0x26] = Ld8.new(cpu: self, target: :h, source: :imm8)
 
           instructions[0x28] = Jr.new(cpu: self, condition: :z)
-
+          instructions[0x29] = Add16.new(cpu: self, source: :hl, target: :hl)
           instructions[0x2A] = Ld8.new(cpu: self, target: :a, source: :mem_hli)
           instructions[0x2B] = Inc.new(cpu: self, operand: :hl)
           instructions[0x2C] = Inc.new(cpu: self, operand: :l)
@@ -73,7 +73,7 @@ module Akane
           instructions[0x36] = Ld8.new(cpu: self, target: :mem_hl, source: :imm8)
 
           instructions[0x38] = Jr.new(cpu: self, condition: :c)
-
+          instructions[0x09] = Add16.new(cpu: self, source: :hl, target: :sp)
           instructions[0x3A] = Ld8.new(cpu: self, target: :a, source: :mem_hld)
           instructions[0x3B] = Inc.new(cpu: self, operand: :sp)
           instructions[0x3C] = Inc.new(cpu: self, operand: :a)
@@ -269,7 +269,7 @@ module Akane
           instructions[0xE5] = Push.new(cpu: self, reg16: :hl)
           instructions[0xE6] = And.new(cpu: self, source: :imm8)
           instructions[0xE7] = Rst.new(cpu: self, vector: 0x20)
-
+          instructions[0xE8] = Add16.new(cpu: self, source: :sp, target: :sig8)
           instructions[0xE9] = Jp.new(cpu: self, location: :hl)
           instructions[0xEA] = Ld8.new(cpu: self, target: :mem_imm16, source: :a)
           instructions[0xEB] = nil # not implemented in the Game Boy
@@ -303,12 +303,76 @@ module Akane
           cb_instructions = Array.new(256)
 
           # Opcodes 0x00 -> 0x0F
+          cb_instructions[0x00] = CbRlc.new(cpu: self, target: :b)
+          cb_instructions[0x01] = CbRlc.new(cpu: self, target: :c)
+          cb_instructions[0x02] = CbRlc.new(cpu: self, target: :d)
+          cb_instructions[0x03] = CbRlc.new(cpu: self, target: :e)
+          cb_instructions[0x04] = CbRlc.new(cpu: self, target: :h)
+          cb_instructions[0x05] = CbRlc.new(cpu: self, target: :l)
+          cb_instructions[0x06] = CbRlc.new(cpu: self, target: :mem_hl)
+          cb_instructions[0x07] = CbRlc.new(cpu: self, target: :a)
+          cb_instructions[0x08] = CbRrc.new(cpu: self, target: :b)
+          cb_instructions[0x09] = CbRrc.new(cpu: self, target: :c)
+          cb_instructions[0x0A] = CbRrc.new(cpu: self, target: :d)
+          cb_instructions[0x0B] = CbRrc.new(cpu: self, target: :e)
+          cb_instructions[0x0C] = CbRrc.new(cpu: self, target: :h)
+          cb_instructions[0x0D] = CbRrc.new(cpu: self, target: :l)
+          cb_instructions[0x0E] = CbRrc.new(cpu: self, target: :mem_hl)
+          cb_instructions[0x0F] = CbRrc.new(cpu: self, target: :a)
 
           # Opcodes 0x10 -> 0x1F
+          cb_instructions[0x10] = CbRl.new(cpu: self, target: :b)
+          cb_instructions[0x11] = CbRl.new(cpu: self, target: :c)
+          cb_instructions[0x12] = CbRl.new(cpu: self, target: :d)
+          cb_instructions[0x13] = CbRl.new(cpu: self, target: :e)
+          cb_instructions[0x14] = CbRl.new(cpu: self, target: :h)
+          cb_instructions[0x15] = CbRl.new(cpu: self, target: :l)
+          cb_instructions[0x16] = CbRl.new(cpu: self, target: :mem_hl)
+          cb_instructions[0x17] = CbRl.new(cpu: self, target: :a)
+          cb_instructions[0x18] = CbRr.new(cpu: self, target: :b)
+          cb_instructions[0x19] = CbRr.new(cpu: self, target: :c)
+          cb_instructions[0x1A] = CbRr.new(cpu: self, target: :d)
+          cb_instructions[0x1B] = CbRr.new(cpu: self, target: :e)
+          cb_instructions[0x1C] = CbRr.new(cpu: self, target: :h)
+          cb_instructions[0x1D] = CbRr.new(cpu: self, target: :l)
+          cb_instructions[0x1E] = CbRr.new(cpu: self, target: :mem_hl)
+          cb_instructions[0x1F] = CbRr.new(cpu: self, target: :a)
 
           # Opcodes 0x20 -> 0x2F
+          cb_instructions[0x20] = CbSla.new(cpu: self, target: :b)
+          cb_instructions[0x21] = CbSla.new(cpu: self, target: :c)
+          cb_instructions[0x22] = CbSla.new(cpu: self, target: :d)
+          cb_instructions[0x23] = CbSla.new(cpu: self, target: :e)
+          cb_instructions[0x24] = CbSla.new(cpu: self, target: :h)
+          cb_instructions[0x25] = CbSla.new(cpu: self, target: :l)
+          cb_instructions[0x26] = CbSla.new(cpu: self, target: :mem_hl)
+          cb_instructions[0x27] = CbSla.new(cpu: self, target: :a)
+          cb_instructions[0x28] = CbSra.new(cpu: self, target: :b)
+          cb_instructions[0x29] = CbSra.new(cpu: self, target: :c)
+          cb_instructions[0x2A] = CbSra.new(cpu: self, target: :d)
+          cb_instructions[0x2B] = CbSra.new(cpu: self, target: :e)
+          cb_instructions[0x2C] = CbSra.new(cpu: self, target: :h)
+          cb_instructions[0x2D] = CbSra.new(cpu: self, target: :l)
+          cb_instructions[0x2E] = CbSra.new(cpu: self, target: :mem_hl)
+          cb_instructions[0x2F] = CbSra.new(cpu: self, target: :a)
 
           # Opcodes 0x30 -> 0x3F
+          cb_instructions[0x30] = CbSwap.new(cpu: self, target: :b)
+          cb_instructions[0x31] = CbSwap.new(cpu: self, target: :c)
+          cb_instructions[0x32] = CbSwap.new(cpu: self, target: :d)
+          cb_instructions[0x33] = CbSwap.new(cpu: self, target: :e)
+          cb_instructions[0x34] = CbSwap.new(cpu: self, target: :h)
+          cb_instructions[0x35] = CbSwap.new(cpu: self, target: :l)
+          cb_instructions[0x36] = CbSwap.new(cpu: self, target: :mem_hl)
+          cb_instructions[0x37] = CbSwap.new(cpu: self, target: :a)
+          cb_instructions[0x38] = CbSrl.new(cpu: self, target: :b)
+          cb_instructions[0x39] = CbSrl.new(cpu: self, target: :c)
+          cb_instructions[0x3A] = CbSrl.new(cpu: self, target: :d)
+          cb_instructions[0x3B] = CbSrl.new(cpu: self, target: :e)
+          cb_instructions[0x3C] = CbSrl.new(cpu: self, target: :h)
+          cb_instructions[0x3D] = CbSrl.new(cpu: self, target: :l)
+          cb_instructions[0x3E] = CbSrl.new(cpu: self, target: :mem_hl)
+          cb_instructions[0x3F] = CbSrl.new(cpu: self, target: :a)
 
           # Opcodes 0x40 -> 0x4F
           cb_instructions[0x40] = CbBit.new(cpu: self, bit_pos: 0, target: :b)
