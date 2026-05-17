@@ -40,7 +40,7 @@ module Akane
 
       CONSOLE_CHARS = [' ', '░', '▒', '█'].freeze
 
-      attr_reader :lcdc, :scy, :scx, :ly, :lyc, :dma, :bgp, :obp0, :obp1, :wy, :wx
+      attr_reader :lcdc, :stat, :scy, :scx, :ly, :lyc, :dma, :bgp, :obp0, :obp1, :wy, :wx
 
       def initialize(interrupts, trace_ppu)
         @interrupts = interrupts
@@ -75,9 +75,13 @@ module Akane
         @stat = value & 0xFF
       end
 
-      # Reports current mode (2 bits).
       def stat
-        @mode
+        if @ly == @lyc
+          @stat = @stat.set_bit(2)
+        else
+          @stat = @stat.clear_bit(2)
+        end
+        @stat | @mode
       end
 
       def scy=(value)
@@ -151,13 +155,16 @@ module Akane
         elsif @dots >= DOTS_PER_SCANLINE # -> Scanline completed.
           @dots = 0
           @ly = (@ly + 1) % 154
+          @interrupts.request(:lcd) if @ly == @lyc && @stat.bit(6) == 1
+          @scanline_drawn = false
+          @framebuffer << "\n"
 
-          if @ly == 144
+          if @ly == 144 # -> Frame completed
             @mode = MODES[:v_blank]
             @interrupts.request(:v_blank)
-            puts @pixel_buffer.join
-            @pixel_buffer = []
-            @scanline_drawn = false
+            @framebuffer << "\e[H"
+            puts @framebuffer.join
+            @framebuffer = []
           end
         end
 
@@ -179,33 +186,48 @@ module Akane
       # byte1 => 1 1 1 1 1 1 1 1
       # byte2 => 1 1 1 1 1 1 1 1
       def draw_scanline
-        tile_map_base_address = bg_tile_map[:start]
-
         # Loops through 20 tiles (20 * 8 px = 160px = width of the scanline)
-        (0..19).each do |tile_pos|
-          # Tile map is a grid of 32 x 32 tiles.
-          # You need a x and y coordinate to get the tile index.
-          # Each entry in the grid is a single byte with the tile index.
-          map_tile_x = @scx / 8
-          map_tile_y = (@ly + @scy) / 8
+        # Tile map is a grid of 32 x 32 tiles.
+        # You need a x and y coordinate to get the tile index.
+        # Each entry in the grid is a single byte with the tile index.
+        tile_map_base_address = bg_tile_map[:start]
+        map_tile_x = @scx / 8
+        map_tile_y = (@ly + @scy) / 8
 
+        (0..19).each do |tile_pos|
           tile_index_address = tile_map_base_address + ((map_tile_x + tile_pos) % 32) + ((map_tile_y % 32) * 32)
           tile_index = @vram.read_byte(tile_index_address)
 
-          check_addressing_mode
           row_in_tile_data = (@ly + @scy) % 8
-          tile_data_address = @tile_data_base_pointer + (tile_index * 16) + (row_in_tile_data * 2)
 
-          byte1 = @vram.read_byte(tile_data_address)
-          byte2 = @vram.read_byte(tile_data_address + 1)
+          if addressing_mode == 1
+            tile_data_address = 0x8000 + (tile_index * 16) + (row_in_tile_data * 2)
+          else
+            signed_index = (tile_index >= 128) ? tile_index - 256 : tile_index
+            tile_data_address = 0x9000 + (signed_index * 16) + (row_in_tile_data * 2)
+          end
+
+          byte1 = @vram.read_byte(tile_data_address - VRAM_OFFSET)
+          byte2 = @vram.read_byte(tile_data_address - VRAM_OFFSET + 1)
 
           bit_pos = 7
           while bit_pos >= 0
-            pixel_encoded = (byte2.bit(bit_pos) << 1) | byte1.bit(bit_pos)
-            @pixel_buffer << CONSOLE_CHARS[pixel_encoded]
+            pixel_color_index = (byte2.bit(bit_pos) << 1) | byte1.bit(bit_pos)
+            pixel_shade = shade(pixel_color_index)
+            @framebuffer << CONSOLE_CHARS[pixel_shade]
             bit_pos -= 1
           end
         end
+      end
+
+      def shade(color_index)
+        shade0 = @bgp & 0b11
+        shade1 = (@bgp >> 2) & 0b11
+        shade2 = (@bgp >> 4) & 0b11
+        shade3 = (@bgp >> 6) & 0b11
+
+        shades = [shade0, shade1, shade2, shade3]
+        shades[color_index]
       end
 
       def lcd_on?
@@ -224,12 +246,12 @@ module Akane
         BG_TILE_MAPS[@lcdc.bit(3)]
       end
 
-      def check_addressing_mode
-        @tile_data_base_pointer = if @lcdc.bit(4) == 1
-                                    0x8000 - VRAM_OFFSET
-                                  else
-                                    0x9000 - VRAM_OFFSET
-                                  end
+      # Tile data addressing mode.
+      #
+      # - LCDC Bit 4 is 1 -> Base address = $8000 (Unsigned byte).
+      # - LCDC Bit 4 is 0 -> Base address = $9000 (Sign byte offset).
+      def addressing_mode
+        @lcdc.bit(4)
       end
 
       def trace
