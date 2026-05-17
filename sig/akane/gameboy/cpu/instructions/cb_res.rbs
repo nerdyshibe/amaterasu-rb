@@ -12,7 +12,6 @@ module Akane
           private
 
           def build_logic: (Integer bit_pos, Symbol target) -> Proc
-          def res: (Integer bit_pos, Symbol target) -> void
         end
       end
     end

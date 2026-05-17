@@ -21,33 +21,24 @@ module Akane
           # @param bit_pos [Integer] Integer between 0 and 7.
           # @param target [Symbol] Either a 8-bit register (:a, :b, :c, ...) or :mem_hl.
           #
-          # @return [Proc] Setups what the instruction should execute at runtime.
+          # @return [Proc] Logic to be executed by the Cpu.
           #
           def build_logic(bit_pos, target)
             case target
-            when :a      then -> { @registers.a = res(bit_pos, @registers.a) }
-            when :b      then -> { @registers.b = res(bit_pos, @registers.b) }
-            when :c      then -> { @registers.c = res(bit_pos, @registers.c) }
-            when :d      then -> { @registers.d = res(bit_pos, @registers.d) }
-            when :e      then -> { @registers.e = res(bit_pos, @registers.e) }
-            when :h      then -> { @registers.h = res(bit_pos, @registers.h) }
-            when :l      then -> { @registers.l = res(bit_pos, @registers.l) }
+            when :a      then -> { @registers.a = clear_bit(@registers.a, bit_pos) }
+            when :b      then -> { @registers.b = clear_bit(@registers.b, bit_pos) }
+            when :c      then -> { @registers.c = clear_bit(@registers.c, bit_pos) }
+            when :d      then -> { @registers.d = clear_bit(@registers.d, bit_pos) }
+            when :e      then -> { @registers.e = clear_bit(@registers.e, bit_pos) }
+            when :h      then -> { @registers.h = clear_bit(@registers.h, bit_pos) }
+            when :l      then -> { @registers.l = clear_bit(@registers.l, bit_pos) }
             when :mem_hl
               lambda do
-                result = res(bit_pos, @cpu.bus_read(address: @registers.hl))
+                value_at_mem_hl = @cpu.bus_read(address: @registers.hl)
+                result = clear_bit(value_at_mem_hl, bit_pos)
                 @cpu.bus_write(address: @registers.hl, value: result)
               end
             end
-          end
-
-          # Clears the bit from a given position [7..0] in a given target.
-          # All flags remain untouched.
-          #
-          # @param bit_pos [Integer] Integer between 0 and 7.
-          # @param target [Symbol] Either a 8-bit register (:a, :b, :c, ...) or :mem_hl.
-          #
-          def res(bit_pos, target)
-            target.clear_bit(bit_pos)
           end
         end
       end
