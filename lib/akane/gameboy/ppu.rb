@@ -88,7 +88,15 @@ module Akane
       end
 
       def bgp=(value)
-        @scx = value & 0xFF
+        @bgp = value & 0xFF
+      end
+
+      def wy=(value)
+        @wy = value & 0xFF
+      end
+
+      def wx=(value)
+        @wx = value & 0xFF
       end
 
       # Returns a 8-bit value stored in VRAM in a given offset.
@@ -98,7 +106,7 @@ module Akane
       # $9800-$9BFF: Tile map 0 (32×32 = 1024 tile indices)
       # $9C00-$9FFF: Tile map 1 (alternative map)
       def read_vram(offset)
-        return 0xFF unless @mode == MODES[:v_blank]
+        return 0xFF if @mode == MODES[:drawing]
 
         @vram.read_byte(offset)
       end
@@ -110,6 +118,8 @@ module Akane
 
       # Returns a 8-bit value stored in OAM in a given offset.
       def read_oam(offset)
+        return 0xFF if [MODES[:oam_search], MODES[:drawing]].include?(@mode)
+
         @oam.read_byte(offset)
       end
 
@@ -130,24 +140,22 @@ module Akane
 
         # Core state machine.
         if @dots < DOTS_PER_OAM_SEARCH && @ly < 144
-          # oam search mode, skip for now
           @mode = MODES[:oam_search]
         elsif @dots < 252 && @ly < 144
-          # drawing mode
           @mode = MODES[:drawing]
           draw_scanline
         elsif @dots < DOTS_PER_SCANLINE && @ly < 144
-          # hblank mode, skip for now -> scanline completed
           @mode = MODES[:h_blank]
-          puts @pixel_buffer.size
-          puts @pixel_buffer.join
-          @pixel_buffer = []
-          exit
         elsif @dots >= DOTS_PER_SCANLINE
           @dots = 0
           @ly = (@ly + 1) % 154
-          @mode = MODES[:v_blank] # -> frame completed
-          @interrupts.request(:v_blank)
+
+          if @ly == 144
+            @mode = MODES[:v_blank]
+            @interrupts.request(:v_blank)
+            puts @pixel_buffer.join
+            @pixel_buffer = []
+          end
         end
 
         trace
@@ -179,9 +187,11 @@ module Akane
           byte1 = @vram.read_byte(tile_data_address)
           byte2 = @vram.read_byte(tile_data_address + 1)
 
-          (0..7).each do |bit_pos|
+          bit_pos = 7
+          while bit_pos >= 0
             pixel_encoded = (byte2.bit(bit_pos) << 1) | byte1.bit(bit_pos)
             @pixel_buffer << CONSOLE_CHARS[pixel_encoded]
+            bit_pos -= 1
           end
         end
       end
