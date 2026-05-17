@@ -8,11 +8,11 @@ module Akane
     class Cpu
       attr_reader :registers, :m_cycles
 
-      def initialize(bus, interrupts, advance_components, verbose)
+      def initialize(bus, interrupts, advance_components, trace_cpu: false)
         @bus = bus
         @interrupts = interrupts
         @advance_components = advance_components
-        @verbose = verbose
+        @trace_cpu = trace_cpu
 
         @registers = Registers.new
         @ime = false
@@ -189,7 +189,7 @@ module Akane
       end
 
       def log(old_pc, old_cycles, instruction)
-        return unless @verbose
+        return unless @trace_cpu
 
         $stdout.printf(
           '%<cycles>04d | PC: $%<pc>04X | %<im>-14s (took %<ic>d) | ' \

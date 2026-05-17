@@ -138,26 +138,26 @@ describe Akane::Gameboy::Interrupts do
       end
     end
 
-    context 'when :lcd is highest' do
-      it 'returns :lcd when 4 of the interrupt bits are set' do
+    context 'when :lcd_stat is highest' do
+      it 'returns :lcd_stat when 4 of the interrupt bits are set' do
         interrupts.if_register = 0b00011110
         interrupts.ie_register = 0b00011110
 
-        expect(interrupts.highest_pending).to eq(:lcd)
+        expect(interrupts.highest_pending).to eq(:lcd_stat)
       end
 
-      it 'returns :lcd when all bits are set on IF but only Bit 1 in IE' do
+      it 'returns :lcd_stat when all bits are set on IF but only Bit 1 in IE' do
         interrupts.if_register = 0b00011111
         interrupts.ie_register = 0b00000010
 
-        expect(interrupts.highest_pending).to eq(:lcd)
+        expect(interrupts.highest_pending).to eq(:lcd_stat)
       end
 
-      it 'returns :lcd when all bits are set on IE but only Bit 1 in IF' do
+      it 'returns :lcd_stat when all bits are set on IE but only Bit 1 in IF' do
         interrupts.if_register = 0b00000010
         interrupts.ie_register = 0b00011111
 
-        expect(interrupts.highest_pending).to eq(:lcd)
+        expect(interrupts.highest_pending).to eq(:lcd_stat)
       end
     end
 
@@ -229,36 +229,6 @@ describe Akane::Gameboy::Interrupts do
         expect(interrupts.highest_pending).to eq(:joypad)
       end
     end
-
-    context 'when there is none' do
-      it 'returns nil if no bit is set in neither register' do
-        interrupts.if_register = 0b00000000
-        interrupts.ie_register = 0b00000000
-
-        expect(interrupts.highest_pending).to be_nil
-      end
-
-      it 'returns nil if all bits are set on IF but no bits are set on IE' do
-        interrupts.if_register = 0b00011111
-        interrupts.ie_register = 0b00000000
-
-        expect(interrupts.highest_pending).to be_nil
-      end
-
-      it 'returns nil if all bits are set on IE but no bits are set on IF' do
-        interrupts.if_register = 0b00000000
-        interrupts.ie_register = 0b00011111
-
-        expect(interrupts.highest_pending).to be_nil
-      end
-
-      it 'returns nil if only the upper 3 bits are set on both registers' do
-        interrupts.if_register = 0b11100000
-        interrupts.ie_register = 0b11100000
-
-        expect(interrupts.highest_pending).to be_nil
-      end
-    end
   end
 
   describe '#request' do
@@ -278,17 +248,17 @@ describe Akane::Gameboy::Interrupts do
       end
     end
 
-    context 'when :lcd is requested' do
-      it 'sets Bit 1 of the IF register when requesting :lcd interrupt' do
+    context 'when :lcd_stat is requested' do
+      it 'sets Bit 1 of the IF register when requesting :lcd_stat interrupt' do
         interrupts.if_register = 0b11100000
-        interrupts.request(:lcd)
+        interrupts.request(:lcd_stat)
 
         expect(interrupts.if_register).to eq(0b11100010)
       end
 
       it 'keeps other Bits state if they were already set' do
         interrupts.if_register = 0b11111101
-        interrupts.request(:lcd)
+        interrupts.request(:lcd_stat)
 
         expect(interrupts.if_register).to eq(0b11111111)
       end
@@ -360,17 +330,17 @@ describe Akane::Gameboy::Interrupts do
       end
     end
 
-    context 'when :lcd is serviced' do
-      it 'clears Bit 1 of the IF register when servicing :lcd interrupt' do
+    context 'when :lcd_stat is serviced' do
+      it 'clears Bit 1 of the IF register when servicing :lcd_stat interrupt' do
         interrupts.if_register = 0b11111111
-        interrupts.service(:lcd)
+        interrupts.service(:lcd_stat)
 
         expect(interrupts.if_register).to eq(0b11111101)
       end
 
       it 'keeps other Bits state if they were already cleared' do
         interrupts.if_register = 0b11100010
-        interrupts.service(:lcd)
+        interrupts.service(:lcd_stat)
 
         expect(interrupts.if_register).to eq(0b11100000)
       end

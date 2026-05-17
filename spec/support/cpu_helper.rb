@@ -27,6 +27,6 @@ module CpuHelper
       joypad: joypad
     )
 
-    Akane::Gameboy::Cpu.new(bus, interrupts, -> {}, false)
+    Akane::Gameboy::Cpu.new(bus, interrupts, -> {})
   end
 end

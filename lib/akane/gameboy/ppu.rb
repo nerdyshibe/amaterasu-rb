@@ -42,7 +42,7 @@ module Akane
 
       attr_reader :lcdc, :scy, :scx, :ly, :lyc, :dma, :bgp, :obp0, :obp1, :wy, :wx
 
-      def initialize(interrupts, trace_ppu, debug_mode)
+      def initialize(interrupts, trace_ppu: false, debug_mode: false)
         @interrupts = interrupts
         @trace_ppu = trace_ppu
         @debug_mode = debug_mode

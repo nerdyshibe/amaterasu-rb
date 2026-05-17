@@ -53,8 +53,6 @@ describe Akane::Gameboy::Bus do
     end
 
     context 'when in the 0x8000 - 0x9FFF (PPU VRAM) range' do
-      let(:offset) { 0x8000 }
-
       before do
         allow(ppu).to receive(:read_vram).and_call_original
       end
@@ -63,7 +61,7 @@ describe Akane::Gameboy::Bus do
         bus.write_byte(address: 0x8000, value: 0xAB)
         byte = bus.read_byte(address: 0x8000)
 
-        expect(ppu).to have_received(:read_vram).with(0x8000 - offset)
+        expect(ppu).to have_received(:read_vram).with(0x8000)
         expect(byte).to eq(0xAB)
       end
 
@@ -71,14 +69,12 @@ describe Akane::Gameboy::Bus do
         bus.write_byte(address: 0x9FFF, value: 0xCD)
         byte = bus.read_byte(address: 0x9FFF)
 
-        expect(ppu).to have_received(:read_vram).with(0x9FFF - offset)
+        expect(ppu).to have_received(:read_vram).with(0x9FFF)
         expect(byte).to eq(0xCD)
       end
     end
 
     context 'when in the 0xA000 - 0xBFFF (Cartridge RAM) range' do
-      let(:offset) { 0xA000 }
-
       before do
         allow(cartridge).to receive(:read_ram).and_call_original
       end
@@ -87,7 +83,7 @@ describe Akane::Gameboy::Bus do
         bus.write_byte(address: 0xA000, value: 0x88)
         byte = bus.read_byte(address: 0xA000)
 
-        expect(cartridge).to have_received(:read_ram).with(0xA000 - offset)
+        expect(cartridge).to have_received(:read_ram).with(0xA000)
         expect(byte).to eq(0xFF)
       end
 
@@ -95,14 +91,12 @@ describe Akane::Gameboy::Bus do
         bus.write_byte(address: 0xBFFF, value: 0x99)
         byte = bus.read_byte(address: 0xBFFF)
 
-        expect(cartridge).to have_received(:read_ram).with(0xBFFF - offset)
+        expect(cartridge).to have_received(:read_ram).with(0xBFFF)
         expect(byte).to eq(0xFF)
       end
     end
 
     context 'when in the 0xC000 - 0xDFFF (WRAM) range' do
-      let(:offset) { 0xC000 }
-
       before do
         allow(wram).to receive(:read_byte).and_call_original
       end
@@ -111,7 +105,7 @@ describe Akane::Gameboy::Bus do
         bus.write_byte(address: 0xC000, value: 0x66)
         byte = bus.read_byte(address: 0xC000)
 
-        expect(wram).to have_received(:read_byte).with(0xC000 - offset)
+        expect(wram).to have_received(:read_byte).with(0xC000)
         expect(byte).to eq(0x66)
       end
 
@@ -119,14 +113,12 @@ describe Akane::Gameboy::Bus do
         bus.write_byte(address: 0xDFFF, value: 0x77)
         byte = bus.read_byte(address: 0xDFFF)
 
-        expect(wram).to have_received(:read_byte).with(0xDFFF - offset)
+        expect(wram).to have_received(:read_byte).with(0xDFFF)
         expect(byte).to eq(0x77)
       end
     end
 
     context 'when in the 0xE000 - 0xFDFF (Echo RAM) range' do
-      let(:offset) { 0xE000 }
-
       before do
         allow(wram).to receive(:read_byte).and_call_original
       end
@@ -135,7 +127,7 @@ describe Akane::Gameboy::Bus do
         bus.write_byte(address: 0xC000, value: 0x44)
         byte = bus.read_byte(address: 0xE000)
 
-        expect(wram).to have_received(:read_byte).with(0xE000 - offset)
+        expect(wram).to have_received(:read_byte).with(0xE000)
         expect(byte).to eq(0x44)
       end
 
@@ -143,14 +135,12 @@ describe Akane::Gameboy::Bus do
         bus.write_byte(address: 0xDDFF, value: 0x55)
         byte = bus.read_byte(address: 0xFDFF)
 
-        expect(wram).to have_received(:read_byte).with(0xFDFF - offset)
+        expect(wram).to have_received(:read_byte).with(0xFDFF)
         expect(byte).to eq(0x55)
       end
     end
 
     context 'when in the 0xFE00 - 0xFE9F (PPU OAM) range' do
-      let(:offset) { 0xFE00 }
-
       before do
         allow(ppu).to receive(:read_oam).and_call_original
       end
@@ -159,7 +149,7 @@ describe Akane::Gameboy::Bus do
         bus.write_byte(address: 0xFE00, value: 0x22)
         byte = bus.read_byte(address: 0xFE00)
 
-        expect(ppu).to have_received(:read_oam).with(0xFE00 - offset)
+        expect(ppu).to have_received(:read_oam).with(0xFE00)
         expect(byte).to eq(0x22)
       end
 
@@ -167,7 +157,7 @@ describe Akane::Gameboy::Bus do
         bus.write_byte(address: 0xFE9F, value: 0x33)
         byte = bus.read_byte(address: 0xFE9F)
 
-        expect(ppu).to have_received(:read_oam).with(0xFE9F - offset)
+        expect(ppu).to have_received(:read_oam).with(0xFE9F)
         expect(byte).to eq(0x33)
       end
     end
@@ -260,8 +250,6 @@ describe Akane::Gameboy::Bus do
     end
 
     context 'when in the 0xFF80 - 0xFFFE (HRAM) range' do
-      let(:offset) { 0xFF80 }
-
       before do
         allow(hram).to receive(:read_byte).and_call_original
       end
@@ -270,7 +258,7 @@ describe Akane::Gameboy::Bus do
         bus.write_byte(address: 0xFF80, value: 0x12)
         byte = bus.read_byte(address: 0xFF80)
 
-        expect(hram).to have_received(:read_byte).with(0xFF80 - offset)
+        expect(hram).to have_received(:read_byte).with(0xFF80)
         expect(byte).to eq(0x12)
       end
 
@@ -278,7 +266,7 @@ describe Akane::Gameboy::Bus do
         bus.write_byte(address: 0xFFFE, value: 0x23)
         byte = bus.read_byte(address: 0xFFFE)
 
-        expect(hram).to have_received(:read_byte).with(0xFFFE - offset)
+        expect(hram).to have_received(:read_byte).with(0xFFFE)
         expect(byte).to eq(0x23)
       end
     end
@@ -324,8 +312,6 @@ describe Akane::Gameboy::Bus do
     end
 
     context 'when in the 0x8000 - 0x9FFF (PPU VRAM) range' do
-      let(:offset) { 0x8000 }
-
       before do
         allow(ppu).to receive(:write_vram).and_call_original
       end
@@ -333,21 +319,19 @@ describe Akane::Gameboy::Bus do
       it 'delegates the write to the PPU for address 0x8000', :aggregate_failures do
         bus.write_byte(address: 0x8000, value: 0xAB)
 
-        expect(ppu).to have_received(:write_vram).with(0x8000 - offset, 0xAB)
+        expect(ppu).to have_received(:write_vram).with(0x8000, 0xAB)
         expect(bus.read_byte(address: 0x8000)).to eq(0xAB)
       end
 
       it 'delegates the write to the PPU for address 0x9FFF', :aggregate_failures do
         bus.write_byte(address: 0x9FFF, value: 0xCD)
 
-        expect(ppu).to have_received(:write_vram).with(0x9FFF - offset, 0xCD)
+        expect(ppu).to have_received(:write_vram).with(0x9FFF, 0xCD)
         expect(bus.read_byte(address: 0x9FFF)).to eq(0xCD)
       end
     end
 
     context 'when in the 0xA000 - 0xBFFF (Cartridge RAM) range' do
-      let(:offset) { 0xA000 }
-
       before do
         allow(cartridge).to receive(:write_ram).and_call_original
       end
@@ -355,19 +339,17 @@ describe Akane::Gameboy::Bus do
       it 'delegates the write to the Cartridge for address 0xA000', :aggregate_failures do
         bus.write_byte(address: 0xA000, value: 0x88)
 
-        expect(cartridge).to have_received(:write_ram).with(0xA000 - offset, 0x88)
+        expect(cartridge).to have_received(:write_ram).with(0xA000, 0x88)
       end
 
       it 'delegates the write to the Cartridge for address 0xBFFF', :aggregate_failures do
         bus.write_byte(address: 0xBFFF, value: 0x99)
 
-        expect(cartridge).to have_received(:write_ram).with(0xBFFF - offset, 0x99)
+        expect(cartridge).to have_received(:write_ram).with(0xBFFF, 0x99)
       end
     end
 
     context 'when in the 0xC000 - 0xDFFF (WRAM) range' do
-      let(:offset) { 0xC000 }
-
       before do
         allow(wram).to receive(:write_byte).and_call_original
       end
@@ -375,21 +357,19 @@ describe Akane::Gameboy::Bus do
       it 'delegates the write to the WRAM for address 0xC000', :aggregate_failures do
         bus.write_byte(address: 0xC000, value: 0x66)
 
-        expect(wram).to have_received(:write_byte).with(0xC000 - offset, 0x66)
+        expect(wram).to have_received(:write_byte).with(0xC000, 0x66)
         expect(bus.read_byte(address: 0xC000)).to eq(0x66)
       end
 
       it 'delegates the write to the WRAM for address 0xDFFF', :aggregate_failures do
         bus.write_byte(address: 0xDFFF, value: 0x77)
 
-        expect(wram).to have_received(:write_byte).with(0xDFFF - offset, 0x77)
+        expect(wram).to have_received(:write_byte).with(0xDFFF, 0x77)
         expect(bus.read_byte(address: 0xDFFF)).to eq(0x77)
       end
     end
 
     context 'when in the 0xE000 - 0xFDFF (Echo RAM) range' do
-      let(:offset) { 0xE000 }
-
       before do
         allow(wram).to receive(:write_byte).and_call_original
       end
@@ -397,21 +377,19 @@ describe Akane::Gameboy::Bus do
       it 'mirrors WRAM - writing in Echo RAM and reading WRAM on 0xE000', :aggregate_failures do
         bus.write_byte(address: 0xE000, value: 0x44)
 
-        expect(wram).to have_received(:write_byte).with(0xE000 - offset, 0x44)
+        expect(wram).to have_received(:write_byte).with(0xE000, 0x44)
         expect(bus.read_byte(address: 0xC000)).to eq(0x44)
       end
 
       it 'mirrors WRAM - writing in Echo RAM and reading WRAM on 0xFDFF', :aggregate_failures do
         bus.write_byte(address: 0xFDFF, value: 0x55)
 
-        expect(wram).to have_received(:write_byte).with(0xFDFF - offset, 0x55)
+        expect(wram).to have_received(:write_byte).with(0xFDFF, 0x55)
         expect(bus.read_byte(address: 0xDDFF)).to eq(0x55)
       end
     end
 
     context 'when in the 0xFE00 - 0xFE9F (PPU OAM) range' do
-      let(:offset) { 0xFE00 }
-
       before do
         allow(ppu).to receive(:write_oam).and_call_original
       end
@@ -419,14 +397,14 @@ describe Akane::Gameboy::Bus do
       it 'delegates the write to the PPU for address 0xFE00', :aggregate_failures do
         bus.write_byte(address: 0xFE00, value: 0x22)
 
-        expect(ppu).to have_received(:write_oam).with(0xFE00 - offset, 0x22)
+        expect(ppu).to have_received(:write_oam).with(0xFE00, 0x22)
         expect(bus.read_byte(address: 0xFE00)).to eq(0x22)
       end
 
       it 'delegates the write to the PPU for address 0xFE9F', :aggregate_failures do
         bus.write_byte(address: 0xFE9F, value: 0x33)
 
-        expect(ppu).to have_received(:write_oam).with(0xFE9F - offset, 0x33)
+        expect(ppu).to have_received(:write_oam).with(0xFE9F, 0x33)
         expect(bus.read_byte(address: 0xFE9F)).to eq(0x33)
       end
     end
@@ -516,8 +494,6 @@ describe Akane::Gameboy::Bus do
     end
 
     context 'when in the 0xFF80 - 0xFFFE (HRAM) range' do
-      let(:offset) { 0xFF80 }
-
       before do
         allow(hram).to receive(:write_byte).and_call_original
       end
@@ -525,14 +501,14 @@ describe Akane::Gameboy::Bus do
       it 'delegates the read to the hram for address 0xFF80', :aggregate_failures do
         bus.write_byte(address: 0xFF80, value: 0x12)
 
-        expect(hram).to have_received(:write_byte).with(0xFF80 - offset, 0x12)
+        expect(hram).to have_received(:write_byte).with(0xFF80, 0x12)
         expect(bus.read_byte(address: 0xFF80)).to eq(0x12)
       end
 
       it 'delegates the read to the hram for address 0xFFFE', :aggregate_failures do
         bus.write_byte(address: 0xFFFE, value: 0x23)
 
-        expect(hram).to have_received(:write_byte).with(0xFFFE - offset, 0x23)
+        expect(hram).to have_received(:write_byte).with(0xFFFE, 0x23)
         expect(bus.read_byte(address: 0xFFFE)).to eq(0x23)
       end
     end

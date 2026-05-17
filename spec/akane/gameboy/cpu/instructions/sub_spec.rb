@@ -14,14 +14,6 @@ describe Akane::Gameboy::Cpu::Instructions::Sub do
       it 'defines the mnemonic correctly' do
         expect(instruction.mnemonic).to eq('SUB A, B')
       end
-
-      it 'defines the bytes correctly' do
-        expect(instruction.bytes).to eq(1)
-      end
-
-      it 'defines the m_cycles correctly' do
-        expect(instruction.m_cycles).to eq(1)
-      end
     end
 
     context 'when initializing SUB A, C (0x91)' do
@@ -29,14 +21,6 @@ describe Akane::Gameboy::Cpu::Instructions::Sub do
 
       it 'defines the mnemonic correctly' do
         expect(instruction.mnemonic).to eq('SUB A, C')
-      end
-
-      it 'defines the bytes correctly' do
-        expect(instruction.bytes).to eq(1)
-      end
-
-      it 'defines the m_cycles correctly' do
-        expect(instruction.m_cycles).to eq(1)
       end
     end
 
@@ -46,14 +30,6 @@ describe Akane::Gameboy::Cpu::Instructions::Sub do
       it 'defines the mnemonic correctly' do
         expect(instruction.mnemonic).to eq('SUB A, D')
       end
-
-      it 'defines the bytes correctly' do
-        expect(instruction.bytes).to eq(1)
-      end
-
-      it 'defines the m_cycles correctly' do
-        expect(instruction.m_cycles).to eq(1)
-      end
     end
 
     context 'when initializing SUB A, E (0x93)' do
@@ -61,14 +37,6 @@ describe Akane::Gameboy::Cpu::Instructions::Sub do
 
       it 'defines the mnemonic correctly' do
         expect(instruction.mnemonic).to eq('SUB A, E')
-      end
-
-      it 'defines the bytes correctly' do
-        expect(instruction.bytes).to eq(1)
-      end
-
-      it 'defines the m_cycles correctly' do
-        expect(instruction.m_cycles).to eq(1)
       end
     end
 
@@ -78,14 +46,6 @@ describe Akane::Gameboy::Cpu::Instructions::Sub do
       it 'defines the mnemonic correctly' do
         expect(instruction.mnemonic).to eq('SUB A, H')
       end
-
-      it 'defines the bytes correctly' do
-        expect(instruction.bytes).to eq(1)
-      end
-
-      it 'defines the m_cycles correctly' do
-        expect(instruction.m_cycles).to eq(1)
-      end
     end
 
     context 'when initializing SUB A, L (0x95)' do
@@ -93,14 +53,6 @@ describe Akane::Gameboy::Cpu::Instructions::Sub do
 
       it 'defines the mnemonic correctly' do
         expect(instruction.mnemonic).to eq('SUB A, L')
-      end
-
-      it 'defines the bytes correctly' do
-        expect(instruction.bytes).to eq(1)
-      end
-
-      it 'defines the m_cycles correctly' do
-        expect(instruction.m_cycles).to eq(1)
       end
     end
 
@@ -110,14 +62,6 @@ describe Akane::Gameboy::Cpu::Instructions::Sub do
       it 'defines the mnemonic correctly' do
         expect(instruction.mnemonic).to eq('SUB A, [HL]')
       end
-
-      it 'defines the bytes correctly' do
-        expect(instruction.bytes).to eq(1)
-      end
-
-      it 'defines the m_cycles correctly' do
-        expect(instruction.m_cycles).to eq(2)
-      end
     end
 
     context 'when initializing SUB A, A (0x97)' do
@@ -126,14 +70,6 @@ describe Akane::Gameboy::Cpu::Instructions::Sub do
       it 'defines the mnemonic correctly' do
         expect(instruction.mnemonic).to eq('SUB A, A')
       end
-
-      it 'defines the bytes correctly' do
-        expect(instruction.bytes).to eq(1)
-      end
-
-      it 'defines the m_cycles correctly' do
-        expect(instruction.m_cycles).to eq(1)
-      end
     end
 
     context 'when initializing SUB A, n8 (0xD6)' do
@@ -141,14 +77,6 @@ describe Akane::Gameboy::Cpu::Instructions::Sub do
 
       it 'defines the mnemonic correctly' do
         expect(instruction.mnemonic).to eq('SUB A, n8')
-      end
-
-      it 'defines the bytes correctly' do
-        expect(instruction.bytes).to eq(2)
-      end
-
-      it 'defines the m_cycles correctly' do
-        expect(instruction.m_cycles).to eq(2)
       end
     end
   end

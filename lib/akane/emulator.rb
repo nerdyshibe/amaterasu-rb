@@ -20,9 +20,9 @@ module Akane
       interrupts = Gameboy::Interrupts.new
 
       trace_ppu = options[:trace]&.include?('ppu')
-      @ppu = Gameboy::Ppu.new(interrupts, trace_ppu, options[:debug])
+      @ppu = Gameboy::Ppu.new(interrupts, trace_ppu, debug_mode: options[:debug])
       @timer = Gameboy::Timer.new(interrupts)
-      serial = Gameboy::Serial.new(interrupts, options[:debug])
+      serial = Gameboy::Serial.new(interrupts, debug_mode: options[:debug])
       joypad = Gameboy::Joypad.new(interrupts)
 
       bus = Gameboy::Bus.new(

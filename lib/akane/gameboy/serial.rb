@@ -16,7 +16,7 @@ module Akane
       #
       # - Needs to hold an instance of interrupts to request a :serial interrupt.
       # - Holds the state of the Transfer Data and Control registers.
-      def initialize(interrupts, debug_mode)
+      def initialize(interrupts, debug_mode: false)
         @interrupts = interrupts
         @debug_mode = debug_mode
 
