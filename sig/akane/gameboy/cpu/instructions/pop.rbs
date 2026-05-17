@@ -1,0 +1,17 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class Pop < Base
+          def initialize: (cpu: Cpu, reg16: Symbol) -> void
+
+          private
+
+          def build_logic: (Symbol reg16) -> Proc
+        end
+      end
+    end
+  end
+end

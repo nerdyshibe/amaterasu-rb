@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class Ei < Base
+          def initialize: (cpu: Cpu) -> void
+        end
+      end
+    end
+  end
+end

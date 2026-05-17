@@ -1,0 +1,21 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class Rotate < Base
+          def initialize: (cpu: Cpu, operation: Symbol) -> void
+
+          private
+
+          def build_logic: (Symbol operation) -> Proc
+          def rlca: () -> void
+          def rrca: () -> void
+          def rla: () -> void
+          def rra: () -> void
+        end
+      end
+    end
+  end
+end

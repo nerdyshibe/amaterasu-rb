@@ -1,0 +1,19 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class Dec < Base
+          def initialize: (cpu: Cpu, operand: Symbol) -> void
+
+          private
+
+          def build_logic: (Symbol operand) -> Proc
+          def dec: (Integer value) -> Integer
+          def dec16: (Integer value) -> void
+        end
+      end
+    end
+  end
+end

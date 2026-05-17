@@ -1,0 +1,20 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class Misc < Base
+          def initialize: (cpu: Cpu, operation: Symbol) -> void
+
+          private
+
+          def build_logic: (Symbol operation) -> Proc
+          def scf: () -> void
+          def ccf: () -> void
+          def cpl: () -> void
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class Jp < Base
+          def initialize: (cpu: Cpu, location: Symbol, ?condition: Symbol) -> void
+
+          private
+
+          def build_logic: (Symbol location, Symbol ?condition) -> Proc
+          def jp: (condition: bool) -> void
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,17 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class Rst < Base
+          def initialize: (cpu: Cpu, vector: Integer) -> void
+
+          private
+
+          def rst: (Integer vector) -> void
+        end
+      end
+    end
+  end
+end

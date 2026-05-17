@@ -1,0 +1,19 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class CbRr < Base
+          def initialize: (cpu: Cpu, target: Symbol) -> void
+
+          private
+
+          def build_logic: (Symbol target) -> Proc
+          def rr_reg8: (Symbol reg8) -> void
+          def rr_mem_hl: () -> void
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,19 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class CbSwap < Base
+          def initialize: (cpu: Cpu, target: Symbol) -> void
+
+          private
+
+          def build_logic: (Symbol target) -> Proc
+          def swap: (Integer reg8) -> void
+          def swap_mem_hl: () -> void
+        end
+      end
+    end
+  end
+end

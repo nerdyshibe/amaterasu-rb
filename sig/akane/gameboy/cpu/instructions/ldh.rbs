@@ -1,0 +1,23 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class Ldh < Base
+          IO_BASE_ADDRESS: Integer
+
+          def initialize: (cpu: Cpu, target: Symbol, source: Symbol) -> void
+
+          private
+
+          def build_logic: (Symbol target, Symbol source) -> Proc
+          def ldh_mem_unsig8_a: () -> void
+          def ldh_a_mem_unsig8: () -> void
+          def ldh_mem_c_a: () -> void
+          def ldh_a_mem_c: () -> void
+        end
+      end
+    end
+  end
+end

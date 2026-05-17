@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class Ld16 < Base
+          def initialize: (cpu: Cpu, target: Symbol, source: Symbol) -> void
+
+          private
+
+          def build_logic: (Symbol target, Symbol source) -> Proc
+          def ld_mem_imm16_sp: () -> void
+        end
+      end
+    end
+  end
+end

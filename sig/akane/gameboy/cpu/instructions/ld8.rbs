@@ -1,0 +1,31 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class Ld8 < Base
+          def initialize: (cpu: Cpu, target: Symbol, source: Symbol) -> void
+
+          private
+
+          def build_logic: (Symbol target, Symbol source) -> Proc
+          def load_a: (Symbol source) -> Proc
+          def load_b: (Symbol source) -> Proc
+          def load_c: (Symbol source) -> Proc
+          def load_d: (Symbol source) -> Proc
+          def load_e: (Symbol source) -> Proc
+          def load_h: (Symbol source) -> Proc
+          def load_l: (Symbol source) -> Proc
+          def load_mem_hl: (Integer value) -> Proc
+          def load_mem_hli: () -> void
+          def load_mem_hld: () -> void
+          def ld_mem_imm16_a: () -> void
+          def ld_a_mem_imm16: () -> void
+          def ld_a_mem_bc: () -> void
+          def ld_a_mem_de: () -> void
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,19 @@
+# frozen_string_literal: true
+
+module Akane
+  module Gameboy
+    class Cpu
+      module Instructions
+        class Xor < Base
+          def initialize: (cpu: Cpu, source: Symbol) -> void
+
+          private
+
+          def define_mnemonic: (Symbol source) -> String
+          def build_logic: (Symbol source) -> Proc
+          def xor_a: (Integer value) -> void
+        end
+      end
+    end
+  end
+end
