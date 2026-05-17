@@ -19,7 +19,7 @@ module Akane
       @apu = Gameboy::Apu.new
       interrupts = Gameboy::Interrupts.new
 
-      trace_ppu = options[:trace].include?('ppu')
+      trace_ppu = options[:trace]&.include?('ppu')
       @ppu = Gameboy::Ppu.new(interrupts, trace_ppu)
       @timer = Gameboy::Timer.new(interrupts)
       serial = Gameboy::Serial.new(interrupts, options[:debug])
@@ -37,7 +37,7 @@ module Akane
         joypad: joypad
       )
 
-      trace_cpu = options[:trace].include?('cpu')
+      trace_cpu = options[:trace]&.include?('cpu')
       cpu = Gameboy::Cpu.new(bus, interrupts, -> { advance_components }, trace_cpu)
 
       Kernel.loop do

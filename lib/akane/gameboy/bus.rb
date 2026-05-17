@@ -136,7 +136,7 @@ module Akane
         when 0xFF41 then @ppu.stat = value
         when 0xFF42 then @ppu.scy = value
         when 0xFF43 then @ppu.scx = value
-        when 0xFF44 then @ppu.ly = value
+        when 0xFF44 then nil # @ppu.ly = value -> read-only
         when 0xFF45 then @ppu.lyc = value
         when 0xFF46 then @ppu.dma = value
         when 0xFF47 then @ppu.bgp = value
