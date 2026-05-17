@@ -10,12 +10,12 @@ module Akane
             super(cpu:)
 
             @mnemonic = "DEC #{format_operand(operand)}"
-            @logic    = define_logic(operand)
+            @logic    = build_logic(operand)
           end
 
           private
 
-          def define_logic(operand)
+          def build_logic(operand)
             case operand
             when :a      then -> { @registers.a = dec(@registers.a) }
             when :b      then -> { @registers.b = dec(@registers.b) }

@@ -10,12 +10,12 @@ module Akane
             super(cpu:)
 
             @mnemonic = "LD #{format_operand(target)}, #{format_operand(source)}"
-            @logic    = define_logic(target, source)
+            @logic    = build_logic(target, source)
           end
 
           private
 
-          def define_logic(target, source)
+          def build_logic(target, source)
             return -> { ld_a_mem_imm16 } if source == :mem_imm16
             return -> { ld_a_mem_bc } if source == :mem_bc
             return -> { ld_a_mem_de } if source == :mem_de

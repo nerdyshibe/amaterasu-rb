@@ -16,14 +16,14 @@ module Akane
             super(cpu:)
 
             @mnemonic = "SUB A, #{format_operand(source)}"
-            @logic    = define_logic(source)
+            @logic    = build_logic(source)
           end
 
           private
 
           # Builds the logic for all SUB instructions.
           # Returns a lambda object to be called by the CPU.
-          def define_logic(source)
+          def build_logic(source)
             case source
             when :a      then -> { sub_a(@registers.a) }
             when :b      then -> { sub_a(@registers.b) }
@@ -34,6 +34,8 @@ module Akane
             when :l      then -> { sub_a(@registers.l) }
             when :mem_hl then -> { sub_a(@cpu.bus_read(address: @registers.hl)) }
             when :imm8   then -> { sub_a(@cpu.fetch_next_byte) }
+            else
+              -> { raise 'Not implemented Sub operation' }
             end
           end
 

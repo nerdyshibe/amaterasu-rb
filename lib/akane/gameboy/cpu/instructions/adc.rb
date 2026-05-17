@@ -16,14 +16,14 @@ module Akane
             super(cpu:)
 
             @mnemonic = "ADC A, #{source}"
-            @logic    = define_logic(source)
+            @logic    = build_logic(source)
           end
 
           private
 
           # Builds the logic for all ADC instructions.
           # Returns a lambda object to be called by the CPU.
-          def define_logic(source)
+          def build_logic(source)
             case source
             when :a      then -> { adc_a(@registers.a) }
             when :b      then -> { adc_a(@registers.b) }
@@ -34,6 +34,8 @@ module Akane
             when :l      then -> { adc_a(@registers.l) }
             when :mem_hl then -> { adc_a(@cpu.bus_read(address: @registers.hl)) }
             when :imm8   then -> { adc_a(@cpu.fetch_next_byte) }
+            else
+              -> { puts 'Not implemented source' }
             end
           end
 

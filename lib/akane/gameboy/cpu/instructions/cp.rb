@@ -16,14 +16,14 @@ module Akane
             super(cpu:)
 
             @mnemonic = "CP A, #{source}"
-            @logic    = define_logic(source)
+            @logic    = build_logic(source)
           end
 
           private
 
           # Builds the logic for all CP instructions.
           # Returns a lambda object to be called by the CPU.
-          def define_logic(source)
+          def build_logic(source)
             case source
             when :a      then -> { cp_a(@registers.a) }
             when :b      then -> { cp_a(@registers.b) }

@@ -10,8 +10,6 @@ module Akane
             super
 
             @mnemonic = 'NOP'
-            @bytes = 1
-            @m_cycles = 1
             @logic = -> {}
           end
         end

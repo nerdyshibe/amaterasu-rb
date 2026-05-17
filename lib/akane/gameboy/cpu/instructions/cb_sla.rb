@@ -37,9 +37,9 @@ module Akane
           #
           # C <- [7][6][5][4][3][2][1][0] <- 0
           #
-          def sla_reg8(reg8)
-            old_bit7 = reg8.bit(7)
-            result = reg8 << 1
+          def sla_reg8(reg8_value)
+            old_bit7 = reg8_value.bit(7)
+            result = reg8_value << 1
 
             @registers.clear_flags
             @registers.z_flag = result.nobits?(0xFF)

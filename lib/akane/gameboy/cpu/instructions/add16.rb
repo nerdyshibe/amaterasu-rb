@@ -16,14 +16,14 @@ module Akane
             super(cpu:)
 
             @mnemonic = "ADD #{format_operand(source)}, #{format_operand(target)}"
-            @logic    = define_logic(source, target)
+            @logic    = build_logic(source, target)
           end
 
           private
 
           # Builds the logic for each ADD 16-bit instruction.
           # @return [Proc] A lambda object to be called by the CPU.
-          def define_logic(source, target)
+          def build_logic(source, target)
             return -> { add16_sig8 } if target == :sp
 
             case source
@@ -31,6 +31,8 @@ module Akane
             when :de     then -> { add16(@registers.de) }
             when :hl     then -> { add16(@registers.hl) }
             when :sp     then -> { add16(@registers.sp) }
+            else
+              -> { raise 'Not implemented Add16' }
             end
           end
 

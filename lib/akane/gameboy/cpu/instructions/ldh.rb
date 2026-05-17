@@ -14,12 +14,12 @@ module Akane
             @mnemonic = "LDH #{format_operand(target)}, #{format_operand(source)}"
             @bytes    = 2
             @m_cycles = 2
-            @logic    = define_logic(target, source)
+            @logic    = build_logic(target, source)
           end
 
           private
 
-          def define_logic(target, source)
+          def build_logic(target, source)
             case target
             when :a
               case source

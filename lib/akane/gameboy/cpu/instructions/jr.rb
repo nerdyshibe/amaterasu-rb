@@ -10,12 +10,12 @@ module Akane
             super(cpu:)
 
             @mnemonic = "JR #{format_operand(condition)}, e8"
-            @logic    = define_logic(condition)
+            @logic    = build_logic(condition)
           end
 
           private
 
-          def define_logic(condition)
+          def build_logic(condition)
             case condition
             when :nz then -> { jr(@registers.z_flag.zero?) }
             when :z  then -> { jr(@registers.z_flag == 1) }

@@ -16,7 +16,7 @@ module Akane
             super(cpu:)
 
             @mnemonic = define_mnemonic(source)
-            @logic    = define_logic(source)
+            @logic    = build_logic(source)
           end
 
           private
@@ -29,7 +29,7 @@ module Akane
             end
           end
 
-          def define_logic(source)
+          def build_logic(source)
             case source
             when :a      then -> { xor_a(@registers.a) }
             when :b      then -> { xor_a(@registers.b) }
@@ -40,6 +40,7 @@ module Akane
             when :l      then -> { xor_a(@registers.l) }
             when :mem_hl then -> { xor_a(@cpu.bus_read(address: @registers.hl)) }
             when :imm8   then -> { xor_a(@cpu.fetch_next_byte) }
+            else -> { raise 'Not implemented XOR operation' }
             end
           end
 

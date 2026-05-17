@@ -16,14 +16,14 @@ module Akane
             super(cpu:)
 
             @mnemonic = "SBC A, #{source}"
-            @logic    = define_logic(source)
+            @logic    = build_logic(source)
           end
 
           private
 
           # Builds the logic for all SBC instructions.
           # Returns a lambda object to be called by the CPU.
-          def define_logic(source)
+          def build_logic(source)
             case source
             when :a      then -> { sbc_a(@registers.a) }
             when :b      then -> { sbc_a(@registers.b) }
