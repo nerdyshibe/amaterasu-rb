@@ -6,7 +6,7 @@ module Akane
       module Instructions
         # Holds the logic of all the BIT instructions.
         class CbBit < Base
-          using Akane::Utils::BitOperations
+          include Utils::BitOps
 
           def initialize(cpu:, bit_pos:, target:)
             super(cpu:)
@@ -36,8 +36,8 @@ module Akane
           # - Subtraction flag is always cleared.
           # - Half Carry flag is always set.
           # - Carry flag is untouched.
-          def bit_test(bit_pos, target)
-            bit_value = target.bit(bit_pos)
+          def bit_test(bit_pos, target_value)
+            bit_value = bit(target_value, bit_pos)
 
             @registers.z_flag = bit_value.zero?
             @registers.n_flag = false

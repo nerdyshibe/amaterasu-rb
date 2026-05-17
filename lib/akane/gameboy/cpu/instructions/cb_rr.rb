@@ -9,7 +9,7 @@ module Akane
         # - RR r8
         # - RR [HL]
         class CbRr < Base
-          using Akane::Utils::BitOperations
+          include Utils::BitOps
 
           def initialize(cpu:, target:)
             super(cpu:)
@@ -36,10 +36,10 @@ module Akane
           # [C] -> [7][6][5][4][3][2][1][0] -> [C]
           #        [C][7][6][5][4][3][2][1] -> [0]
           #
-          def rr_reg8(reg8)
+          def rr_reg8(reg8_value)
             carry_in = @registers.c_flag
-            old_bit0 = reg8.bit(0)
-            result = (carry_in << 7) | (reg8 >> 1)
+            old_bit0 = bit(reg8_value, 0)
+            result = (carry_in << 7) | (reg8_value >> 1)
 
             @registers.clear_flags
             @registers.z_flag = result.nobits?(0xFF)
@@ -50,10 +50,10 @@ module Akane
 
           # Takes 2 extra cycles due to the Bus read and write operations.
           def rr_mem_hl
-            byte = @cpu.bus_read(address: @registers.hl)
+            value_at_mem_hl = @cpu.bus_read(address: @registers.hl)
             carry_in = @registers.c_flag
-            old_bit0 = byte.bit(0)
-            result = (carry_in << 7) | (byte >> 1)
+            old_bit0 = bit(value_at_mem_hl, 0)
+            result = (carry_in << 7) | (value_at_mem_hl >> 1)
 
             @registers.clear_flags
             @registers.z_flag = result.nobits?(0xFF)

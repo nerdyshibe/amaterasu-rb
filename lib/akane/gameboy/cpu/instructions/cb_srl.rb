@@ -9,7 +9,7 @@ module Akane
         # - SRL r8
         # - SRL [HL]
         class CbSrl < Base
-          using Akane::Utils::BitOperations
+          include Utils::BitOps
 
           def initialize(cpu:, target:)
             super(cpu:)
@@ -38,7 +38,7 @@ module Akane
           # 0 -> [7][6][5][4][3][2][1][0] -> C
           #
           def srl_reg8(reg8)
-            old_bit0 = reg8.bit(0)
+            old_bit0 = bit(reg8, 0)
             result = reg8 >> 1
 
             @registers.clear_flags
@@ -51,7 +51,7 @@ module Akane
           # Takes 2 extra cycles due to the Bus read and write operations.
           def srl_mem_hl
             byte = @cpu.bus_read(address: @registers.hl)
-            old_bit0 = byte.bit(0)
+            old_bit0 = bit(byte, 0)
             result = byte >> 1
 
             @registers.clear_flags

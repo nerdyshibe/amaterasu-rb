@@ -11,7 +11,7 @@ module Akane
         # - RLA: Rotate Left Through Carry A.
         # - RRA: Rotate Right Through Carry A.
         class Rotate < Base
-          using Akane::Utils::BitOperations
+          include Utils::BitOps
 
           def initialize(cpu:, operation:)
             super(cpu:)
@@ -44,7 +44,7 @@ module Akane
           # M-cycle 1: Fetches the opcode and performs the rotate.
           #
           def rlca
-            old_bit7 = @registers.a.bit(7)
+            old_bit7 = bit(@registers.a, 7)
 
             @registers.clear_flags
             @registers.c_flag = old_bit7 == 1
@@ -64,7 +64,7 @@ module Akane
           # M-cycle 1: Fetches the opcode and performs the rotate.
           #
           def rrca
-            old_bit0 = @registers.a.bit(0)
+            old_bit0 = bit(@registers.a, 0)
 
             @registers.clear_flags
             @registers.c_flag = old_bit0 == 1
@@ -84,7 +84,7 @@ module Akane
           #
           def rla
             carry_in = @registers.c_flag
-            old_bit7 = @registers.a.bit(7)
+            old_bit7 = bit(@registers.a, 7)
 
             @registers.clear_flags
             @registers.c_flag = old_bit7 == 1
@@ -104,7 +104,7 @@ module Akane
           #
           def rra
             carry_in = @registers.c_flag
-            old_bit0 = @registers.a.bit(0)
+            old_bit0 = bit(@registers.a, 0)
 
             @registers.clear_flags
             @registers.c_flag = old_bit0 == 1

@@ -9,7 +9,7 @@ module Akane
         # - SET u3, r8
         # - SET u3, [HL]
         class CbSet < Base
-          using Akane::Utils::BitOperations
+          include Utils::BitOps
 
           # Creates a new CbSet object containing the mnemonic (String) and logic (Proc).
           def initialize(cpu:, bit_pos:, target:)
@@ -28,29 +28,19 @@ module Akane
           #
           def build_logic(bit_pos, target)
             case target
-            when :a      then -> { @registers.a = set(bit_pos, @registers.a) }
-            when :b      then -> { @registers.b = set(bit_pos, @registers.b) }
-            when :c      then -> { @registers.c = set(bit_pos, @registers.c) }
-            when :d      then -> { @registers.d = set(bit_pos, @registers.d) }
-            when :e      then -> { @registers.e = set(bit_pos, @registers.e) }
-            when :h      then -> { @registers.h = set(bit_pos, @registers.h) }
-            when :l      then -> { @registers.l = set(bit_pos, @registers.l) }
+            when :a      then -> { @registers.a = set_bit(@registers.a, bit_pos) }
+            when :b      then -> { @registers.b = set_bit(@registers.b, bit_pos) }
+            when :c      then -> { @registers.c = set_bit(@registers.c, bit_pos) }
+            when :d      then -> { @registers.d = set_bit(@registers.d, bit_pos) }
+            when :e      then -> { @registers.e = set_bit(@registers.e, bit_pos) }
+            when :h      then -> { @registers.h = set_bit(@registers.h, bit_pos) }
+            when :l      then -> { @registers.l = set_bit(@registers.l, bit_pos) }
             when :mem_hl
               lambda do
-                result = set(bit_pos, @cpu.bus_read(address: @registers.hl))
+                result = set_bit(@cpu.bus_read(address: @registers.hl), bit_pos)
                 @cpu.bus_write(address: @registers.hl, value: result)
               end
             end
-          end
-
-          # Sets the bit from a given position [7..0] in a given target.
-          # All flags remain untouched.
-          #
-          # @param bit_pos [Integer] Integer between 0 and 7.
-          # @param target [Symbol] Either a 8-bit register (:a, :b, :c, ...) or :mem_hl.
-          #
-          def set(bit_pos, target)
-            target.set_bit(bit_pos)
           end
         end
       end

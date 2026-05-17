@@ -1,6 +1,8 @@
 module Akane
   module Gameboy
     class Ppu
+      include Utils::BitOps
+
       MODES: Hash[Symbol, Integer]
       DOTS_PER_OAM_SCAN: Integer
       DOTS_PER_SCANLINE: Integer

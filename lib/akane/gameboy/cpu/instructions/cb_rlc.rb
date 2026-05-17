@@ -9,7 +9,7 @@ module Akane
         # - RLC r8
         # - RLC [HL]
         class CbRlc < Base
-          using Akane::Utils::BitOperations
+          include Utils::BitOps
 
           def initialize(cpu:, target:)
             super(cpu:)
@@ -36,9 +36,9 @@ module Akane
           # [C]   <- [7][6][5][4][3][2][1][0] <- [7]
           # [C=7]    [6][5][4][3][2][1][0][7]
           #
-          def rlc_reg8(reg8)
-            old_bit7 = reg8.bit(7)
-            result = (reg8 << 1) | old_bit7
+          def rlc_reg8(reg8_value)
+            old_bit7 = bit(reg8_value, 7)
+            result = (reg8_value << 1) | old_bit7
 
             @registers.clear_flags
             @registers.z_flag = result.nobits?(0xFF)
@@ -49,9 +49,9 @@ module Akane
 
           # Takes 2 extra cycles due to the Bus read and write operations.
           def rlc_mem_hl
-            byte = @cpu.bus_read(address: @registers.hl)
-            old_bit7 = byte.bit(7)
-            result = (byte << 1) | old_bit7
+            value_at_mem_hl = @cpu.bus_read(address: @registers.hl)
+            old_bit7 = bit(value_at_mem_hl, 7)
+            result = (value_at_mem_hl << 1) | old_bit7
 
             @registers.clear_flags
             @registers.z_flag = result.nobits?(0xFF)

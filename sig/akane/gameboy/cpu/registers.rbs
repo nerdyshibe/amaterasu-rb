@@ -2,6 +2,8 @@ module Akane
   module Gameboy
     class Cpu
       class Registers
+        include Utils::BitOps
+
         attr_reader a: Integer
         attr_reader f: Integer
         attr_reader b: Integer

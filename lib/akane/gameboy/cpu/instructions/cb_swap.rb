@@ -9,7 +9,7 @@ module Akane
         # - SWAP r8
         # - SWAP [HL]
         class CbSwap < Base
-          using Akane::Utils::BitOperations
+          include Utils::BitOps
 
           def initialize(cpu:, target:)
             super(cpu:)

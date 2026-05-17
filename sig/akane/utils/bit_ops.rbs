@@ -1,0 +1,11 @@
+# frozen_string_literal: true
+
+module Akane
+  module Utils
+    module BitOps
+      def self?.set_bit: (Integer value, Integer pos) -> Integer
+      def self?.clear_bit: (Integer value, Integer pos) -> Integer
+      def self?.bit: (Integer value, Integer pos) -> Integer
+    end
+  end
+end

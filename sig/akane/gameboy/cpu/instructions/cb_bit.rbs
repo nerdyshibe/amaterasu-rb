@@ -5,6 +5,8 @@ module Akane
     class Cpu
       module Instructions
         class CbBit < Base
+          include Utils::BitOps
+
           def initialize: (cpu: Cpu, bit_pos: Integer, target: Symbol) -> void
 
           private

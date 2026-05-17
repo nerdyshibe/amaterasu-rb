@@ -5,6 +5,8 @@ module Akane
     class Cpu
       module Instructions
         class Rotate < Base
+          include Utils::BitOps
+
           def initialize: (cpu: Cpu, operation: Symbol) -> void
 
           private

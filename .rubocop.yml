@@ -5,16 +5,6 @@ plugins:
 AllCops:
   NewCops: enable
 
-Style/FrozenStringLiteralComment:
-  Enabled: true
-  EnforcedStyle: always
-
-Style/ComparableBetween:
-  Enabled: false
-
-Style/EmptyLiteral:
-  Enabled: false
-
 Metrics/AbcSize:
   Enabled: false
 
@@ -32,6 +22,9 @@ Metrics/MethodLength:
 Metrics/PerceivedComplexity:
   Max: 15
 
+Naming/AccessorMethodName:
+  Enabled: false
+
 RSpec/ExampleLength:
   Max: 15
 
@@ -40,3 +33,13 @@ RSpec/NestedGroups:
 
 RSpec/MultipleMemoizedHelpers:
   Max: 10
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+Style/ComparableBetween:
+  Enabled: false
+
+Style/EmptyLiteral:
+  Enabled: false

@@ -6,7 +6,7 @@ module Akane
       module Instructions
         # Holds the logic of all the RES instructions.
         class CbRes < Base
-          using Akane::Utils::BitOperations
+          include Utils::BitOps
 
           # Creates a new CbRes object containing the mnemonic (String) and logic (Proc).
           def initialize(cpu:, bit_pos:, target:)

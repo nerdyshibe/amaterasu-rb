@@ -8,7 +8,7 @@ module Akane
       # - Contains 8 8-bit core registers.
       # - 8-bit registers can be combined into 16-bit register pair.
       class Registers
-        using Akane::Utils::BitOperations
+        include Utils::BitOps
 
         # Returns the 8-bit value stored in the A (Accumulator) register.
         attr_reader :a
@@ -210,48 +210,48 @@ module Akane
         #
         # - The Zero flag is Bit 7 of the Flags register.
         def z_flag
-          @f.bit(7)
+          bit(@f, 7)
         end
 
         # Returns the current value of the Subtraction bit flag.
         #
         # - The Subtraction flag is Bit 6 of the Flags register.
         def n_flag
-          @f.bit(6)
+          bit(@f, 6)
         end
 
         # Returns the current value of the Half Carry bit flag.
         #
         # - The Half Carry flag is Bit 5 of the Flags register.
         def h_flag
-          @f.bit(5)
+          bit(@f, 5)
         end
 
         # Returns the current value of the Carry bit flag.
         #
         # - The Carry flag is Bit 4 of the Flags register.
         def c_flag
-          @f.bit(4)
+          bit(@f, 4)
         end
 
         # Either sets or clears the value of the Zero flag (Bit 7).
         def z_flag=(set)
-          @f = set ? @f.set_bit(7) : @f.clear_bit(7)
+          @f = set ? set_bit(@f, 7) : clear_bit(@f, 7)
         end
 
         # Either sets or clears the value of the Subtraction flag (Bit 6).
         def n_flag=(set)
-          @f = set ? @f.set_bit(6) : @f.clear_bit(6)
+          @f = set ? set_bit(@f, 6) : clear_bit(@f, 6)
         end
 
         # Either sets or clears the value of the Half Carry flag (Bit 5).
         def h_flag=(set)
-          @f = set ? @f.set_bit(5) : @f.clear_bit(5)
+          @f = set ? set_bit(@f, 5) : clear_bit(@f, 5)
         end
 
         # Either sets or clears the value of the Carry flag (Bit 4).
         def c_flag=(set)
-          @f = set ? @f.set_bit(4) : @f.clear_bit(4)
+          @f = set ? set_bit(@f, 4) : clear_bit(@f, 4)
         end
 
         # Clears all 4 flags.

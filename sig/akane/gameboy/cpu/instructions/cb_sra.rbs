@@ -5,6 +5,8 @@ module Akane
     class Cpu
       module Instructions
         class CbSra < Base
+          include Utils::BitOps
+
           def initialize: (cpu: Cpu, target: Symbol) -> void
 
           private

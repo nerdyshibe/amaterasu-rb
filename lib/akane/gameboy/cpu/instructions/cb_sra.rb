@@ -9,7 +9,7 @@ module Akane
         # - SRA r8
         # - SRA [HL]
         class CbSra < Base
-          using Akane::Utils::BitOperations
+          include Utils::BitOps
 
           def initialize(cpu:, target:)
             super(cpu:)
@@ -38,8 +38,8 @@ module Akane
           # [7][6][5][4][3][2][1][0] -> C
           #
           def sra_reg8(reg8)
-            old_bit0 = reg8.bit(0)
-            old_bit7 = reg8.bit(7)
+            old_bit0 = bit(reg8, 0)
+            old_bit7 = bit(reg8, 7)
             result = (old_bit7 << 7) | (reg8 >> 1)
 
             @registers.clear_flags
@@ -52,8 +52,8 @@ module Akane
           # Takes 2 extra cycles due to the Bus read and write operations.
           def sra_mem_hl
             byte = @cpu.bus_read(address: @registers.hl)
-            old_bit0 = byte.bit(0)
-            old_bit7 = byte.bit(7)
+            old_bit0 = bit(byte, 0)
+            old_bit7 = bit(byte, 7)
             result = (old_bit7 << 7) | (byte >> 1)
 
             @registers.clear_flags
