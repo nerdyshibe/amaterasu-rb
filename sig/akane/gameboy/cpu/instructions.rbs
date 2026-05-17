@@ -3,9 +3,9 @@
 module Akane
   module Gameboy
     class Cpu
-      module Instructions : Cpu
-        def load_base_instructions: () -> void
-        def load_cb_instructions: () -> void
+      module Instructions
+        def self.load_base_instructions: (cpu: Cpu) -> void
+        def self.load_cb_instructions: (cpu: Cpu) -> void
       end
     end
   end

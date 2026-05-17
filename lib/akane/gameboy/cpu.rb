@@ -6,8 +6,6 @@ module Akane
   module Gameboy
     # Models the CPU behavior from the Game Boy.
     class Cpu
-      include Instructions
-
       attr_reader :registers, :m_cycles
 
       def initialize(bus, interrupts, advance_components, verbose)
@@ -25,8 +23,8 @@ module Akane
 
         @m_cycles = 0
 
-        @instructions = load_base_instructions
-        @cb_instructions = load_cb_instructions
+        @instructions = Instructions.load_base_instructions(cpu: self)
+        @cb_instructions = Instructions.load_cb_instructions(cpu: self)
       end
 
       # Core CPU loop:
