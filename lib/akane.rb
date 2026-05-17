@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'akane/version'
 require_relative 'akane/cli'
 require_relative 'akane/emulator'
 require_relative 'akane/cartridge'
@@ -22,8 +23,3 @@ end
 require_relative 'akane/gameboy/cpu/instructions'
 require_relative 'akane/gameboy/cpu/registers'
 require_relative 'akane/gameboy/cpu'
-
-# Base container for all Library modules and classes
-module Akane
-  VERSION = 0.1
-end
