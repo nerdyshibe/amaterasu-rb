@@ -58,7 +58,12 @@ module Akane
         @opcode = fetch_next_byte
         decode_instruction
         execute_instruction
-        log(old_pc, old_cycles, @instruction)
+        log_state(old_pc, old_cycles, @instruction)
+
+        # return unless @opcode == 0x40
+
+        # puts 'Mooney breakpoint reached'
+        # exit
       end
 
       # Reads a byte from the Bus at a given address.
@@ -188,7 +193,7 @@ module Akane
         @instruction.execute
       end
 
-      def log(old_pc, old_cycles, instruction)
+      def log_state(old_pc, old_cycles, instruction)
         return unless @trace_cpu
 
         $stdout.printf(
@@ -214,7 +219,8 @@ module Akane
       # Custom inspect method to facilitate debugging, prevents circular references
       # since all instructions hold the Cpu object and the Cpu holds instruction objects.
       def inspect
-        "#<Akane::Gameboy::Cpu @pc=$#{@registers.pc} " \
+        '#<Akane::Gameboy::Cpu ' \
+          "@pc=$#{@registers.pc} " \
           "@instructions_size=#{@instructions.compact.size} " \
           "@cb_instructions_size=#{@cb_instructions.compact.size}"
       end

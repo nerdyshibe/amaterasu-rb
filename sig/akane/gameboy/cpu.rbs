@@ -33,7 +33,7 @@ module Akane
       def decode_instruction: () -> void
       def execute_instruction: () -> void
       def internal_processing: () -> void
-      def log: (Integer old_pc, Integer old_cycles, Instructions::Base instruction) -> void
+      def log_state: (Integer old_pc, Integer old_cycles, Instructions::Base instruction) -> void
     end
   end
 end

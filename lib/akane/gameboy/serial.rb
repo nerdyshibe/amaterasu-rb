@@ -21,7 +21,7 @@ module Akane
         @debug_mode = debug_mode
 
         @sb = 0x00
-        @sc = 0x00
+        @sc = 0xFF
 
         @message_buffer = Array.new
       end

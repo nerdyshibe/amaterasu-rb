@@ -6,6 +6,7 @@ module Akane
     CYCLES_PER_FRAME = 17_556
 
     def self.start(options)
+      @options = options
       @cycles = 0
       @steps = 0
       @stop_cycles = options[:cycles] if options[:cycles]
@@ -80,6 +81,10 @@ module Akane
       puts "#{@steps} steps / #{@cycles} cycles in #{@elapsed.round(2)}s"
       puts "#{fps.round(2)} FPS (Target: 59.73)"
       puts "#{(fps / 59.73).round(2)}x real-time Game Boy"
+
+      if @options[:cycles]
+        exit
+      end
     end
   end
 end

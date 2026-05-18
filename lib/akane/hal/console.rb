@@ -8,6 +8,8 @@ module Akane
       LCD_HEIGHT = 144
 
       DOUBLE_CHAR = '▀'
+      CONSOLE_CHARS = [' ', '░', '▒', '█'].freeze
+      # CONSOLE_CHARS = [' ', ':', '#', '@'].freeze
 
       def initialize
         $stdout.print("\e[?1049h")

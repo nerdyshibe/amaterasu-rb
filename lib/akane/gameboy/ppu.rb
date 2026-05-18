@@ -39,12 +39,15 @@ module Akane
         1 => { start: 0x9C00, end: 0x9FFF }
       }.freeze
 
-      CONSOLE_CHARS = [' ', '░', '▒', '█'].freeze
-      # CONSOLE_CHARS = [' ', ':', '#', '@'].freeze
-
       attr_reader :lcdc, :scy, :scx, :ly, :lyc, :dma, :bgp, :obp0, :obp1, :wy, :wx
 
-      def initialize(display, interrupts, trace_ppu: false, debug_mode: false)
+      def initialize(
+        display,
+        interrupts,
+        skip_boot_rom: true,
+        trace_ppu: false,
+        debug_mode: false
+      )
         @display = display
         @interrupts = interrupts
         @trace_ppu = trace_ppu
@@ -57,15 +60,13 @@ module Akane
         @framebuffer = Array.new
         @scanline_drawn = false
 
-        # print "\e[?1049h" if @debug_mode
-
-        @lcdc = 0x00
-        @stat = 0x00
+        @lcdc = skip_boot_rom ? 0x91 : 0x00
+        @stat = skip_boot_rom ? 0x85 : 0x00
         @scy  = 0x00
         @scx  = 0x00
         @ly   = 0x00
         @lyc  = 0x00
-        @dma  = 0x00
+        @dma  = skip_boot_rom ? 0xFF : 0x00
         @bgp  = 0x00
         @obp0 = 0x00
         @obp1 = 0x00
@@ -188,7 +189,7 @@ module Akane
             @interrupts.request(:v_blank)
             # @framebuffer << "\e[H"
             # print @framebuffer.join if @debug_mode
-            @display.draw(@framebuffer)
+            @display&.draw(@framebuffer)
             @framebuffer = Array.new
           end
         end
