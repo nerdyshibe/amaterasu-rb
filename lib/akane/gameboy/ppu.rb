@@ -81,6 +81,8 @@ module Akane
         @stat = value & 0xFF
       end
 
+      # Bits: [7][6][5][4][3][2]([1][0])
+      #                          @mode
       def stat
         @stat = if @ly == @lyc
                   set_bit(@stat, 2)
@@ -273,7 +275,7 @@ module Akane
       # Tile data addressing mode.
       #
       # - LCDC Bit 4 is 1 -> Base address = $8000 (Unsigned byte).
-      # - LCDC Bit 4 is 0 -> Base address = $9000 (Sign byte offset).
+      # - LCDC Bit 4 is 0 -> Base address = $9000 (Sign byte offset -128 to +127).
       def addressing_mode
         bit(@lcdc, 4)
       end

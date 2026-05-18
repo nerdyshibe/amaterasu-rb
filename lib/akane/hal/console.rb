@@ -1,0 +1,21 @@
+# frozen_string_literal: true
+
+module Akane
+  module HAL
+    # Console display renderer.
+    class Console
+      LCD_WIDTH  = 160
+      LCD_HEIGHT = 144
+
+      DOUBLE_CHAR = '▀'
+
+      def initialize
+        $stdout.print("\e[?1049h")
+      end
+
+      def shutdown
+        $stdout.print("\e[?1049l")
+      end
+    end
+  end
+end

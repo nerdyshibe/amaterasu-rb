@@ -4,8 +4,8 @@ require 'ffi'
 
 module Akane
   module HAL
-    # Implement all SDL2 bindings needed.
     class SDL2
+      # Implement all SDL2 bindings needed.
       module Bindings
         extend FFI::Library
 
@@ -18,13 +18,14 @@ module Akane
         TEXTUREACCESS_STREAMING = 1
         RENDERER_ACCELERATED    = 0x00000002
         QUIT                    = 0x100
-        EVENT_SIZE                  = 56
+        EVENT_SIZE              = 56
 
         attach_function :init, :SDL_Init, [:uint32], :int
         attach_function :quit, :SDL_Quit, [], :void
         attach_function :get_error, :SDL_GetError, [], :string
 
         attach_function :create_window, :SDL_CreateWindow, %i[string int int int int uint32], :pointer
+        attach_function :set_window_title, :SDL_SetWindowTitle, %i[pointer string], :void
         attach_function :destroy_window, :SDL_DestroyWindow, [:pointer], :void
 
         attach_function :create_renderer, :SDL_CreateRenderer, %i[pointer int uint32], :pointer

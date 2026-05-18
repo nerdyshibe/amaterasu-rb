@@ -19,7 +19,7 @@ module Akane
       @apu = Gameboy::Apu.new
       interrupts = Gameboy::Interrupts.new
 
-      display = HAL::SDL2.new
+      display = HAL::SDL2.new unless options[:video] == 'null'
       @ppu = Gameboy::Ppu.new(
         display,
         interrupts,
@@ -50,8 +50,13 @@ module Akane
       )
 
       Kernel.loop do
-        stop if @steps == @stop_steps
+        if @steps == @stop_steps
+          stop
+          break
+        end
+
         cpu.step
+
         @steps += 1
       end
     end
@@ -75,7 +80,6 @@ module Akane
       puts "#{@steps} steps / #{@cycles} cycles in #{@elapsed.round(2)}s"
       puts "#{fps.round(2)} FPS (Target: 59.73)"
       puts "#{(fps / 59.73).round(2)}x real-time Game Boy"
-      exit
     end
   end
 end
