@@ -36,9 +36,10 @@ module Akane
           @status = :transfer
           @cycles += 1
         when :transfer
-          log_state if @trace_dma
           source_byte = bus_read(address: @source_address)
           bus_write(address: @target_address, value: source_byte)
+
+          log_state if @trace_dma
 
           @source_address += 1
           @target_address += 1
@@ -76,10 +77,12 @@ module Akane
           puts 'DMA: #000 || START DELAY'
         else
           $stdout.printf(
-            "DMA: #%<n>03d || $%<sa>04X -> $%<ta>04X\n",
+            "DMA: #%<n>03d || $%<sa>04X ($%<sb>02X) -> $%<ta>04X ($%<tb>02X)\n",
             n: @cycles,
             sa: @source_address,
-            ta: @target_address
+            sb: @bus.read_byte(address: @source_address),
+            ta: @target_address,
+            tb: @bus.read_byte(address: @target_address)
           )
         end
       end
