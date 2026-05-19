@@ -14,7 +14,8 @@ module Akane
       DMA_TOTAL_CYCLES = 160 + DMA_START_DELAY
 
       # Receiving value 0xC0
-      def initialize(trace_dma: false)
+      def initialize(bus, trace_dma: false)
+        @bus = bus
         @trace_dma = trace_dma
 
         @source_address = nil
@@ -54,8 +55,7 @@ module Akane
         end
       end
 
-      def start_transfer(bus:, source_value:)
-        @bus = bus
+      def start_transfer(source_value:)
         @source_address = source_value * 0x100
         @status = :pending
       end

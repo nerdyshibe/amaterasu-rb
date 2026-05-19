@@ -16,9 +16,9 @@ module Akane
       #
       # - Needs to hold an instance of interrupts to request a :serial interrupt.
       # - Holds the state of the Transfer Data and Control registers.
-      def initialize(interrupts, debug_mode: false)
+      def initialize(interrupts, trace_serial: false)
         @interrupts = interrupts
-        @debug_mode = debug_mode
+        @trace_serial = trace_serial
 
         @sb = 0x00
         @sc = 0xFF
@@ -83,7 +83,7 @@ module Akane
       # - Requests a :serial interrupt.
       def complete_transfer
         @sc &= 0b01111111
-        puts @message_buffer.pack('C*') if @debug_mode
+        puts @message_buffer.pack('C*') if @trace_serial
         @interrupts.request(:serial)
       end
     end

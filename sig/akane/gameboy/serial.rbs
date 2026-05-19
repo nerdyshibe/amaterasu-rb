@@ -4,7 +4,7 @@ module Akane
       attr_reader sb: Integer
       attr_reader message_buffer: Array[Integer]
 
-      def initialize: (Interrupts interrupts, ?debug_mode: bool) -> void
+      def initialize: (Interrupts interrupts, ?trace_serial: bool) -> void
 
       def sc: () -> Integer
       def sb=: (Integer value) -> void

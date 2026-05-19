@@ -13,7 +13,7 @@ module Akane
     # | 0xFF80-0xFFFE | 127 B | High RAM (HRAM) | Fast RAM, accessible during DMA |
     # | 0xFFFF | 1 B | IE Register | Interrupt Enable |
     class Bus
-      def initialize( # rubocop:disable Metrics/ParameterLists
+      def wire_components( # rubocop:disable Metrics/ParameterLists
         cartridge:,
         ppu:,
         wram:,
@@ -34,7 +34,6 @@ module Akane
         @timer = timer
         @serial = serial
         @joypad = joypad
-
         @dma = dma
       end
 
@@ -145,7 +144,7 @@ module Akane
         when 0xFF43 then @ppu.scx = value
         when 0xFF44 then nil # @ppu.ly = value -> read-only
         when 0xFF45 then @ppu.lyc = value
-        when 0xFF46 then @dma.start_transfer(bus: self, source_value: value)
+        when 0xFF46 then @dma.start_transfer(source_value: value)
         when 0xFF47 then @ppu.bgp = value
         when 0xFF48 then @ppu.obp0 = value
         when 0xFF49 then @ppu.obp1 = value

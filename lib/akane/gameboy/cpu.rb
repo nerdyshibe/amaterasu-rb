@@ -8,10 +8,11 @@ module Akane
     class Cpu
       attr_reader :registers, :m_cycles
 
-      def initialize(bus, interrupts, advance_components, trace_cpu: false)
+      def initialize(bus, hram, interrupts, advance_cycle, trace_cpu: false)
         @bus = bus
+        @hram = hram
         @interrupts = interrupts
-        @advance_components = advance_components
+        @advance_cycle = advance_cycle
         @trace_cpu = trace_cpu
 
         @registers = Registers.new
@@ -49,7 +50,7 @@ module Akane
         end
 
         if @halted
-          @m_cycles = @advance_components.call
+          @m_cycles = @advance_cycle.call
           return
         end
 
@@ -69,7 +70,7 @@ module Akane
       # Reads a byte from the Bus at a given address.
       def bus_read(address:)
         byte = @bus.read_byte(address:)
-        @m_cycles = @advance_components.call
+        @m_cycles = @advance_cycle.call
 
         byte
       end
@@ -77,7 +78,7 @@ module Akane
       # Requests a Bus write at a given address with a given value.
       def bus_write(address:, value:)
         @bus.write_byte(address:, value:)
-        @m_cycles = @advance_components.call
+        @m_cycles = @advance_cycle.call
       end
 
       # Fetches the next immediate byte from memory pointed to by the Program Counter.
@@ -161,7 +162,7 @@ module Akane
 
       # Emulates CPU internal processing which advance cycles without Bus access.
       def internal_processing
-        @m_cycles = @advance_components.call
+        @m_cycles = @advance_cycle.call
       end
 
       private
@@ -169,8 +170,8 @@ module Akane
       # Is only called if IME and any interrupt is pending.
       # Takes 5 cycles to complete.
       def handle_interrupts
-        @m_cycles = @advance_components.call
-        @m_cycles = @advance_components.call
+        @m_cycles = @advance_cycle.call
+        @m_cycles = @advance_cycle.call
         @ime = false
         stack_push(value: @registers.pc)
         address_vector = @interrupts.priority_vector

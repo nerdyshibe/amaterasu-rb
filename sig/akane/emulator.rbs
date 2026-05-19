@@ -2,8 +2,18 @@ module Akane
   class Emulator
     CYCLES_PER_FRAME: Integer
 
-    def self.start: (CLI::emulator_options options) -> void
-    def self.advance_components: () -> void
-    def self.stop: () -> void
+    def initialize: (
+      audio: String,
+      cycles: Integer,
+      debug: bool,
+      profiling: String,
+      steps: Integer,
+      trace: String,
+      video: String,
+      rom_path: String
+    ) -> void
+    def start: (CLI::emulator_options options) -> void
+    def advance_cycle: () -> void
+    def stop: () -> void
   end
 end

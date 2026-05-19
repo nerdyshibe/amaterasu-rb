@@ -42,19 +42,19 @@ module Akane
       attr_reader :lcdc, :scy, :scx, :ly, :lyc, :dma, :bgp, :obp0, :obp1, :wy, :wx
 
       def initialize(
+        vram,
+        oam,
         display,
         interrupts,
         skip_boot_rom: true,
-        trace_ppu: false,
-        debug_mode: false
+        trace_ppu: false
       )
+        @vram = vram
+        @oam = oam
         @display = display
         @interrupts = interrupts
         @trace_ppu = trace_ppu
-        @debug_mode = debug_mode
 
-        @vram = Ram.new(size: 8192, offset: 0x8000)
-        @oam  = Ram.new(size: 160, offset: 0xFE00)
         @mode = MODES[:oam_scan]
         @dots = 0
         @framebuffer = Array.new
@@ -188,7 +188,7 @@ module Akane
             @mode = MODES[:v_blank]
             @interrupts.request(:v_blank)
             # @framebuffer << "\e[H"
-            # print @framebuffer.join if @debug_mode
+            # print @framebuffer.join if @video == 'console'
             @display&.draw(@framebuffer)
             @framebuffer = Array.new
           end

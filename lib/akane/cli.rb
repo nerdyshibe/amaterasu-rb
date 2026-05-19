@@ -10,8 +10,7 @@ module Akane
       options = {
         audio: nil,
         cycles: nil,
-        debug: false,
-        profile: nil,
+        profiling: nil,
         steps: nil,
         trace: nil,
         video: nil,
@@ -29,20 +28,16 @@ module Akane
           options[:cycles] = n
         end
 
-        parser.on('-d', '--debug', 'Enable debug mode for serial port output') do
-          options[:debug] = true
-        end
-
-        parser.on('-p', '--profile=MODE', 'Enable Stackprof profiling') do |mode|
-          options[:profile] = mode.to_sym
+        parser.on('-p', '--profiling=MODE', 'Enable Stackprof profiling') do |mode|
+          options[:profiling] = mode.to_sym
         end
 
         parser.on('-s', '--steps=n', Integer, 'Amount of CPU steps to run') do |n|
           options[:steps] = n
         end
 
-        parser.on('-t', '--trace=COMPONENTS', 'Enable logging for specific components') do |values|
-          options[:trace] = values.split(',')
+        parser.on('-t', '--trace=COMPONENT', 'Enable logging for specific component') do |component|
+          options[:trace] = component
         end
 
         parser.on('-v', '--video=VIDEO', 'Define the video backend') do |video|

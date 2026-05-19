@@ -8,10 +8,10 @@ if options[:profile]
   require 'stackprof'
 
   results = StackProf.run(mode: options[:profile]) do
-    Akane::Emulator.start(**options)
+    Akane::Emulator.new(**options).start
   end
 
   StackProf::Report.new(results).print_text
 else
-  Akane::Emulator.start(**options)
+  Akane::Emulator.new(**options).start
 end

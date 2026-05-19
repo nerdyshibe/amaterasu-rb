@@ -6,7 +6,7 @@ module Akane
 
       attr_reader registers: Registers
 
-      def initialize: (Bus bus, Interrupts interrupts, Proc advance_components, bool ?trace_cpu) -> void
+      def initialize: (Bus bus, Hram hram, Interrupts interrupts, Proc advance_cycle, bool ?trace_cpu) -> void
 
       def step: () -> void
 
