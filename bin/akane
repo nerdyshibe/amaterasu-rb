@@ -4,14 +4,18 @@ require_relative '../lib/akane'
 
 options = Akane::CLI.parse(ARGV)
 
-if options[:profile]
+if options[:profiling]
   require 'stackprof'
 
-  results = StackProf.run(mode: options[:profile]) do
-    Akane::Emulator.new(**options).start
+  StackProf.start(mode: options[:profiling].to_sym)
+
+  at_exit do
+    StackProf.stop
+    results = StackProf.results
+    StackProf::Report.new(results).print_text(sort: true, limit: 30)
   end
 
-  StackProf::Report.new(results).print_text
+  Akane::Emulator.new(**options).start
 else
   Akane::Emulator.new(**options).start
 end

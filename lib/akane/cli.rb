@@ -28,7 +28,12 @@ module Akane
           options[:cycles] = n
         end
 
-        parser.on('-p', '--profiling=MODE', 'Enable Stackprof profiling') do |mode|
+        parser.on(
+          '-p',
+          '--profiling=MODE',
+          %w[cpu object wall],
+          'Enable Stackprof profiling (cpu, object, wall)'
+        ) do |mode|
           options[:profiling] = mode.to_sym
         end
 
