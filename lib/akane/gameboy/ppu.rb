@@ -72,6 +72,8 @@ module Akane
         @obp1 = 0x00
         @wy   = 0x00
         @wx   = 0x00
+
+        @shades = [0b00, 0b00, 0b00, 0b00]
       end
 
       def lcdc=(value)
@@ -111,6 +113,13 @@ module Akane
 
       def bgp=(value)
         @bgp = value & 0xFF
+
+        @shades = [
+          @bgp & 0b11,
+          (@bgp >> 2) & 0b11,
+          (@bgp >> 4) & 0b11,
+          (@bgp >> 6) & 0b11
+        ]
       end
 
       def obp0=(value)
@@ -239,22 +248,12 @@ module Akane
           bit_pos = 7
           while bit_pos >= 0
             pixel_color_index = (bit(byte2, bit_pos) << 1) | bit(byte1, bit_pos)
-            pixel_shade = shade(pixel_color_index)
+            pixel_shade = @shades[pixel_color_index]
             # @framebuffer << CONSOLE_CHARS[pixel_shade]
             @framebuffer << pixel_shade
             bit_pos -= 1
           end
         end
-      end
-
-      def shade(color_index)
-        shade0 = @bgp & 0b11
-        shade1 = (@bgp >> 2) & 0b11
-        shade2 = (@bgp >> 4) & 0b11
-        shade3 = (@bgp >> 6) & 0b11
-
-        shades = [shade0, shade1, shade2, shade3]
-        shades[color_index]
       end
 
       def lcd_on?
