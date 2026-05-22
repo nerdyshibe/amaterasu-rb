@@ -15,10 +15,22 @@ I will try to document my progress as I try to create the emulator from the grou
 
 I'm heavily relying on the great work done by the community to document every possible (and obscure) behaviours that can be found in the Game Boy. I'll place here all the resources I'm using and some other relevant ones I find.
 
+### Docs
+
 - **[Pan Docs](https://gbdev.io/pandocs/)**: The single most comprehensive technical reference for the Game Boy. An absolute must-read.
-- **[Blargg's Test ROMs](https://gbdev.gg8.se/files/roms/blargg-gb-tests/)**: A suite of essential test ROMs for verifying the accuracy of CPU instructions, timing, and memory access.
+- **[GB: Complete Technical Reference](https://gekkio.fi/files/gb-docs/gbctr.pdf)**: Great documentation about how the Game Boy hardware behaves, including some of the most obscure behaviors.
 - **[The Ultimate Game Boy Talk](https://www.youtube.com/watch?v=HyzD8pNlpwI)**: An amazing talk that provides a high-level overview of the hardware architecture.
 - **[GBDev Community](https://gbdev.io/)**: A fantastic hub for documentation, forums, and tools related to Game Boy development.
+
+### Tests
+
+- **[Mooneye Test Suite](https://github.com/Gekkio/mooneye-test-suite)**: Very complete suite of ROMs to test pretty much all aspects of the Game Boy.
+- **[Blargg's Test ROMs](https://gbdev.gg8.se/files/roms/blargg-gb-tests/)**: A suite of essential test ROMs for verifying the accuracy of CPU instructions, timing, and memory access.
+- **[Game Boy Test Roms](https://github.com/c-sp/game-boy-test-roms)**: A collection of different test suites for your Game Boy emulator, also has a [Wiki](https://deepwiki.com/c-sp/game-boy-test-roms/1-overview).
+
+### Emulators
+
+- **[Mooneye GB](https://github.com/Gekkio/mooneye-gb)**: Very accurate Game Boy emulator written in Rust.
 
 ## Current Progress
 
