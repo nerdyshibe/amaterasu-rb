@@ -15,7 +15,7 @@ module Akane
     # - Dots per scanline = 456 t-cycles (114 m-cycles) -> Hardware spec.
     # - Dots per frame = 154 * 456 = 70_224 t-cycles (17_556 m-cycles).
     # - OAM search takes 80 dots (20 m-cycles) -> 40 sprites, 2 dots each.
-    class Ppu
+    class PPU
       include Utils::BitOps
 
       MODES = {

@@ -3,7 +3,7 @@ module Akane
     class Bus
       def initialize: (
         cartridge: Akane::Cartridge,
-        ppu: Ppu,
+        ppu: PPU,
         apu: Apu,
         wram: Ram,
         hram: Ram,

@@ -22,7 +22,7 @@ describe Akane::GameBoy::Bus do
     data
   end
   let(:cartridge) { Akane::Cartridge.new(rom: Akane::Cartridge::Rom.new(rom_data)) }
-  let(:ppu) { Akane::GameBoy::Ppu.new(interrupts) }
+  let(:ppu) { Akane::GameBoy::PPU.new(interrupts) }
   let(:apu) { Akane::GameBoy::Apu.new }
   let(:wram) { Akane::GameBoy::Ram.new(size: 8192, offset: 0x8000) }
   let(:hram) { Akane::GameBoy::Ram.new(size: 127, offset: 0xFF80) }

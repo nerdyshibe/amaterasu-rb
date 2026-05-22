@@ -2,7 +2,7 @@
 
 module Akane
   module GameBoy
-    class Ppu
+    class PPU
       # Defines the behavior of the PPU during OAM Scan mode.
       class OAMScan
         def tick(ppu:)
