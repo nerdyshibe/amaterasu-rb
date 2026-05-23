@@ -148,7 +148,7 @@ module Akane
         when 0xFF43 then @ppu.scx = value
         when 0xFF44 then nil # @ppu.ly = value -> read-only
         when 0xFF45 then @ppu.lyc = value
-        when 0xFF46 then @dma.request_transfer(source_value: value)
+        when 0xFF46 then @dma.request_transfert(source_value: value)
         when 0xFF47 then @ppu.bgp = value
         when 0xFF48 then @ppu.obp0 = value
         when 0xFF49 then @ppu.obp1 = value

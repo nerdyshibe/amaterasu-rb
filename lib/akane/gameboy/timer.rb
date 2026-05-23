@@ -4,6 +4,8 @@ module Akane
   module GameBoy
     # Models the built-in clock timer inside the Game Boy.
     class Timer
+      include Utils::BitOps
+
       # Each tick advances 4 T-cycles / 1 M-cycle
       T_CYCLES = 4
 
@@ -29,14 +31,18 @@ module Akane
       #
       # - Needs the interrupts instance to request a timer interrupt.
       # - Has an internal-only 16-bit counter that increments each T-cycle.
-      def initialize(interrupts, skip_boot_rom: true)
+      def initialize(interrupts, skip_boot_rom: true, trace_timer: false)
         @interrupts = interrupts
-        @counter = skip_boot_rom ? 0xABCC : 0x0000
-        @tima_overflow = false
+        @trace_timer = trace_timer
 
-        @tima = 0x00
-        @tma = 0x00
-        @tac = skip_boot_rom ? 0xF8 : 0x00
+        @counter = skip_boot_rom ? 0xABCC : 0x0000
+        @tima    = 0x00
+        @tma     = 0x00
+        @tac     = skip_boot_rom ? 0xF8 : 0x00
+
+        @m_cycles = 0
+        @state = :running
+        @tima_overflow = false
       end
 
       # Exposes only the upper byte of the system counter.
@@ -49,43 +55,42 @@ module Akane
       # When the value is reset to 0x0000, if the current bit being "watched"
       # goes from 1 -> 0, a falling edge occurs and can trigger a TIMA increment.
       def div=(_value)
-        previous_counter = @counter
+        old_signal = joint_signal
         @counter = 0x0000
+        new_signal = joint_signal
 
-        @tima = (@tima + 1) & 0xFF if increment_tima?(previous_counter)
+        increment_tima if falling_edge?(old_signal, new_signal)
       end
 
       # Sets a 8-bit value into the TIMA register.
       def tima=(value)
-        @tima_overflow = false if @tima_overflow && @tima.zero?
+        return if @state == :tima_reloaded
+
+        @state = :tima_reloaded if @state == :tima_reload_pending
 
         @tima = value & 0xFF
       end
 
       # Sets a 8-bit value into the TMA register.
       def tma=(value)
+        return if @state == :tima_reloaded
+
         @tma = value & 0xFF
       end
 
       # Sets a 8-bit value into the TAC register.
       #
-      # Obscure behavior:
-      # - If before the write, TAC is pointing to Bit 9 which is set (1),
-      # and after the write it points to Bit 3 which is not set (0),
-      # this is seen as a falling edge which increments TIMA.
+      # There are 2 distinct cases in which writing to TAC can cause
+      # a sporadic TIMA increment:
+      # - TAC Enable (Bit 2) going from 1 -> 0 can cause a falling edge in the joint signal.
+      # - Changing the TAC Clock Select (Bits 1-0) can also cause a falling edge
+      #   if the previous bit selected from the counter was 1, and the new one is 0.
       def tac=(value)
-        previous_bit_selected = (@counter >> clock_bit_position) & 1
-        previous_tac_enable = tac_enable
-        previous_signal = previous_bit_selected & previous_tac_enable
-
+        old_signal = joint_signal
         @tac = value & 0xFF
+        new_signal = joint_signal
 
-        current_bit_selected = (@counter >> clock_bit_position) & 1
-        current_tac_enable = tac_enable
-        current_signal = current_bit_selected & current_tac_enable
-
-        falling_edge = previous_signal == 1 && current_signal.zero?
-        @tima = (@tima + 1) & 0xFF if falling_edge
+        increment_tima if falling_edge?(old_signal, new_signal)
       end
 
       # Advances the system counter, increments TIMA if needed and handles TIMA overflow logic.
@@ -94,30 +99,39 @@ module Akane
       # - Each tick should advance the timer by 1 M-cycle, so 4 T-cycles.
       # - After TIMA overflows, there is a 1 M-cycle delay before setting TMA into TIMA and requesting the Timer interrupt.
       def tick
-        previous_counter = @counter
+        old_signal = joint_signal
         @counter = (@counter + T_CYCLES) & 0xFFFF
+        new_signal = joint_signal
 
-        if @tima_overflow
+        case @state
+        when :running
+          increment_tima if falling_edge?(old_signal, new_signal)
+        when :tima_reload_pending
           @tima = @tma
           @interrupts.request(:timer)
-          @tima_overflow = false
+          @state = :tima_reloaded
+        when :tima_reloaded
+          @state = :running
         end
 
-        previous_tima = @tima
-        @tima = (@tima + 1) & 0xFF if increment_tima?(previous_counter)
-        @tima_overflow = true if previous_tima == 0xFF && @tima.zero?
+        log_state(old_signal, new_signal) if @trace_timer
+        @m_cycles += 1
       end
 
       private
 
-      # Returns whether or not TIMA should be incremented this cycle.
-      def increment_tima?(previous_counter)
-        tac_enable == 1 && falling_edge?(previous_counter)
+      def increment_tima
+        @tima = (@tima + 1) & 0xFF
+        @state = :tima_reload_pending if @tima.zero?
       end
 
       # Controls whether or not TIMA should be incremented.
       def tac_enable
-        (@tac >> 2) & 1
+        bit(@tac, 2)
+      end
+
+      def joint_signal
+        tac_enable & clock_bit_value
       end
 
       # Controls at which frequency TIMA should be incremented.
@@ -135,12 +149,33 @@ module Akane
         COUNTER_BITS_TO_WATCH[tac_clock_select]
       end
 
-      # Returns whether or not a falling edge was detected in the current watched bit of the counter.
-      def falling_edge?(previous_counter)
-        previous_clock_bit = (previous_counter >> clock_bit_position) & 1
-        current_clock_bit = (@counter >> clock_bit_position) & 1
+      def clock_bit_value
+        @counter[clock_bit_position]
+      end
 
-        previous_clock_bit == 1 && current_clock_bit.zero?
+      # Checks for a falling edge (1 -> 0) in the joint signal.
+      # Joint signal is composed of (TAC enable bit && Currently selected bit in the Counter).
+      #
+      # @param old_value [Integer] Either 0 or 1.
+      # @param new_value [Integer] Either 0 or 1.
+      def falling_edge?(old_value, new_value)
+        old_value == 1 && new_value.zero?
+      end
+
+      def log_state(old_signal, new_signal)
+        $stdout.printf(
+          '#%<cy>05d || COUNTER: $%<n>04X (%<n>06d) || TIMA: $%<tima>02X || TMA: $%<tma>02X || TAC: %<tac>08b || ' \
+          'OLD SIGNAL: %<os>d => NEW SIGNAL: %<ns>d || ' \
+          "INTERRUPT: %<int>d\n",
+          cy: @m_cycles,
+          n: @counter,
+          tima: @tima,
+          tma: @tma,
+          tac: @tac,
+          os: old_signal,
+          ns: new_signal,
+          int: @interrupts.if_register[2]
+        )
       end
     end
   end

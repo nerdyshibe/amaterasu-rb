@@ -23,6 +23,7 @@ module Akane
       @trace_cpu    = trace == 'cpu'
       @trace_ppu    = trace == 'ppu'
       @trace_dma    = trace == 'dma'
+      @trace_timer  = trace == 'timer'
       @trace_serial = trace == 'serial'
 
       @rom_path = rom_path
@@ -77,7 +78,7 @@ module Akane
       @dma = GameBoy::DMA.new(@bus, trace_dma: @trace_dma)
       @interrupts = GameBoy::Interrupts.new
       @ppu = GameBoy::PPU.new(@vram, @oam, @lcd, @interrupts, trace_ppu: @trace_ppu)
-      @timer = GameBoy::Timer.new(@interrupts)
+      @timer = GameBoy::Timer.new(@interrupts, trace_timer: @trace_timer)
       @serial = GameBoy::Serial.new(@interrupts, trace_serial: @trace_serial)
       @joypad = GameBoy::Joypad.new(@interrupts)
       @bus.wire_components(
