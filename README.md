@@ -38,8 +38,11 @@ Here is a snapshot of the current implementation status of the Game Boy's hardwa
 
 ### Address Bus
 
+- [x] Receives all components by dependency injection.
+- [x] Creates a public API with read_byte and write_byte methods.
 - [x] Delegates the memory read and write to the correct components.
-- [ ] Pending wire PPU/APU registers addresses.
+- [x] Correctly mapped the address range for the Cartridge, External RAM, VRAM, Echo RAM, OAM, HRAM and most of the IO registers.
+- [ ] Still pending to wire and implement all the APU registers.
 
 ### CPU
 
@@ -49,8 +52,15 @@ Here is a snapshot of the current implementation status of the Game Boy's hardwa
 
 ### Timer
 
-- [x] All registers correctly implemented.
-- [x] TIMA overflow logic implemented.
+- [x] Resets the value of the internal counter on any write to DIV.
+
+### DMA Controller
+
+- [x] Correctly latches the value used to start the transfer, if $FF46 is read return this value.
+- [x] Correctly implemented the 1 cycle delay before starting the actual transfer.
+- [x] Correctly implemented the 160 cycles (1 byte per cycle) transfer.
+- [x] Correctly implemented the Bus locking mechanism, whila DMA is active, the CPU should only be able to read/write in the IO + HRAM address range (0xFF00 - 0xFFFF).
+- [x] Correctly implemented the DMA restart logic, should reset the cycles to 0, source address to the new source * $100 and target address to 0xFE00.
 
 ### Serial Port
 
@@ -59,6 +69,12 @@ Here is a snapshot of the current implementation status of the Game Boy's hardwa
 - [x] Requests serial interrupt when transfer is completed.
 
 ## Accuracy Checks
+
+| Suite    | Passed | Failed   | Total  |
+|:---------|-------:|---------:|-------:|
+| Blargg   |   18   |    3     |   21   |
+| Mooneye  |    -   |    -     |    -   |
+
 
 ### Blargg Tests
 

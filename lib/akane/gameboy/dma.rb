@@ -7,36 +7,39 @@ module Akane
     # On the real Game Boy, the CPU and DMA share the same physical bus.
     # During DMA, the DMA controller physically takes over the bus lines — the CPU is
     # electrically disconnected from the bus (except HRAM, which is on a separate internal path).
-    # Both are clocked by the same 4MHz crystal, and each
     class DMA
       OAM_START_ADDRESS = 0xFE00
       DMA_START_DELAY = 1
       DMA_TOTAL_CYCLES = 160 + DMA_START_DELAY
 
-      # Receiving value 0xC0
+      attr_reader :internal_latch
+
       def initialize(bus, trace_dma: false)
         @bus = bus
         @trace_dma = trace_dma
 
+        @internal_latch = 0xFF
         @source_address = nil
         @target_address = OAM_START_ADDRESS
         @status = :inactive
-        @dma_delay = false
+        @active = false
         @cycles = 0
       end
 
-      # This method is called once per M-cycle, Cpu drives this.
+      # This method is called once per M-cycle, CPU drives this.
       #
-      # - DMA uses the bus to transfer one byte
-      # - CPU can still execute from HRAM (it doesn't need the bus for that)
+      # - DMA transfer 1 byte per M-cycle, totalling 160 bytes.
+      # - It fills the OAM memory range from 0xFE00 - 0xFE9F
+      # - While DMA is transferring, the CPU should not be able to use the Bus (except for HRAM).
       def tick
         case @status
         when :inactive then nil
         when :pending
           log_state if @trace_dma
-          @status = :transfer
+          @status = :transferring
           @cycles += 1
-        when :transfer
+        when :transferring
+          @active = true
           source_byte = bus_read(address: @source_address)
           bus_write(address: @target_address, value: source_byte)
 
@@ -46,22 +49,25 @@ module Akane
           @target_address += 1
           @cycles += 1
 
-          if @cycles == DMA_TOTAL_CYCLES
-            @cycles = 0
-            @source_address = nil
-            @target_address = OAM_START_ADDRESS
-            @status = :inactive
-          end
+          @status = :complete if @cycles == DMA_TOTAL_CYCLES
+        when :complete
+          @cycles = 0
+          @source_address = nil
+          @target_address = OAM_START_ADDRESS
+          @status = :inactive
+          @active = false
         end
       end
 
       def start_transfer(source_value:)
+        @internal_latch = source_value
         @source_address = source_value * 0x100
         @status = :pending
+        @cycles = 0
       end
 
       def active?
-        @status == :transfer
+        @active
       end
 
       def bus_read(address:)

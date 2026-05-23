@@ -35,8 +35,8 @@ module Akane
       @start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
       load_cartridge
-      add_memory
-      add_components
+      load_memory
+      load_components
 
       Kernel.loop do
         stop if @steps == @stop_steps
@@ -63,14 +63,14 @@ module Akane
       @cartridge = Cartridge.load_rom(@rom_path)
     end
 
-    def add_memory
+    def load_memory
       @wram = GameBoy::Ram.new(size: 8192, offset: 0xC000)
       @hram = GameBoy::Ram.new(size: 127, offset: 0xFF80)
       @vram = GameBoy::Ram.new(size: 8192, offset: 0x8000)
       @oam  = GameBoy::Ram.new(size: 160, offset: 0xFE00)
     end
 
-    def add_components
+    def load_components
       @bus = GameBoy::Bus.new
       @lcd = HAL::SDL2.new unless @video == 'null'
       @apu = GameBoy::Apu.new

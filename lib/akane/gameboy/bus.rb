@@ -39,8 +39,10 @@ module Akane
 
       # Delegates the read to the proper component based on the address
       # and returns the 8-bit value that was stored there.
-      def read_byte(address:)
-        # return 0xFF if @dma.active?
+      def read_byte(address:, caller: nil)
+        return 0xFF if @dma.active?
+          && caller.is_a?(Cpu)
+          && address < 0xFF00
 
         if address <= 0x7FFF
           @cartridge.read_rom(address)
@@ -69,8 +71,10 @@ module Akane
 
       # Delegates the write to the proper component based on the address
       # and stores a 8-bit value at that location.
-      def write_byte(address:, value:)
-        # return if @dma.active?
+      def write_byte(address:, value:, caller: nil)
+        return if @dma.active?
+          && caller.is_a?(Cpu)
+          && address < 0xFF00
 
         if address <= 0x7FFF
           @cartridge.write_rom(address, value)
@@ -116,7 +120,7 @@ module Akane
         when 0xFF43 then @ppu.scx
         when 0xFF44 then @ppu.ly
         when 0xFF45 then @ppu.lyc
-        when 0xFF46 then @ppu.dma
+        when 0xFF46 then @dma.internal_latch
         when 0xFF47 then @ppu.bgp
         when 0xFF48 then @ppu.obp0
         when 0xFF49 then @ppu.obp1

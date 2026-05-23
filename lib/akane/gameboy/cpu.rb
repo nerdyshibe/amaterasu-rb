@@ -69,7 +69,7 @@ module Akane
 
       # Reads a byte from the Bus at a given address.
       def bus_read(address:)
-        byte = @bus.read_byte(address:)
+        byte = @bus.read_byte(address:, caller: self)
         @m_cycles = @advance_cycle.call
 
         byte
@@ -77,7 +77,7 @@ module Akane
 
       # Requests a Bus write at a given address with a given value.
       def bus_write(address:, value:)
-        @bus.write_byte(address:, value:)
+        @bus.write_byte(address:, value:, caller: self)
         @m_cycles = @advance_cycle.call
       end
 
