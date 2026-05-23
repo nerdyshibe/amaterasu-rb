@@ -29,15 +29,14 @@ module Akane
       # This method is called once per M-cycle, CPU drives this.
       #
       # - DMA transfer 1 byte per M-cycle, totalling 160 bytes.
-      # - It fills the OAM memory range from 0xFE00 - 0xFE9F
-      # - While DMA is transferring, the CPU should not be able to use the Bus (except for HRAM).
+      # - It fills the OAM memory range from 0xFE00 - 0xFE9F.
       def tick
         case @status
         when :inactive then nil
         when :pending
           log_state if @trace_dma
-          @status = :transferring
           @cycles += 1
+          start_transfer
         when :transferring
           @active = true
           source_byte = bus_read(address: @source_address)
@@ -49,8 +48,8 @@ module Akane
           @target_address += 1
           @cycles += 1
 
-          @status = :complete if @cycles == DMA_TOTAL_CYCLES
-        when :complete
+          complete_transfer if @cycles == DMA_TOTAL_CYCLES
+        when :completed
           @cycles = 0
           @source_address = nil
           @target_address = OAM_START_ADDRESS
@@ -59,15 +58,33 @@ module Akane
         end
       end
 
-      def start_transfer(source_value:)
+      # When a value is written to 0xFF46, it means a DMA transfer was requested.
+      # The value represents the upper byte of the source address.
+      # This value is saved (latched), if there is a read from 0xFF46, it should return this value.
+      # Requesting a transfer with value 0x80, means the source address is 0x8000.
+      # You can multiple the given value by 0x100 to get the source address.
+      #
+      # @param [Integer] A 8-bit value that represents the upper byte of the source address.
+      def request_transfer(source_value:)
         @internal_latch = source_value
         @source_address = source_value * 0x100
         @status = :pending
         @cycles = 0
       end
 
+      # @return [Boolean] Checks if the DMA transfer is in progress.
       def active?
         @active
+      end
+
+      private
+
+      def start_transfer
+        @status = :transferring
+      end
+
+      def complete_transfer
+        @status = :completed
       end
 
       def bus_read(address:)
