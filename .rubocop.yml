@@ -45,3 +45,6 @@ Style/ComparableBetween:
 
 Style/EmptyLiteral:
   Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false

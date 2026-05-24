@@ -9,14 +9,48 @@ module Akane
       # Each tick advances 4 T-cycles / 1 M-cycle
       T_CYCLES = 4
 
-      # Stores the Bits to watch for falling edges in the system counter.
-      # Values are based on the given frequency defined by the TAC clock select.
+      # Master clock defined by the hardware specs (in T-cycles).
+      MASTER_CLOCK_FREQUENCY = 4_194_304
+
+      # Frequency in which TIMA increments once for each clock select.
+      TIMA_INCREMENT_FREQUENCIES = [
+        4_096,
+        262_144,
+        65_536,
+        16_384
+      ].freeze
+
+      # How many cycles are needed to increment TIMA once for each clock select.
+      TIMA_INCREMENT_CYCLES = [
+        MASTER_CLOCK_FREQUENCY / TIMA_INCREMENT_FREQUENCIES[0b00],
+        MASTER_CLOCK_FREQUENCY / TIMA_INCREMENT_FREQUENCIES[0b01],
+        MASTER_CLOCK_FREQUENCY / TIMA_INCREMENT_FREQUENCIES[0b10],
+        MASTER_CLOCK_FREQUENCY / TIMA_INCREMENT_FREQUENCIES[0b11]
+      ].freeze
+
+      # TIMA only increments if there is a falling edge.
+      # The value needs to be divided by 2 to achieve the correct value.
+      # The given bit needs to flip twice to reach a falling edge (0 -> 1 and 1 -> 0).
+      COUNTER_FALLING_EDGE_CYCLES = [
+        TIMA_INCREMENT_CYCLES[0b00] / 2,
+        TIMA_INCREMENT_CYCLES[0b01] / 2,
+        TIMA_INCREMENT_CYCLES[0b10] / 2,
+        TIMA_INCREMENT_CYCLES[0b11] / 2
+      ].freeze
+
+      # In binary a given Bit N always flips each 2^N ticks/cycles.
+      # Based on the number of cycles derived above you can find the correct bit to watch.
       #
-      # - 0b00: 1024 = 2^10 -> 2^10 = 2^(N+1) -> N = 9 -> Watch Bit 9 of the system counter.
-      # - 0b01: 16 = 2^4    -> 2^4 = 2^(N+1)  -> N = 3 -> Watch Bit 3 of the system counter.
-      # - 0b10: 64 = 2^6    -> 2^6 = 2^(N+1)  -> N = 5 -> Watch Bit 5 of the system counter.
-      # - 0b11: 256 = 2^8   -> 2^8 = 2^(N+1)  -> N = 7 -> Watch Bit 7 of the system counter.
-      COUNTER_BITS_TO_WATCH = [9, 3, 5, 7].freeze
+      # Example for clock select 0b00:
+      # - 1024 T-cycles to increment TIMA.
+      # - So we need to find a Bit N that flips (1024 / 2) times to achieve a falling edge.
+      # - 2^N = 512 => N = log2(512) => N = 9 (Watch Bit 9 from the system counter).
+      COUNTER_BITS_TO_WATCH = [
+        Math.log2(COUNTER_FALLING_EDGE_CYCLES[0b00]).round,
+        Math.log2(COUNTER_FALLING_EDGE_CYCLES[0b01]).round,
+        Math.log2(COUNTER_FALLING_EDGE_CYCLES[0b10]).round,
+        Math.log2(COUNTER_FALLING_EDGE_CYCLES[0b11]).round
+      ].freeze
 
       # Returns the 8-bit value stored in the TIMA (Timer Counter) register.
       attr_reader :tima
@@ -45,15 +79,16 @@ module Akane
         @tima_overflow = false
       end
 
-      # Exposes only the upper byte of the system counter.
+      # Reading DIV only exposes the upper byte of the system counter.
       def div
         (@counter >> 8) & 0xFF
       end
 
-      # Writing to DIV register resets the system counter.
+      # Writing to DIV register always resets the system counter.
       #
       # When the value is reset to 0x0000, if the current bit being "watched"
-      # goes from 1 -> 0, a falling edge occurs and can trigger a TIMA increment.
+      # goes from 1 -> 0 it can trigger a TIMA increment due to a falling edge
+      # in the joint signal.
       def div=(_value)
         old_signal = joint_signal
         @counter = 0x0000
@@ -63,6 +98,13 @@ module Akane
       end
 
       # Sets a 8-bit value into the TIMA register.
+      #
+      # Obscure behaviors:
+      # - If the CPU tries to write to TIMA the same cycle it was already reloaded
+      #   with TMA, the write is completely ignored and TIMA keeps the TMA value.
+      # - If the CPU tries to write to TIMA the cycle immediately after it overflows,
+      #   but hasn't been reloaded with TMA yet, the write succeeds, TIMA keeps the
+      #   value written by the CPU and the reload is cancelled as if the overflow never happened.
       def tima=(value)
         return if @state == :tima_reloaded
 
@@ -72,10 +114,14 @@ module Akane
       end
 
       # Sets a 8-bit value into the TMA register.
+      #
+      # Obscure behavior:
+      # - If the CPU writes to TMA the cycle after TIMA was already reloaded,
+      #   TIMA is reloaded a second time with the new value because the TMA latch
+      #   remains open for 2 M-cycles (the original reload + the next).
       def tma=(value)
-        return if @state == :tima_reloaded
-
         @tma = value & 0xFF
+        @tima = @tma if @state == :tima_reloaded
       end
 
       # Sets a 8-bit value into the TAC register.
@@ -96,8 +142,10 @@ module Akane
       # Advances the system counter, increments TIMA if needed and handles TIMA overflow logic.
       #
       # - Counter value should wrap around 0xFFFF (16-bit).
-      # - Each tick should advance the timer by 1 M-cycle, so 4 T-cycles.
-      # - After TIMA overflows, there is a 1 M-cycle delay before setting TMA into TIMA and requesting the Timer interrupt.
+      # - The Counter is always counting independent from all the other logic.
+      # - The tick is being implemented in M-cycle precision, so each tick is 4 T-cycles.
+      # - After TIMA overflows, there is a 1 M-cycle delay before
+      #   setting TMA into TIMA and requesting the Timer interrupt.
       def tick
         old_signal = joint_signal
         @counter = (@counter + T_CYCLES) & 0xFFFF
@@ -120,18 +168,21 @@ module Akane
 
       private
 
+      # Increments TIMA once, the register is 8-bit so it wraps around 0xFF.
+      # Sets a new Timer state when the overflow occurs to be handled in the M-cycle after.
       def increment_tima
         @tima = (@tima + 1) & 0xFF
         @state = :tima_reload_pending if @tima.zero?
       end
 
-      # Controls whether or not TIMA should be incremented.
-      def tac_enable
+      # It is 1 of 2 bits responsible for TIMA incrementing whenever a falling edge occurs.
+      def tac_enable_bit
         bit(@tac, 2)
       end
 
+      # This is the joint signal that determines if TIMA should increment or not.
       def joint_signal
-        tac_enable & clock_bit_value
+        tac_enable_bit & counter_bit_value
       end
 
       # Controls at which frequency TIMA should be incremented.
@@ -145,30 +196,36 @@ module Akane
       end
 
       # Returns which bit in the system counter we need to watch for a falling edge.
-      def clock_bit_position
+      def counter_bit_position
         COUNTER_BITS_TO_WATCH[tac_clock_select]
       end
 
-      def clock_bit_value
-        @counter[clock_bit_position]
+      # Returns the actual value of the bit being watched (0 or 1).
+      def counter_bit_value
+        @counter[counter_bit_position]
       end
 
       # Checks for a falling edge (1 -> 0) in the joint signal.
-      # Joint signal is composed of (TAC enable bit && Currently selected bit in the Counter).
+      # Joint signal is a bitwise AND between:
+      # - TAC enable bit (Bit 2)
+      # - Currently selected bit in the system counter
       #
-      # @param old_value [Integer] Either 0 or 1.
-      # @param new_value [Integer] Either 0 or 1.
-      def falling_edge?(old_value, new_value)
-        old_value == 1 && new_value.zero?
+      # @param old_signal [Integer] Either 0 or 1.
+      # @param new_signal [Integer] Either 0 or 1.
+      # @return [Boolean]
+      def falling_edge?(old_signal, new_signal)
+        old_signal == 1 && new_signal == 0
       end
 
       def log_state(old_signal, new_signal)
         $stdout.printf(
-          '#%<cy>05d || COUNTER: $%<n>04X (%<n>06d) || TIMA: $%<tima>02X || TMA: $%<tma>02X || TAC: %<tac>08b || ' \
+          '%<cy>05d || COUNTER: $%<n>04X (%<n>06d) || :%<state>-20s || ' \
+          'TIMA: $%<tima>02X || TMA: $%<tma>02X || TAC: %<tac>08b || ' \
           'OLD SIGNAL: %<os>d => NEW SIGNAL: %<ns>d || ' \
           "INTERRUPT: %<int>d\n",
           cy: @m_cycles,
           n: @counter,
+          state: @state.upcase,
           tima: @tima,
           tma: @tma,
           tac: @tac,
