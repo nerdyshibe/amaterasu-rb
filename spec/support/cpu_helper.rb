@@ -10,7 +10,7 @@ module CpuHelper
     apu = Akane::GameBoy::Apu.new
     interrupts = Akane::GameBoy::Interrupts.new
 
-    ppu = Akane::GameBoy::PPU.new(interrupts)
+    ppu = Akane::GameBoy::Ppu.new(interrupts)
     timer = Akane::GameBoy::Timer.new(interrupts)
     serial = Akane::GameBoy::Serial.new(interrupts)
     joypad = Akane::GameBoy::Joypad.new(interrupts)

@@ -2,8 +2,8 @@
 
 module Akane
   module GameBoy
-    class PPU
-      # Models the behavior of the PPU registers.
+    class Ppu
+      # Models the behavior of the Ppu registers.
       class Registers
         def initialize
           @ly = 0x00

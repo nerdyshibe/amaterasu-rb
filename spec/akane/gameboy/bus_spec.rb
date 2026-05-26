@@ -22,7 +22,7 @@ describe Akane::GameBoy::Bus do
     data
   end
   let(:cartridge) { Akane::Cartridge.new(rom: Akane::Cartridge::Rom.new(rom_data)) }
-  let(:ppu) { Akane::GameBoy::PPU.new(interrupts) }
+  let(:ppu) { Akane::GameBoy::Ppu.new(interrupts) }
   let(:apu) { Akane::GameBoy::Apu.new }
   let(:wram) { Akane::GameBoy::Ram.new(size: 8192, offset: 0x8000) }
   let(:hram) { Akane::GameBoy::Ram.new(size: 127, offset: 0xFF80) }
@@ -52,7 +52,7 @@ describe Akane::GameBoy::Bus do
       end
     end
 
-    context 'when in the 0x8000 - 0x9FFF (PPU VRAM) range' do
+    context 'when in the 0x8000 - 0x9FFF (Ppu VRAM) range' do
       before do
         allow(ppu).to receive(:read_vram).and_call_original
       end
@@ -140,7 +140,7 @@ describe Akane::GameBoy::Bus do
       end
     end
 
-    context 'when in the 0xFE00 - 0xFE9F (PPU OAM) range' do
+    context 'when in the 0xFE00 - 0xFE9F (Ppu OAM) range' do
       before do
         allow(ppu).to receive(:read_oam).and_call_original
       end
@@ -311,19 +311,19 @@ describe Akane::GameBoy::Bus do
       end
     end
 
-    context 'when in the 0x8000 - 0x9FFF (PPU VRAM) range' do
+    context 'when in the 0x8000 - 0x9FFF (Ppu VRAM) range' do
       before do
         allow(ppu).to receive(:write_vram).and_call_original
       end
 
-      it 'delegates the write to the PPU for address 0x8000', :aggregate_failures do
+      it 'delegates the write to the Ppu for address 0x8000', :aggregate_failures do
         bus.write_byte(address: 0x8000, value: 0xAB)
 
         expect(ppu).to have_received(:write_vram).with(0x8000, 0xAB)
         expect(bus.read_byte(address: 0x8000)).to eq(0xAB)
       end
 
-      it 'delegates the write to the PPU for address 0x9FFF', :aggregate_failures do
+      it 'delegates the write to the Ppu for address 0x9FFF', :aggregate_failures do
         bus.write_byte(address: 0x9FFF, value: 0xCD)
 
         expect(ppu).to have_received(:write_vram).with(0x9FFF, 0xCD)
@@ -389,19 +389,19 @@ describe Akane::GameBoy::Bus do
       end
     end
 
-    context 'when in the 0xFE00 - 0xFE9F (PPU OAM) range' do
+    context 'when in the 0xFE00 - 0xFE9F (Ppu OAM) range' do
       before do
         allow(ppu).to receive(:write_oam).and_call_original
       end
 
-      it 'delegates the write to the PPU for address 0xFE00', :aggregate_failures do
+      it 'delegates the write to the Ppu for address 0xFE00', :aggregate_failures do
         bus.write_byte(address: 0xFE00, value: 0x22)
 
         expect(ppu).to have_received(:write_oam).with(0xFE00, 0x22)
         expect(bus.read_byte(address: 0xFE00)).to eq(0x22)
       end
 
-      it 'delegates the write to the PPU for address 0xFE9F', :aggregate_failures do
+      it 'delegates the write to the Ppu for address 0xFE9F', :aggregate_failures do
         bus.write_byte(address: 0xFE9F, value: 0x33)
 
         expect(ppu).to have_received(:write_oam).with(0xFE9F, 0x33)

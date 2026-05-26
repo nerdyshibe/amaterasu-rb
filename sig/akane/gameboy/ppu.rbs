@@ -1,6 +1,6 @@
 module Akane
   module GameBoy
-    class PPU
+    class Ppu
       include Utils::BitOps
 
       MODES: Hash[Symbol, Integer]

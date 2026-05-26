@@ -4,9 +4,9 @@ module Akane
   module GameBoy
     # This class models the Pixel Processing Unit from the Original Game Boy.
     #
-    # The PPU outputs a 160x144 pixel framebuffer each frame.
+    # The Ppu outputs a 160x144 pixel framebuffer each frame.
     # This framebuffer will be used by the rendered to display the graphics.
-    # The PPU should not care about how the pixels are rendered, just output them.
+    # The Ppu should not care about how the pixels are rendered, just output them.
     #
     # Specifications:
     # - The frame consists of 154 scanlines, 144 visible + 10 vblank (Cpu can access VRAM).
@@ -15,7 +15,7 @@ module Akane
     # - Dots per scanline = 456 t-cycles (114 m-cycles) -> Hardware spec.
     # - Dots per frame = 154 * 456 = 70_224 t-cycles (17_556 m-cycles).
     # - OAM search takes 80 dots (20 m-cycles) -> 40 sprites, 2 dots each.
-    class PPU
+    class Ppu
       include Utils::BitOps
 
       MODES = {
@@ -166,6 +166,15 @@ module Akane
       def write_oam(address:, value:)
         @oam.write_byte(address:, value:)
       end
+
+      # def tick
+      #   case @mode
+      #   when :oam_scan
+      #   when :drawing
+      #   when :h_blank
+      #   when :v_blank
+      #   end
+      # end
 
       def tick
         if lcd_off?
