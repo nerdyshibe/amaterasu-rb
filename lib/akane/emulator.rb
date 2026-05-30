@@ -73,7 +73,7 @@ module Akane
       @wram = GameBoy::Ram.new(size: 8192, offset: 0xC000)
       @hram = GameBoy::Ram.new(size: 127, offset: 0xFF80)
       @vram = GameBoy::Ram.new(size: 8192, offset: 0x8000)
-      @oam  = GameBoy::Ram.new(size: 160, offset: 0xFE00)
+      @oam  = GameBoy::Oam.new
     end
 
     def load_components
