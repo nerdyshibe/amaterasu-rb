@@ -18,8 +18,8 @@ module Akane
     class Ppu
       include Utils::BitOps
 
-      DOTS_PER_OAM_SCAN = 80
       DOTS_PER_SCANLINE = 456
+      MAX_SPRITES_PER_SCANLINE = 10
 
       WINDOW_TILE_MAPS = {
         0 => { start: 0x9800, end: 0x9BFF },
@@ -30,7 +30,7 @@ module Akane
         1 => { start: 0x9C00, end: 0x9FFF }
       }.freeze
 
-      attr_reader :registers, :dots
+      attr_reader :registers, :dots, :sprite_buffer
 
       def initialize(
         vram,
@@ -46,12 +46,13 @@ module Akane
         @interrupts = interrupts
         @trace_ppu = trace_ppu
 
-        @modes = Modes.build_hash(ppu: self)
+        @modes = Modes.build_hash(ppu: self, oam: @oam)
         @mode = @modes[:oam_scan]
         @registers = Registers.new(@mode, update_shades, skip_boot_rom:)
         @dots = 0
         @framebuffer = Array.new
         @scanline_drawn = false
+        @sprite_buffer = Array.new(MAX_SPRITES_PER_SCANLINE)
 
         @shades = [0b00, 0b00, 0b00, 0b00]
       end

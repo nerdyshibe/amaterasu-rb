@@ -223,7 +223,7 @@ module Akane
         '#<Akane::GameBoy::Cpu ' \
           "@pc=$#{@registers.pc} " \
           "@instructions_size=#{@instructions.compact.size} " \
-          "@cb_instructions_size=#{@cb_instructions.compact.size}"
+          "@cb_instructions_size=#{@cb_instructions.compact.size}>"
       end
     end
   end

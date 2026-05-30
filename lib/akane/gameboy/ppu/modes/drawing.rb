@@ -8,8 +8,9 @@ module Akane
         class Drawing
           attr_reader :name, :number
 
-          def initialize(ppu:)
+          def initialize(ppu:, oam:)
             @ppu = ppu
+            @oam = oam
 
             @name = 'DRAWING'
             @number = 3
