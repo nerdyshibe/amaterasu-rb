@@ -51,9 +51,14 @@ module Akane
       stop if @cycles == @stop_cycles
 
       @timer.tick
-      @ppu.tick
       @apu.tick
       @dma.tick
+
+      i = 0
+      while i < 4
+        @ppu.tick
+        i += 1
+      end
 
       @cycles += 1
     end

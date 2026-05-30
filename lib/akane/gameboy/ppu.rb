@@ -18,15 +18,6 @@ module Akane
     class Ppu
       include Utils::BitOps
 
-      MODES = {
-        h_blank: 0,
-        v_blank: 1,
-        oam_scan: 2,
-        drawing: 3
-      }.freeze
-
-      OAM_SCAN = OAMScan.new.freeze
-
       DOTS_PER_OAM_SCAN = 80
       DOTS_PER_SCANLINE = 456
 
@@ -39,7 +30,7 @@ module Akane
         1 => { start: 0x9C00, end: 0x9FFF }
       }.freeze
 
-      attr_reader :lcdc, :scy, :scx, :ly, :lyc, :dma, :bgp, :obp0, :obp1, :wy, :wx
+      attr_reader :registers, :dots
 
       def initialize(
         vram,
@@ -55,87 +46,14 @@ module Akane
         @interrupts = interrupts
         @trace_ppu = trace_ppu
 
-        @mode = MODES[:oam_scan]
+        @modes = Modes.build_hash(ppu: self)
+        @mode = @modes[:oam_scan]
+        @registers = Registers.new(@mode, update_shades, skip_boot_rom:)
         @dots = 0
         @framebuffer = Array.new
         @scanline_drawn = false
 
-        @lcdc = skip_boot_rom ? 0x91 : 0x00
-        @stat = skip_boot_rom ? 0x85 : 0x00
-        @scy  = 0x00
-        @scx  = 0x00
-        @ly   = 0x00
-        @lyc  = 0x00
-        @dma  = skip_boot_rom ? 0xFF : 0x00
-        @bgp  = 0x00
-        @obp0 = 0x00
-        @obp1 = 0x00
-        @wy   = 0x00
-        @wx   = 0x00
-
         @shades = [0b00, 0b00, 0b00, 0b00]
-      end
-
-      def lcdc=(value)
-        @lcdc = value & 0xFF
-      end
-
-      def stat=(value)
-        @stat = value & 0xFF
-      end
-
-      # Bits: [7][6][5][4][3][2]([1][0])
-      #                          @mode
-      def stat
-        @stat = if @ly == @lyc
-                  set_bit(@stat, 2)
-                else
-                  clear_bit(@stat, 2)
-                end
-        @stat | @mode
-      end
-
-      def scy=(value)
-        @scy = value & 0xFF
-      end
-
-      def scx=(value)
-        @scx = value & 0xFF
-      end
-
-      def lyc=(value)
-        @lyc = value & 0xFF
-      end
-
-      def dma=(value)
-        @dma = value & 0xFF
-      end
-
-      def bgp=(value)
-        @bgp = value & 0xFF
-
-        @shades = [
-          @bgp & 0b11,
-          (@bgp >> 2) & 0b11,
-          (@bgp >> 4) & 0b11,
-          (@bgp >> 6) & 0b11
-        ]
-      end
-
-      def obp0=(value)
-        @obp0 = value & 0xFF
-      end
-
-      def obp1=(value)
-        @obp1 = value & 0xFF
-      end
-
-      def wy=(value)
-        @wy = value & 0xFF
-      end
-
-      def wx=(value)
-        @wx = value & 0xFF
       end
 
       # Returns a 8-bit value stored in VRAM in a given address.
@@ -145,7 +63,7 @@ module Akane
       # $9800-$9BFF: Tile map 0 (32×32 = 1024 tile indices)
       # $9C00-$9FFF: Tile map 1 (alternative map)
       def read_vram(address:)
-        return 0xFF if @mode == MODES[:drawing]
+        return 0xFF if @mode == @modes[:drawing]
 
         @vram.read_byte(address:)
       end
@@ -157,7 +75,7 @@ module Akane
 
       # Returns a 8-bit value stored in OAM in a given address.
       def read_oam(address:)
-        return 0xFF if [MODES[:oam_scan], MODES[:drawing]].include?(@mode)
+        return 0xFF if [@modes[:oam_scan], @modes[:drawing]].include?(@mode)
 
         @oam.read_byte(address:)
       end
@@ -167,52 +85,56 @@ module Akane
         @oam.write_byte(address:, value:)
       end
 
-      # def tick
-      #   case @mode
-      #   when :oam_scan
-      #   when :drawing
-      #   when :h_blank
-      #   when :v_blank
-      #   end
-      # end
+      def update_shades
+        lambda do |bgp|
+          @shades[0] = bgp & 0b11
+          @shades[1] = (bgp >> 2) & 0b11
+          @shades[2] = (bgp >> 4) & 0b11
+          @shades[3] = (bgp >> 6) & 0b11
+        end
+      end
+
+      def set_mode(mode)
+        @mode = @modes[mode]
+      end
 
       def tick
         if lcd_off?
-          @ly = 0
+          @registers.ly = 0x00
           @dots = 0
-          @mode = MODES[:h_blank]
+          @mode = @modes[:oam_scan]
           return
         end
 
-        @dots += 4
+        @mode.tick
+        log_state
+        @dots += 1
 
         # Core state machine.
-        if @dots < DOTS_PER_OAM_SCAN && @ly < 144
-          @mode = MODES[:oam_scan]
-        elsif @dots < 252 && @ly < 144
-          @mode = MODES[:drawing]
-          draw_scanline unless @scanline_drawn
-          @scanline_drawn = true
-        elsif @dots < DOTS_PER_SCANLINE && @ly < 144
-          @mode = MODES[:h_blank]
-        elsif @dots >= DOTS_PER_SCANLINE # -> Scanline completed.
-          @dots = 0
-          @ly = (@ly + 1) % 154
-          @interrupts.request(:lcd_stat) if @ly == @lyc && bit(@stat, 6) == 1
-          @scanline_drawn = false
-          # @framebuffer << "\n"
+        # if @dots < DOTS_PER_OAM_SCAN && @registers.ly < 144
+        #   @mode = Modes::OAM_SCAN
+        # elsif @dots < 252 && @registers.ly < 144
+        #   @mode = Modes::DRAWING
+        #   draw_scanline unless @scanline_drawn
+        #   @scanline_drawn = true
+        # elsif @dots < DOTS_PER_SCANLINE && @registers.ly < 144
+        #   @mode = Modes::H_BLANK
+        # elsif @dots >= DOTS_PER_SCANLINE # -> Scanline completed.
+        #   @dots = 0
+        #   @registers.ly = (@registers.ly + 1) % 154
+        #   @interrupts.request(:lcd_stat) if @registers.ly == @registers.lyc && bit(@registers.stat, 6) == 1
+        #   @scanline_drawn = false
+        #   # @framebuffer << "\n"
 
-          if @ly == 144 # -> Frame completed
-            @mode = MODES[:v_blank]
-            @interrupts.request(:v_blank)
-            # @framebuffer << "\e[H"
-            # print @framebuffer.join if @video == 'console'
-            @display&.draw(@framebuffer)
-            @framebuffer = Array.new
-          end
-        end
-
-        trace
+        #   if @registers.ly == 144 # -> Frame completed
+        #     @mode = Modes::V_BLANK
+        #     @interrupts.request(:v_blank)
+        #     # @framebuffer << "\e[H"
+        #     # print @framebuffer.join if @video == 'console'
+        #     @display&.draw(@framebuffer)
+        #     @framebuffer = Array.new
+        #   end
+        # end
       end
 
       private
@@ -235,14 +157,14 @@ module Akane
         # You need a x and y coordinate to get the tile index.
         # Each entry in the grid is a single byte with the tile index.
         tile_map_base_address = bg_tile_map[:start]
-        map_tile_x = @scx / 8
-        map_tile_y = (@ly + @scy) / 8
+        map_tile_x = @registers.scx / 8
+        map_tile_y = (@registers.ly + @registers.scy) / 8
 
         (0..19).each do |tile_pos|
           tile_index_address = tile_map_base_address + ((map_tile_x + tile_pos) % 32) + ((map_tile_y % 32) * 32)
           tile_index = @vram.read_byte(address: tile_index_address)
 
-          row_in_tile_data = (@ly + @scy) % 8
+          row_in_tile_data = (@registers.ly + @registers.scy) % 8
 
           if addressing_mode == 1
             tile_data_address = 0x8000 + (tile_index * 16) + (row_in_tile_data * 2)
@@ -266,19 +188,19 @@ module Akane
       end
 
       def lcd_on?
-        bit(@lcdc, 7) == 1
+        bit(@registers.lcdc, 7) == 1
       end
 
       def lcd_off?
-        bit(@lcdc, 7).zero?
+        bit(@registers.lcdc, 7).zero?
       end
 
       def window_tile_map
-        WINDOW_TILE_MAPS[bit(@lcdc, 6)]
+        WINDOW_TILE_MAPS[bit(@registers.lcdc, 6)]
       end
 
       def bg_tile_map
-        BG_TILE_MAPS[bit(@lcdc, 3)]
+        BG_TILE_MAPS[bit(@registers.lcdc, 3)]
       end
 
       # Tile data addressing mode.
@@ -286,17 +208,18 @@ module Akane
       # - LCDC Bit 4 is 1 -> Base address = $8000 (Unsigned byte).
       # - LCDC Bit 4 is 0 -> Base address = $9000 (Sign byte offset -128 to +127).
       def addressing_mode
-        bit(@lcdc, 4)
+        bit(@registers.lcdc, 4)
       end
 
-      def trace
+      # Prints the current state of the PPU into the console for debugging.
+      def log_state
         return unless @trace_ppu
 
         $stdout.printf(
           "Dots: %<dots>04d | Mode: %<mode>s | LY: $%<ly>02X (%<ly>d)\n",
           dots: @dots,
-          mode: MODES.key(@mode)&.to_s&.upcase,
-          ly: @ly
+          mode: @mode.to_s,
+          ly: @registers.ly
         )
       end
     end

@@ -13,7 +13,7 @@ module Akane
     # | 0xFF80-0xFFFE | 127 B | High RAM (HRAM) | Fast RAM, accessible during DMA |
     # | 0xFFFF | 1 B | IE Register | Interrupt Enable |
     class Bus
-      def wire_components( # rubocop:disable Metrics/ParameterLists
+      def wire_components(
         cartridge:,
         ppu:,
         wram:,
@@ -114,18 +114,18 @@ module Akane
         when 0xFF06 then @timer.tma
         when 0xFF07 then @timer.tac
         when 0xFF0F then @interrupts.if_register
-        when 0xFF40 then @ppu.lcdc
-        when 0xFF41 then @ppu.stat
-        when 0xFF42 then @ppu.scy
-        when 0xFF43 then @ppu.scx
-        when 0xFF44 then @ppu.ly
-        when 0xFF45 then @ppu.lyc
+        when 0xFF40 then @ppu.registers.lcdc
+        when 0xFF41 then @ppu.registers.stat
+        when 0xFF42 then @ppu.registers.scy
+        when 0xFF43 then @ppu.registers.scx
+        when 0xFF44 then @ppu.registers.ly
+        when 0xFF45 then @ppu.registers.lyc
         when 0xFF46 then @dma.internal_latch
-        when 0xFF47 then @ppu.bgp
-        when 0xFF48 then @ppu.obp0
-        when 0xFF49 then @ppu.obp1
-        when 0xFF4A then @ppu.wy
-        when 0xFF4B then @ppu.wx
+        when 0xFF47 then @ppu.registers.bgp
+        when 0xFF48 then @ppu.registers.obp0
+        when 0xFF49 then @ppu.registers.obp1
+        when 0xFF4A then @ppu.registers.wy
+        when 0xFF4B then @ppu.registers.wx
         else
           0xFF
         end
@@ -142,18 +142,18 @@ module Akane
         when 0xFF06 then @timer.tma = value
         when 0xFF07 then @timer.tac = value
         when 0xFF0F then @interrupts.if_register = value
-        when 0xFF40 then @ppu.lcdc = value
-        when 0xFF41 then @ppu.stat = value
-        when 0xFF42 then @ppu.scy = value
-        when 0xFF43 then @ppu.scx = value
-        when 0xFF44 then nil # @ppu.ly = value -> read-only
-        when 0xFF45 then @ppu.lyc = value
-        when 0xFF46 then @dma.request_transfert(source_value: value)
-        when 0xFF47 then @ppu.bgp = value
-        when 0xFF48 then @ppu.obp0 = value
-        when 0xFF49 then @ppu.obp1 = value
-        when 0xFF4A then @ppu.wy = value
-        when 0xFF4B then @ppu.wx = value
+        when 0xFF40 then @ppu.registers.lcdc = value
+        when 0xFF41 then @ppu.registers.stat = value
+        when 0xFF42 then @ppu.registers.scy = value
+        when 0xFF43 then @ppu.registers.scx = value
+        when 0xFF44 then nil # @ppu.registers.ly = value -> read-only
+        when 0xFF45 then @ppu.registers.lyc = value
+        when 0xFF46 then @dma.request_transfer(source_value: value)
+        when 0xFF47 then @ppu.registers.bgp = value
+        when 0xFF48 then @ppu.registers.obp0 = value
+        when 0xFF49 then @ppu.registers.obp1 = value
+        when 0xFF4A then @ppu.registers.wy = value
+        when 0xFF4B then @ppu.registers.wx = value
         end
       end
     end
