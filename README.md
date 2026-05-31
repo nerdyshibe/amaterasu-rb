@@ -18,6 +18,8 @@ I'm heavily relying on the great work done by the community to document every po
 ### Docs
 
 - **[Pan Docs](https://gbdev.io/pandocs/)**: The single most comprehensive technical reference for the Game Boy. An absolute must-read.
+- **[Opcode Table](https://gbdev.io/gb-opcodes/optables/)**: Complete Opcode table for the Game Boy CPU instruction set.
+- **[RGBDS Docs](https://rgbds.gbdev.io/docs/v1.0.1/gbz80.7)**: Game Boy CPU instruction reference.
 - **[GB: Complete Technical Reference](https://gekkio.fi/files/gb-docs/gbctr.pdf)**: Great documentation about how the Game Boy hardware behaves, including some of the most obscure behaviors.
 - **[The Ultimate Game Boy Talk](https://www.youtube.com/watch?v=HyzD8pNlpwI)**: An amazing talk that provides a high-level overview of the hardware architecture.
 - **[GBDev Community](https://gbdev.io/)**: A fantastic hub for documentation, forums, and tools related to Game Boy development.
@@ -28,9 +30,11 @@ I'm heavily relying on the great work done by the community to document every po
 - **[Blargg's Test ROMs](https://gbdev.gg8.se/files/roms/blargg-gb-tests/)**: A suite of essential test ROMs for verifying the accuracy of CPU instructions, timing, and memory access.
 - **[Game Boy Test Roms](https://github.com/c-sp/game-boy-test-roms)**: A collection of different test suites for your Game Boy emulator, also has a [Wiki](https://deepwiki.com/c-sp/game-boy-test-roms/1-overview).
 
-### Emulators
+### Other Emulators
 
-- **[Mooneye GB](https://github.com/Gekkio/mooneye-gb)**: Very accurate Game Boy emulator written in Rust.
+- **[Mooneye GB](https://github.com/Gekkio/mooneye-gb)**: A Game Boy research project and emulator written in Rust.
+- **[LLD_gbemu](https://github.com/rockytriton/LLD_gbemu)**: A Game Boy emulator written in C as part of the Low Level Dev tutorial.
+- **[Rubyboy](https://github.com/sacckey/rubyboy)**: A Game Boy emulator written in Ruby.
 
 ## Current Progress
 
