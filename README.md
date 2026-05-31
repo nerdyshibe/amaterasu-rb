@@ -78,24 +78,26 @@ Here is a snapshot of the current implementation status of the Game Boy's hardwa
 
 ### Blargg Tests
 
-- [x] (Passed) `cpu_instrs/01-special.gb`
-- [x] (Passed) `cpu_instrs/02-interrupts.gb`
-- [x] (Passed) `cpu_instrs/03-op sp,hl.gb`
-- [x] (Passed) `cpu_instrs/04-op r,imm.gb`
-- [x] (Passed) `cpu_instrs/05-op rp.gb`
-- [x] (Passed) `cpu_instrs/06-ld r,r.gb`
-- [x] (Passed) `cpu_instrs/07-jr,jp,call,ret,rst.gb`
-- [x] (Passed) `cpu_instrs/08-misc instrs.gb`
-- [x] (Passed) `cpu_instrs/09-op r,r.gb`
-- [x] (Passed) `cpu_instrs/10-bit ops.gb`
-- [x] (Passed) `cpu_instrs/11-op a,(hl).gb`
-- [x] (Passed) `instr_timing.gb`
-- [x] (Passed) `mem_timing/01-read_timing.gb`
-- [x] (Passed) `mem_timing/02-write_timing.gb`
-- [x] (Passed) `mem_timing/03-modify_timing.gb`
-- [x] (Passed) `mem_timing_2/01-read_timing.gb`
-- [x] (Passed) `mem_timing_2/02-write_timing.gb`
-- [x] (Passed) `mem_timing_2/03-modify_timing.gb`
-- [ ] (Pending) `interrupt_time.gb`
-- [ ] (Pending) `halt_bug.gb`
-- [ ] (Pending) `dmg_sound.gb`
+| Test                                  |  Status  |
+|---------------------------------------|:--------:|
+| `cpu_instrs/01-special.gb`            |    ✅    |
+| `cpu_instrs/02-interrupts.gb`         |    ✅    |
+| `cpu_instrs/03-op sp,hl.gb`           |    ✅    |
+| `cpu_instrs/04-op r,imm.gb`           |    ✅    |
+| `cpu_instrs/05-op rp.gb`              |    ✅    |
+| `cpu_instrs/06-ld r,r.gb`             |    ✅    |
+| `cpu_instrs/07-jr,jp,call,ret,rst.gb` |    ✅    |
+| `cpu_instrs/08-misc instrs.gb`        |    ✅    |
+| `cpu_instrs/09-op r,r.gb`             |    ✅    |
+| `cpu_instrs/10-bit ops.gb`            |    ✅    |
+| `cpu_instrs/11-op a,(hl).gb`          |    ✅    |
+| `instr_timing.gb`                     |    ✅    |
+| `mem_timing/01-read_timing.gb`        |    ✅    |
+| `mem_timing/02-write_timing.gb`       |    ✅    |
+| `mem_timing/03-modify_timing.gb`      |    ✅    |
+| `mem_timing_2/01-read_timing.gb`      |    ✅    |
+| `mem_timing_2/02-write_timing.gb`     |    ✅    |
+| `mem_timing_2/03-modify_timing.gb`    |    ✅    |
+| `interrupt_time.gb`                   |    ❌    |
+| `halt_bug.gb`                         |    ❌    |
+| `dmg_sound.gb`                        |    ❌    |
