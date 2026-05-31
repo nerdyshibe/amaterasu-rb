@@ -30,6 +30,8 @@ module Akane
         1 => { start: 0x9C00, end: 0x9FFF }
       }.freeze
 
+      LCD_ENABLE_BIT = 7
+
       attr_reader :registers, :dots, :sprite_buffer
 
       def initialize(
@@ -95,47 +97,22 @@ module Akane
         end
       end
 
+      # @param mode [Symbol]
       def set_mode(mode)
         @mode = @modes[mode]
       end
 
       def tick
-        if lcd_off?
+        unless @registers.lcdc.lcd_enabled?
           @registers.ly = 0x00
           @dots = 0
-          @mode = @modes[:oam_scan]
+          @mode = @modes[:disabled]
           return
         end
 
         @mode.tick
         log_state
         @dots += 1
-
-        # Core state machine.
-        # if @dots < DOTS_PER_OAM_SCAN && @registers.ly < 144
-        #   @mode = Modes::OAM_SCAN
-        # elsif @dots < 252 && @registers.ly < 144
-        #   @mode = Modes::DRAWING
-        #   draw_scanline unless @scanline_drawn
-        #   @scanline_drawn = true
-        # elsif @dots < DOTS_PER_SCANLINE && @registers.ly < 144
-        #   @mode = Modes::H_BLANK
-        # elsif @dots >= DOTS_PER_SCANLINE # -> Scanline completed.
-        #   @dots = 0
-        #   @registers.ly = (@registers.ly + 1) % 154
-        #   @interrupts.request(:lcd_stat) if @registers.ly == @registers.lyc && bit(@registers.stat, 6) == 1
-        #   @scanline_drawn = false
-        #   # @framebuffer << "\n"
-
-        #   if @registers.ly == 144 # -> Frame completed
-        #     @mode = Modes::V_BLANK
-        #     @interrupts.request(:v_blank)
-        #     # @framebuffer << "\e[H"
-        #     # print @framebuffer.join if @video == 'console'
-        #     @display&.draw(@framebuffer)
-        #     @framebuffer = Array.new
-        #   end
-        # end
       end
 
       private
@@ -188,14 +165,6 @@ module Akane
         end
       end
 
-      def lcd_on?
-        bit(@registers.lcdc, 7) == 1
-      end
-
-      def lcd_off?
-        bit(@registers.lcdc, 7).zero?
-      end
-
       def window_tile_map
         WINDOW_TILE_MAPS[bit(@registers.lcdc, 6)]
       end
@@ -217,10 +186,14 @@ module Akane
         return unless @trace_ppu
 
         $stdout.printf(
-          "Dots: %<dots>04d | Mode: %<mode>s | LY: $%<ly>02X (%<ly>d)\n",
+          'Dots: %<dots>04d | ' \
+          'LY: $%<ly>02X (%<ly>d) | ' \
+          'STAT: $%<stat>02X | ' \
+          "Mode: %<mode>s\n",
           dots: @dots,
-          mode: @mode.to_s,
-          ly: @registers.ly
+          ly: @registers.ly,
+          stat: @registers.stat.value,
+          mode: @mode.to_s
         )
       end
     end

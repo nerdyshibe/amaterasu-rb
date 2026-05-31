@@ -7,14 +7,14 @@ module Akane
       class Registers
         include Utils::BitOps
 
-        attr_reader :lcdc, :scy, :scx, :ly, :lyc, :bgp, :obp0, :obp1, :wy, :wx
+        attr_reader :lcdc, :stat, :scy, :scx, :ly, :lyc, :bgp, :obp0, :obp1, :wy, :wx
 
         def initialize(ppu_mode, update_shades, skip_boot_rom: true)
           @ppu_mode = ppu_mode
           @update_shades = update_shades
 
-          @lcdc = skip_boot_rom ? 0x91 : 0x00
-          @stat = skip_boot_rom ? 0x85 : 0x00
+          @lcdc = LcdControl.new(skip_boot_rom:)
+          @stat = LcdStatus.new(skip_boot_rom:)
           @scy  = 0x00
           @scx  = 0x00
           @ly   = 0x00
@@ -27,23 +27,11 @@ module Akane
         end
 
         def lcdc=(value)
-          @lcdc = value & 0xFF
+          @lcdc.value = value
         end
 
         def stat=(value)
-          @stat = value & 0xFF
-        end
-
-        # Bits: [7][6][5][4][3][2]([1][0])
-        #                          @mode
-        def stat
-          @stat = if @ly == @lyc
-                    set_bit(@stat, 2)
-                  else
-                    clear_bit(@stat, 2)
-                  end
-
-          @stat | @ppu_mode.number
+          @stat.value = value
         end
 
         def scy=(value)

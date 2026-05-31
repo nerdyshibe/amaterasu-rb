@@ -64,7 +64,7 @@ module Akane
       # Requesting a transfer with value 0x80, means the source address is 0x8000.
       # You can multiple the given value by 0x100 to get the source address.
       #
-      # @param [Integer] A 8-bit value that represents the upper byte of the source address.
+      # @param source_value [Integer] A 8-bit value that represents the upper byte of the source address.
       def request_transfer(source_value:)
         @internal_latch = source_value
         @source_address = source_value * 0x100
