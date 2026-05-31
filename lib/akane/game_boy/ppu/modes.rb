@@ -5,13 +5,13 @@ module Akane
     class Ppu
       # Instantiates the PPU mode objects that are going to be used.
       module Modes
-        def self.build_hash(ppu:, oam:)
+        def self.build_hash(vram, oam, ppu:)
           @modes = Hash.new
 
-          @modes[:h_blank]  = HBlank.new(ppu:)
-          @modes[:v_blank]  = VBlank.new(ppu:)
-          @modes[:oam_scan] = OamScan.new(ppu:, oam:)
-          @modes[:drawing]  = Drawing.new(ppu:, oam:)
+          @modes[:h_blank]  = HBlank.new(ppu)
+          @modes[:v_blank]  = VBlank.new(ppu)
+          @modes[:oam_scan] = OamScan.new(ppu, oam)
+          @modes[:drawing]  = Drawing.new(ppu, vram)
 
           @modes.freeze
         end

@@ -8,7 +8,7 @@ module Akane
         class VBlank
           attr_reader :name, :number
 
-          def initialize(ppu:)
+          def initialize(ppu)
             @ppu = ppu
 
             @name = 'VBLANK'

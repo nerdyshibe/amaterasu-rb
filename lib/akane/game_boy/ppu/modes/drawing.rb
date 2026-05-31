@@ -19,14 +19,14 @@ module Akane
 
           attr_reader :name, :number
 
-          def initialize(ppu:, oam:)
+          def initialize(ppu, vram)
             @ppu = ppu
-            @oam = oam
+            @vram = vram
 
             @name = 'DRAWING'
             @number = 3
 
-            @pixel_fetcher = PixelFetcher.new
+            @pixel_fetcher = PixelFetcher.new(ppu, vram)
           end
 
           def tick

@@ -46,7 +46,7 @@ module Akane
         @interrupts = interrupts
         @trace_ppu = trace_ppu
 
-        @modes = Modes.build_hash(ppu: self, oam: @oam)
+        @modes = Modes.build_hash(@vram, @oam, ppu: self)
         @mode = @modes[:oam_scan]
         @registers = Registers.new(update_shades, skip_boot_rom:)
         @dots = 0

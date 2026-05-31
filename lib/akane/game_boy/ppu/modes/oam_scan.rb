@@ -13,7 +13,7 @@ module Akane
           # Creates the OamScan object that will be re-used by the Ppu.
           #
           # @param ppu [Akane::GameBoy::Ppu]
-          def initialize(ppu:, oam:)
+          def initialize(ppu, oam)
             @ppu = ppu
             @oam = oam
 
