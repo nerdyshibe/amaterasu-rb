@@ -19,13 +19,7 @@ module Akane
       @stop_cycles = cycles
       @stop_steps = steps
       @profiling_mode = profiling
-
-      @trace_cpu    = trace == 'cpu'
-      @trace_ppu    = trace == 'ppu'
-      @trace_dma    = trace == 'dma'
-      @trace_timer  = trace == 'timer'
-      @trace_serial = trace == 'serial'
-
+      @trace = trace
       @rom_path = rom_path
 
       @cycles = 0
@@ -33,7 +27,7 @@ module Akane
     end
 
     def start
-      @start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      @start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
       load_cartridge
       load_memory
@@ -80,11 +74,11 @@ module Akane
       @bus = GameBoy::Bus.new
       @lcd = HAL::SDL2.new unless @video == 'null'
       @apu = GameBoy::Apu.new
-      @dma = GameBoy::DMA.new(@bus, trace_dma: @trace_dma)
+      @dma = GameBoy::DMA.new(@bus, trace_dma: @trace == 'dma')
       @interrupts = GameBoy::Interrupts.new
-      @ppu = GameBoy::Ppu.new(@vram, @oam, @lcd, @interrupts, trace_ppu: @trace_ppu)
-      @timer = GameBoy::Timer.new(@interrupts, trace_timer: @trace_timer)
-      @serial = GameBoy::Serial.new(@interrupts, trace_serial: @trace_serial)
+      @ppu = GameBoy::Ppu.new(@vram, @oam, @lcd, @interrupts, trace_ppu: @trace == 'ppu')
+      @timer = GameBoy::Timer.new(@interrupts, trace_timer: @trace == 'timer')
+      @serial = GameBoy::Serial.new(@interrupts, trace_serial: @trace == 'serial')
       @joypad = GameBoy::Joypad.new(@interrupts)
       @bus.wire_components(
         cartridge: @cartridge,
@@ -103,17 +97,17 @@ module Akane
         @hram,
         @interrupts,
         -> { advance_cycle },
-        trace_cpu: @trace_cpu
+        trace_cpu: @trace == 'cpu'
       )
     end
 
     def stop
-      @elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - @start
+      @elapsed_time = Process.clock_gettime(Process::CLOCK_MONOTONIC) - @start_time
 
       frames = @cycles.to_f / 17_556
-      fps = frames / @elapsed
+      fps = frames / @elapsed_time
 
-      puts "#{@steps} steps / #{@cycles} cycles in #{@elapsed.round(2)}s"
+      puts "#{@steps} steps / #{@cycles} cycles in #{@elapsed_time.round(2)}s"
       puts "#{fps.round(2)} FPS (Target: 59.73)"
       puts "#{(fps / 59.73).round(2)}x real-time Game Boy"
 
