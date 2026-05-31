@@ -26,7 +26,7 @@ module Akane
       TILE_SIZE_IN_BYTES = 16
       TILE_ENTRIES = TILE_DATA_SIZE_IN_BYTES / TILE_SIZE_IN_BYTES #=> 384 tiles
 
-      attr_reader :tiles, :tile_map0, :tile_map1
+      attr_reader :tiles, :tile_map_low, :tile_map_high
       attr_accessor :data
 
       def initialize
@@ -36,8 +36,8 @@ module Akane
           Tile.new(vram_data: @data, index: index)
         end
 
-        @tile_map0 = TileMap.new(vram_data: @data)
-        @tile_map1 = TileMap.new(vram_data: @data)
+        @tile_map_low  = TileMap.new(vram_data: @data, offset: 0x1800)
+        @tile_map_high = TileMap.new(vram_data: @data, offset: 0x1C00)
       end
 
       def tile(index)

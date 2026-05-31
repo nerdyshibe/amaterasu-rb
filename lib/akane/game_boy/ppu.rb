@@ -21,15 +21,6 @@ module Akane
       DOTS_PER_SCANLINE = 456
       MAX_SPRITES_PER_SCANLINE = 10
 
-      WINDOW_TILE_MAPS = {
-        0 => { start: 0x9800, end: 0x9BFF },
-        1 => { start: 0x9C00, end: 0x9FFF }
-      }.freeze
-      BG_TILE_MAPS = {
-        0 => { start: 0x9800, end: 0x9BFF },
-        1 => { start: 0x9C00, end: 0x9FFF }
-      }.freeze
-
       attr_reader :registers, :dots, :sprite_buffer
 
       def initialize(
@@ -46,14 +37,13 @@ module Akane
         @interrupts = interrupts
         @trace_ppu = trace_ppu
 
+        @registers = Registers.new(update_shades, skip_boot_rom:)
         @modes = Modes.build_hash(@vram, @oam, ppu: self)
         @mode = @modes[:oam_scan]
-        @registers = Registers.new(update_shades, skip_boot_rom:)
         @dots = 0
         @framebuffer = Array.new
         @scanline_drawn = false
         @sprite_buffer = Array.new(MAX_SPRITES_PER_SCANLINE)
-
         @shades = [0b00, 0b00, 0b00, 0b00]
       end
 
@@ -114,6 +104,20 @@ module Akane
         @dots += 1
       end
 
+      # @return [TileMap]
+      def window_tile_map
+        return @vram.tile_map_high if @registers.lcdc.window_tile_map_high?
+
+        @vram.tile_map_low
+      end
+
+      # @return [TileMap]
+      def bg_tile_map
+        return @vram.tile_map_high if @registers.lcdc.bg_tile_map_high?
+
+        @vram.tile_map_low
+      end
+
       private
 
       # Game Boy only cares about tiles.
@@ -162,14 +166,6 @@ module Akane
             bit_pos -= 1
           end
         end
-      end
-
-      def window_tile_map
-        WINDOW_TILE_MAPS[bit(@registers.lcdc, 6)]
-      end
-
-      def bg_tile_map
-        BG_TILE_MAPS[bit(@registers.lcdc, 3)]
       end
 
       # Tile data addressing mode.

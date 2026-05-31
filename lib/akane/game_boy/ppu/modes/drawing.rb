@@ -30,6 +30,7 @@ module Akane
           end
 
           def tick
+            @pixel_fetcher.tick
           end
 
           def inspect
@@ -40,7 +41,7 @@ module Akane
           end
 
           def to_s
-            "#{@name} (#{@number})"
+            "#{@name} (#{@number}) #{@pixel_fetcher.to_s}"
           end
         end
       end
