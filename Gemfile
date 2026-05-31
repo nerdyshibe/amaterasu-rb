@@ -9,6 +9,7 @@ gem 'ffi'
 # gem 'gosu'
 # gem 'raylib-bindings'
 # gem 'sdl2-bindings'
+gem 'zeitwerk'
 
 group :development do
   gem 'benchmark-ips'

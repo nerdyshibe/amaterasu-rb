@@ -7,7 +7,7 @@ module Akane
     # On the real Game Boy, the CPU and DMA share the same physical bus.
     # During DMA, the DMA controller physically takes over the bus lines — the CPU is
     # electrically disconnected from the bus (except HRAM, which is on a separate internal path).
-    class DMA
+    class Dma
       OAM_START_ADDRESS = 0xFE00
       DMA_START_DELAY = 1
       DMA_TOTAL_CYCLES = 160 + DMA_START_DELAY

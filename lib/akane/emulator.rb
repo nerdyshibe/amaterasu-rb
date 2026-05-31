@@ -74,7 +74,7 @@ module Akane
       @bus = GameBoy::Bus.new
       @lcd = HAL::SDL2.new unless @video == 'null'
       @apu = GameBoy::Apu.new
-      @dma = GameBoy::DMA.new(@bus, trace_dma: @trace == 'dma')
+      @dma = GameBoy::Dma.new(@bus, trace_dma: @trace == 'dma')
       @interrupts = GameBoy::Interrupts.new
       @ppu = GameBoy::Ppu.new(@vram, @oam, @lcd, @interrupts, trace_ppu: @trace == 'ppu')
       @timer = GameBoy::Timer.new(@interrupts, trace_timer: @trace == 'timer')

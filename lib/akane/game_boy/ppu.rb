@@ -30,8 +30,6 @@ module Akane
         1 => { start: 0x9C00, end: 0x9FFF }
       }.freeze
 
-      LCD_ENABLE_BIT = 7
-
       attr_reader :registers, :dots, :sprite_buffer
 
       def initialize(
@@ -50,7 +48,7 @@ module Akane
 
         @modes = Modes.build_hash(ppu: self, oam: @oam)
         @mode = @modes[:oam_scan]
-        @registers = Registers.new(@mode, update_shades, skip_boot_rom:)
+        @registers = Registers.new(update_shades, skip_boot_rom:)
         @dots = 0
         @framebuffer = Array.new
         @scanline_drawn = false
@@ -61,10 +59,8 @@ module Akane
 
       # Returns a 8-bit value stored in VRAM in a given address.
       #
-      # VRAM data:
-      # $8000-$97FF: Tile data (up to 384 tiles × 16 bytes each)
-      # $9800-$9BFF: Tile map 0 (32×32 = 1024 tile indices)
-      # $9C00-$9FFF: Tile map 1 (alternative map)
+      # @param address [Integer]
+      # @return [Integer]
       def read_vram(address:)
         return 0xFF if @mode == @modes[:drawing]
 
@@ -72,6 +68,9 @@ module Akane
       end
 
       # Stores a 8-bit value in VRAM in a given address.
+      #
+      # @param address [Integer]
+      # @param value [Integer]
       def write_vram(address:, value:)
         @vram.write_byte(address:, value:)
       end
@@ -186,10 +185,10 @@ module Akane
         return unless @trace_ppu
 
         $stdout.printf(
-          'Dots: %<dots>04d | ' \
+          'DOTS: %<dots>04d | ' \
           'LY: $%<ly>02X (%<ly>d) | ' \
           'STAT: $%<stat>02X | ' \
-          "Mode: %<mode>s\n",
+          "MODE: %<mode>s\n",
           dots: @dots,
           ly: @registers.ly,
           stat: @registers.stat.value,
