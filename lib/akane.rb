@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'zeitwerk'
+require 'debug'
 
 loader = Zeitwerk::Loader.for_gem
 loader.inflector.inflect('cli' => 'CLI')

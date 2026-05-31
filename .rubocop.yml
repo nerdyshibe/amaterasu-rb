@@ -40,8 +40,6 @@ RSpec/MultipleMemoizedHelpers:
 Style/FrozenStringLiteralComment:
   Enabled: true
   EnforcedStyle: always
-  Exclude:
-    - 'bin/akane'
 
 Style/ComparableBetween:
   Enabled: false

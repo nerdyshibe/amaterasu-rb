@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require_relative '../lib/akane'
 
@@ -14,8 +15,6 @@ if options[:profiling]
     results = StackProf.results
     StackProf::Report.new(results).print_text(sort: true, limit: 30)
   end
-
-  Akane::Emulator.new(**options).start
-else
-  Akane::Emulator.new(**options).start
 end
+
+Akane::Emulator.new(**options).start

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'debug'
-
 module Akane
   module GameBoy
     # Models the CPU behavior from the Game Boy.
