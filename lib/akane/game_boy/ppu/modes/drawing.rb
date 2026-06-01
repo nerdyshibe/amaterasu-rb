@@ -15,33 +15,31 @@ module Akane
         # several scenarios in which "penalties" occur and this
         # causes the mode to take longer.
         class Drawing
-          PIXELS_PER_SCANLINE = 160
-
           attr_reader :name, :number
 
-          def initialize(ppu, vram)
+          def initialize(ppu)
             @ppu = ppu
-            @vram = vram
+
+            @pixel_fetcher = @ppu.pixel_fetcher
+            @pixel_emitter = @ppu.pixel_emitter
 
             @name = 'DRAWING'
             @number = 3
-
-            @pixel_fetcher = PixelFetcher.new(ppu, vram)
           end
 
           def tick
             @pixel_fetcher.tick
+            @pixel_emitter.tick
           end
 
           def inspect
             '#<Akane::GameBoy::Ppu::Modes::Drawing ' \
               "@name='#{@name}' " \
-              "@number=#{@number} " \
-              "@sprite_buffer=#{@frame_buffer}"
+              "@number=#{@number} "
           end
 
           def to_s
-            "#{@name} (#{@number}) | #{@pixel_fetcher}"
+            "#{@name} (#{@number}) | #{format('%-30s', @pixel_fetcher)} | #{@pixel_emitter}"
           end
         end
       end

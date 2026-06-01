@@ -6,7 +6,7 @@ module Akane
       module Modes
         # Defines the behavior of the Ppu during OAM Scan mode.
         class OamScan
-          TOTAL_DOTS = 80
+          SCAN_DURATION_IN_DOTS = 80
 
           attr_reader :name, :number
 
@@ -33,14 +33,16 @@ module Akane
               @current_sprite = @oam.sprite(@sprite_index)
               @sprite_index += 1
 
-              return unless @current_sprite.y_pos + 16 == @ppu.registers.ly
-
-              @ppu.sprite_buffer[@sprite_count] = @current_sprite
-              @sprite_count += 1
+              if @current_sprite.y_pos + 16 == @ppu.registers.ly
+                @ppu.sprite_buffer[@sprite_count] = @current_sprite
+                @sprite_count += 1
+              end
             end
 
-            return unless @ppu.dots == TOTAL_DOTS
+            return unless @ppu.dots == SCAN_DURATION_IN_DOTS
 
+            @sprite_count = 0
+            @sprite_index = 0
             @ppu.set_mode(:drawing)
           end
 

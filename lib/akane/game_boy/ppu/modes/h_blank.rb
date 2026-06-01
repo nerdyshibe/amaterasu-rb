@@ -13,11 +13,19 @@ module Akane
 
             @name = 'HBLANK'
             @number = 0
-            @dots = 0
           end
 
           def tick
-            puts 'HBlank mode ticked'
+            return unless @ppu.dots == 455
+
+            @ppu.increment_ly
+
+            if @ppu.registers.ly < 144
+              @ppu.set_mode(:oam_scan)
+            elsif @ppu.registers.ly == 144
+              @ppu.set_mode(:v_blank)
+              @ppu.request_interrupt(:v_blank)
+            end
           end
 
           def inspect
@@ -27,7 +35,7 @@ module Akane
           end
 
           def to_s
-            "#{@name} (#{@number})"
+            "#{@name} (#{@number}) | WAITING FOR SCANLINE TO FINISH"
           end
         end
       end

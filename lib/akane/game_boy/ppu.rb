@@ -23,10 +23,13 @@ module Akane
 
       attr_reader :registers,
                   :dots,
+                  :framebuffer,
                   :sprite_buffer,
                   :shades,
                   :sprite_fifo,
-                  :bg_win_fifo
+                  :bg_win_fifo,
+                  :pixel_fetcher,
+                  :pixel_emitter
 
       def initialize(
         vram,
@@ -42,16 +45,18 @@ module Akane
         @interrupts = interrupts
         @trace_ppu = trace_ppu
 
-        @registers     = Registers.new(update_shades, skip_boot_rom:)
+        @registers     = Registers.new(skip_boot_rom:)
         @framebuffer   = Array.new
         @sprite_buffer = Array.new(MAX_SPRITES_PER_SCANLINE)
-        @sprite_fifo   = PixelFifo.new
-        @bg_win_fifo   = PixelFifo.new
-        @shades        = [0b00, 0b00, 0b00, 0b00]
         @dots          = 0
 
-        @modes         = Modes.build_hash(@vram, @oam, ppu: self)
-        @mode          = @modes[:oam_scan]
+        @sprite_fifo   = PixelFifo.new
+        @bg_win_fifo   = PixelFifo.new
+        @pixel_fetcher = PixelFetcher.new(ppu: self)
+        @pixel_emitter = PixelEmitter.new(ppu: self)
+
+        @modes = Modes.build_hash(@oam, ppu: self)
+        @mode  = @modes[:oam_scan]
       end
 
       # Core PPU state machine.
@@ -67,8 +72,16 @@ module Akane
         end
 
         @mode.tick
+        @dots = (@dots + 1) % 456
         log_state
-        @dots += 1
+      end
+
+      def draw_frame
+        @display.draw(@framebuffer)
+      end
+
+      def request_interrupt(interrupt_type)
+        @interrupts.request(interrupt_type)
       end
 
       # Sets the current PPU mode to be ticked.
@@ -76,6 +89,10 @@ module Akane
       # @param mode [Symbol]
       def set_mode(mode)
         @mode = @modes[mode]
+      end
+
+      def increment_ly
+        @registers.ly += 1
       end
 
       # Returns a 8-bit value stored in VRAM in a given address.
@@ -106,15 +123,6 @@ module Akane
       # Stores a 8-bit value in OAM in a given address.
       def write_oam(address:, value:)
         @oam.write_byte(address:, value:)
-      end
-
-      def update_shades
-        lambda do |bgp|
-          @shades[0] = bgp & 0b11
-          @shades[1] = (bgp >> 2) & 0b11
-          @shades[2] = (bgp >> 4) & 0b11
-          @shades[3] = (bgp >> 6) & 0b11
-        end
       end
 
       # @return [TileMap]

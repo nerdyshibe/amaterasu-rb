@@ -13,11 +13,15 @@ module Akane
 
             @name = 'VBLANK'
             @number = 3
-            @dots = 0
           end
 
           def tick
-            puts 'VBlank mode ticked'
+            @ppu.increment_ly if @ppu.dots == 455
+            return unless @ppu.registers.ly == 154
+
+            @ppu.registers.ly = 0
+            @ppu.draw_frame
+            @ppu.set_mode(:oam_scan)
           end
 
           def inspect
@@ -27,7 +31,7 @@ module Akane
           end
 
           def to_s
-            "#{@name} (#{@number})"
+            "#{@name} (#{@number}) | WAITING UNTIL THE FRAME IS COMPLETED"
           end
         end
       end

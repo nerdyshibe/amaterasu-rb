@@ -30,13 +30,14 @@ module Akane
           true
         end
 
-        def pop?
-          return false if @pixels.empty?
+        # @return [Integer] 2 bit number
+        def pop_pixel
+          return if @pixels.empty?
 
-          @pixels.pop
+          popped = @pixels.pop
           @current_index -= 1
 
-          true
+          popped
         end
 
         private

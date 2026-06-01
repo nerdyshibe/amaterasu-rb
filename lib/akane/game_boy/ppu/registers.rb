@@ -15,23 +15,29 @@ module Akane
                     :obp0,
                     :obp1,
                     :wy,
-                    :wx
+                    :wx,
+                    :pixel_shades
 
-        # @param update_shades [Proc] Updates shade values when BGP is written
-        def initialize(update_shades, skip_boot_rom: true)
-          @update_shades = update_shades
-
+        # @param skip_boot_rom [Boolean]
+        def initialize(skip_boot_rom: true)
           @lcdc = LcdControl.new(skip_boot_rom:)
           @stat = LcdStatus.new(skip_boot_rom:)
           @scy  = 0x00
           @scx  = 0x00
           @ly   = 0x00
           @lyc  = 0x00
-          @bgp  = 0x00
+          @bgp  = skip_boot_rom ? 0xFC : 0x00
           @obp0 = 0x00
           @obp1 = 0x00
           @wy   = 0x00
           @wx   = 0x00
+
+          @pixel_shades = [
+            @bgp & 0b11,
+            (@bgp >> 2) & 0b11,
+            (@bgp >> 4) & 0b11,
+            (@bgp >> 6) & 0b11
+          ]
         end
 
         # @param value [Integer]
@@ -68,7 +74,10 @@ module Akane
         def bgp=(value)
           @bgp = value & 0xFF
 
-          @update_shades.call(@bgp)
+          @pixel_shades[0] = @bgp & 0b11
+          @pixel_shades[1] = (@bgp >> 2) & 0b11
+          @pixel_shades[2] = (@bgp >> 4) & 0b11
+          @pixel_shades[3] = (@bgp >> 6) & 0b11
         end
 
         # @param value [Integer]
