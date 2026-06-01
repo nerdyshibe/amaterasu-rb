@@ -118,6 +118,18 @@ module Akane
         @vram.tile_map_low
       end
 
+      # @return [TileData]
+      def bg_win_tile_data
+        return @vram.unsigned_tile_data if @registers.lcdc.tile_data_at_0x8000?
+
+        @vram.signed_tile_data
+      end
+
+      # @return [TileData]
+      def obj_tile_data
+        @vram.unsigned_tile_data
+      end
+
       private
 
       # Game Boy only cares about tiles.
@@ -166,14 +178,6 @@ module Akane
             bit_pos -= 1
           end
         end
-      end
-
-      # Tile data addressing mode.
-      #
-      # - LCDC Bit 4 is 1 -> Base address = $8000 (Unsigned byte).
-      # - LCDC Bit 4 is 0 -> Base address = $9000 (Sign byte offset -128 to +127).
-      def addressing_mode
-        bit(@registers.lcdc, 4)
       end
 
       # Prints the current state of the PPU into the console for debugging.

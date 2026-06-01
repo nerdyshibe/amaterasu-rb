@@ -41,7 +41,7 @@ module Akane
           end
 
           def to_s
-            "#{@name} (#{@number}) #{@pixel_fetcher.to_s}"
+            "#{@name} (#{@number}) | #{@pixel_fetcher}"
           end
         end
       end

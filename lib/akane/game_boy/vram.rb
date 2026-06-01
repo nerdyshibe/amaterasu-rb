@@ -26,22 +26,28 @@ module Akane
       TILE_SIZE_IN_BYTES = 16
       TILE_ENTRIES = TILE_DATA_SIZE_IN_BYTES / TILE_SIZE_IN_BYTES #=> 384 tiles
 
-      attr_reader :tiles, :tile_map_low, :tile_map_high
-      attr_accessor :data
+      attr_reader :unsigned_tile_data,
+                  :signed_tile_data,
+                  :tile_map_low,
+                  :tile_map_high
 
+      # Creates "lens objects" passing the original VRAM @data Array,
+      # when a value is written into VRAM it will be correctly read
+      # by all the Tile Data and Tile Maps.
       def initialize
         super(size: SIZE_IN_BYTES, offset: START_ADDRESS)
 
-        @tiles = Array.new(TILE_ENTRIES) do |index|
-          Tile.new(vram_data: @data, index: index)
-        end
+        @unsigned_tile_data = TileData.new(
+          vram_data: @data,
+          addressing_mode: :unsigned
+        )
+        @signed_tile_data = TileData.new(
+          vram_data: @data,
+          addressing_mode: :signed
+        )
 
         @tile_map_low  = TileMap.new(vram_data: @data, offset: 0x1800)
         @tile_map_high = TileMap.new(vram_data: @data, offset: 0x1C00)
-      end
-
-      def tile(index)
-        @tiles[index]
       end
     end
   end
