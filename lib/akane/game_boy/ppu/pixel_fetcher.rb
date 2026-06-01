@@ -90,7 +90,7 @@ module Akane
           while bit >= 0
             low_bit = (@tile_data_low >> bit) & 1
             high_bit = (@tile_data_high >> bit) & 1
-            color_id = high_bit | low_bit
+            color_id = (high_bit << 1) | low_bit
             @tile_pixels << @ppu.registers.pixel_shades[color_id]
             bit -= 1
           end
