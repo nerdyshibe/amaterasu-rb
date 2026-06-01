@@ -114,8 +114,8 @@ module Akane
         when 0xFF06 then @timer.tma
         when 0xFF07 then @timer.tac
         when 0xFF0F then @interrupts.if_register
-        when 0xFF40 then @ppu.registers.lcdc
-        when 0xFF41 then @ppu.registers.stat
+        when 0xFF40 then @ppu.registers.lcdc.value
+        when 0xFF41 then @ppu.registers.stat.value
         when 0xFF42 then @ppu.registers.scy
         when 0xFF43 then @ppu.registers.scx
         when 0xFF44 then @ppu.registers.ly

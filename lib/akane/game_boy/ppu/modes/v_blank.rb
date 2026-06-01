@@ -21,6 +21,7 @@ module Akane
 
             @ppu.registers.ly = 0
             @ppu.draw_frame
+            @ppu.framebuffer.clear
             @ppu.set_mode(:oam_scan)
           end
 

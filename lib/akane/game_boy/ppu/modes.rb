@@ -8,7 +8,7 @@ module Akane
         def self.build_hash(oam, ppu:)
           @modes = Hash.new
 
-          @modes[:disabled] = Disabled.new
+          @modes[:disabled] = Disabled.new(ppu)
           @modes[:h_blank]  = HBlank.new(ppu)
           @modes[:v_blank]  = VBlank.new(ppu)
           @modes[:oam_scan] = OamScan.new(ppu, oam)

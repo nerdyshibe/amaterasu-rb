@@ -56,7 +56,7 @@ module Akane
         @pixel_emitter = PixelEmitter.new(ppu: self)
 
         @modes = Modes.build_hash(@oam, ppu: self)
-        @mode  = @modes[:oam_scan]
+        @mode  = @modes[:disabled]
       end
 
       # Core PPU state machine.
@@ -64,13 +64,6 @@ module Akane
       # Each mode is responsible for its own logic and
       # also switching to the next mode.
       def tick
-        unless @registers.lcdc.lcd_enabled?
-          @registers.ly = 0x00
-          @dots = 0
-          @mode = @modes[:disabled]
-          return
-        end
-
         @mode.tick
         @dots = (@dots + 1) % 456
         log_state
@@ -82,6 +75,11 @@ module Akane
 
       def request_interrupt(interrupt_type)
         @interrupts.request(interrupt_type)
+      end
+
+      def reset_dots
+        @dots = 0
+        @registers.ly = 0x00
       end
 
       # Sets the current PPU mode to be ticked.
@@ -159,10 +157,12 @@ module Akane
 
         $stdout.printf(
           'DOTS: %<dots>04d | ' \
+          'LCDC: $%<lcdc>02X | ' \
           'LY: $%<ly>02X (%<ly>d) | ' \
           'STAT: $%<stat>02X | ' \
           "MODE: %<mode>s\n",
           dots: @dots,
+          lcdc: @registers.lcdc.value,
           ly: @registers.ly,
           stat: @registers.stat.value,
           mode: @mode.to_s
