@@ -21,7 +21,12 @@ module Akane
       DOTS_PER_SCANLINE = 456
       MAX_SPRITES_PER_SCANLINE = 10
 
-      attr_reader :registers, :dots, :sprite_buffer
+      attr_reader :registers,
+                  :dots,
+                  :sprite_buffer,
+                  :shades,
+                  :sprite_fifo,
+                  :bg_win_fifo
 
       def initialize(
         vram,
@@ -37,14 +42,40 @@ module Akane
         @interrupts = interrupts
         @trace_ppu = trace_ppu
 
-        @registers = Registers.new(update_shades, skip_boot_rom:)
-        @modes = Modes.build_hash(@vram, @oam, ppu: self)
-        @mode = @modes[:oam_scan]
-        @dots = 0
-        @framebuffer = Array.new
-        @scanline_drawn = false
+        @registers     = Registers.new(update_shades, skip_boot_rom:)
+        @framebuffer   = Array.new
         @sprite_buffer = Array.new(MAX_SPRITES_PER_SCANLINE)
-        @shades = [0b00, 0b00, 0b00, 0b00]
+        @sprite_fifo   = PixelFifo.new
+        @bg_win_fifo   = PixelFifo.new
+        @shades        = [0b00, 0b00, 0b00, 0b00]
+        @dots          = 0
+
+        @modes         = Modes.build_hash(@vram, @oam, ppu: self)
+        @mode          = @modes[:oam_scan]
+      end
+
+      # Core PPU state machine.
+      #
+      # Each mode is responsible for its own logic and
+      # also switching to the next mode.
+      def tick
+        unless @registers.lcdc.lcd_enabled?
+          @registers.ly = 0x00
+          @dots = 0
+          @mode = @modes[:disabled]
+          return
+        end
+
+        @mode.tick
+        log_state
+        @dots += 1
+      end
+
+      # Sets the current PPU mode to be ticked.
+      #
+      # @param mode [Symbol]
+      def set_mode(mode)
+        @mode = @modes[mode]
       end
 
       # Returns a 8-bit value stored in VRAM in a given address.
@@ -86,24 +117,6 @@ module Akane
         end
       end
 
-      # @param mode [Symbol]
-      def set_mode(mode)
-        @mode = @modes[mode]
-      end
-
-      def tick
-        unless @registers.lcdc.lcd_enabled?
-          @registers.ly = 0x00
-          @dots = 0
-          @mode = @modes[:disabled]
-          return
-        end
-
-        @mode.tick
-        log_state
-        @dots += 1
-      end
-
       # @return [TileMap]
       def window_tile_map
         return @vram.tile_map_high if @registers.lcdc.window_tile_map_high?
@@ -131,54 +144,6 @@ module Akane
       end
 
       private
-
-      # Game Boy only cares about tiles.
-      #
-      # Background is 256x256 pixels (256 / 8 => 32x32 tiles).
-      # Screen is 160x144 pixels positioned by SCX/SCY within the background.
-      # 160 / 8 = 20 tiles. 144 / 8 = 18 tiles.
-      # Tiles are 8x8 pixels (64).
-      # Each pixel uses 2 bits for defining the color pallete (0-3).
-      # 64 pixels * 2 bits = 128 bits (16 bytes).
-      # 16 bytes -> 2 bytes per row (8 rows).
-      #
-      # byte1 => 1 1 1 1 1 1 1 1
-      # byte2 => 1 1 1 1 1 1 1 1
-      def draw_scanline
-        # Loops through 20 tiles (20 * 8 px = 160px = width of the scanline)
-        # Tile map is a grid of 32 x 32 tiles.
-        # You need a x and y coordinate to get the tile index.
-        # Each entry in the grid is a single byte with the tile index.
-        tile_map_base_address = bg_tile_map[:start]
-        map_tile_x = @registers.scx / 8
-        map_tile_y = (@registers.ly + @registers.scy) / 8
-
-        (0..19).each do |tile_pos|
-          tile_index_address = tile_map_base_address + ((map_tile_x + tile_pos) % 32) + ((map_tile_y % 32) * 32)
-          tile_index = @vram.read_byte(address: tile_index_address)
-
-          row_in_tile_data = (@registers.ly + @registers.scy) % 8
-
-          if addressing_mode == 1
-            tile_data_address = 0x8000 + (tile_index * 16) + (row_in_tile_data * 2)
-          else
-            signed_index = tile_index >= 128 ? tile_index - 256 : tile_index
-            tile_data_address = 0x9000 + (signed_index * 16) + (row_in_tile_data * 2)
-          end
-
-          byte1 = @vram.read_byte(address: tile_data_address)
-          byte2 = @vram.read_byte(address: tile_data_address + 1)
-
-          bit_pos = 7
-          while bit_pos >= 0
-            pixel_color_index = (bit(byte2, bit_pos) << 1) | bit(byte1, bit_pos)
-            pixel_shade = @shades[pixel_color_index]
-            # @framebuffer << CONSOLE_CHARS[pixel_shade]
-            @framebuffer << pixel_shade
-            bit_pos -= 1
-          end
-        end
-      end
 
       # Prints the current state of the PPU into the console for debugging.
       def log_state

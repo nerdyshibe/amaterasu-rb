@@ -12,6 +12,7 @@ module Akane
           @ly = @ppu.registers.ly
           @scx = @ppu.registers.scx
           @scy = @ppu.registers.scy
+          @shades = @ppu.shades
 
           @bg_fetcher_x = 0
           @window_fetcher_x = 0
@@ -19,6 +20,8 @@ module Akane
           @state = :get_tile_index
           @dots = 0
           @mode = :bg
+          @tile_pixels = Array.new
+          @pixels_decoded = false
         end
 
         def tick
@@ -53,10 +56,31 @@ module Akane
           when :sleep
             @state = :pushing_pixels if @dots == 7
           when :pushing_pixels
-            # push
+            decode_pixels unless @pixels_decoded
+
+            if @ppu.bg_win_fifo.push?(@tile_pixels)
+              @bg_fetcher_x += 1
+              @state = :get_tile_index
+              @tile_pixels.clear
+              @pixels_decoded = false
+            end
           end
 
           @dots += 1
+        end
+
+        def decode_pixels
+          bit = 7
+
+          while bit >= 0
+            low_bit = (@tile_data_low >> bit) & 1
+            high_bit = (@tile_data_high >> bit) & 1
+            color_id = high_bit | low_bit
+            @tile_pixels << @shades[color_id]
+            bit -= 1
+          end
+
+          @pixels_decoded = true
         end
 
         def to_s
