@@ -162,7 +162,7 @@ module Akane
         return unless @trace_ppu
 
         $stdout.printf(
-          'DOTS: %<dots>04d | ' \
+          '#%<dots>03d | ' \
           'LCDC: $%<lcdc>02X | ' \
           'LY: $%<ly>02X (%<ly>d) | ' \
           'STAT: $%<stat>02X | ' \
