@@ -34,31 +34,36 @@ module Akane
         # Total number of rows in the grid.
         GRID_HEIGHT = 32
 
+        # Mask to keep values between 0 and 31.
         BIT_MASK_WRAP_VALUE = 0x1F
 
         # @param vram_data [Array] Reference to the original VRAM data.
-        # @param offset [Integer] Tile map start address within the VRAM data.
-        def initialize(vram_data:, offset:)
-          @vram_data = vram_data
-          @offset = offset
+        # @param base_offset [Integer] Tile map start address within the VRAM data.
+        def initialize(vram_data:, base_offset:)
+          @vram_data   = vram_data
+          @base_offset = base_offset
         end
 
         # Fetches a Tile index from the Tile Map at a given (X, Y) position.
+        #
+        # Before looking up in which column or row the Tile index is,
+        # we need to wrap the values around 32 (0x1F).
         #
         # Since the Memory is a flat array (single dimension) we need to
         # offset the given Y value by the Grid WIDTH to "jump over" the rows in
         # between and reach the correct row.
         #
-        # The X and Y values also need to wrap around 32 (0x1F). 0 -> 31 -> 0
-        #
-        # @param tile_x [Integer] Which column in the grid (0 - 31).
-        # @param tile_y [Integer] Which row in the grid (0 - 31).
-        # @return [Integer] 1 byte representing the given Tile index.
+        # @param tile_x [Integer] Which column in the grid.
+        # @param tile_y [Integer] Which row in the grid.
+        # @return [Integer] 1 byte representing the Tile index at the given (X, Y)
         def tile_index(tile_x:, tile_y:)
-          row_offset = (tile_y * GRID_WIDTH) & BIT_MASK_WRAP_VALUE
-          column     = tile_x & BIT_MASK_WRAP_VALUE
+          grid_row    = tile_y & BIT_MASK_WRAP_VALUE
+          grid_column = tile_x & BIT_MASK_WRAP_VALUE
 
-          @vram_data[@offset + row_offset + column]
+          tile_index_row    = grid_row * GRID_WIDTH
+          tile_index_column = grid_column
+
+          @vram_data[@base_offset + tile_index_row + tile_index_column]
         end
       end
     end

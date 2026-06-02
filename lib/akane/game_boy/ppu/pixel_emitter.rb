@@ -26,6 +26,7 @@ module Akane
 
           @pixels_emmited = 0
           @ppu.pixel_fetcher.reset_progress
+          @ppu.bg_win_fifo.clear
           @ppu.set_mode(:h_blank)
         end
 

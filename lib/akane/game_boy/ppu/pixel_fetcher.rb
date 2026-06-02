@@ -15,6 +15,7 @@ module Akane
           @dots = 0
           @mode = :bg
           @pixels_pushed = false
+          @tile_row_pixels = Array.new
         end
 
         def tick
@@ -38,15 +39,18 @@ module Akane
             @dots += 1
             @state = :get_tile_data_low if @dots == 2
           when :get_tile_data_low
-            @tile = @ppu.bg_win_tile_data.tile(@tile_index)
-            @current_y = (@ppu.registers.ly + @ppu.registers.scy) & 0b111
+            @current_y = @ppu.registers.ly + @ppu.registers.scy
+            @tile_row = @ppu.bg_win_tile_data.tile_row(
+              @tile_index,
+              @current_y
+            )
 
-            @tile_data_low = @tile.data_low(@current_y)
+            @tile_data_low = @tile_row[:low_byte]
 
             @dots += 1
             @state = :get_tile_data_high if @dots == 4
           when :get_tile_data_high
-            @tile_data_high = @tile.data_high(@current_y)
+            @tile_data_high = @tile_row[:high_byte]
 
             @dots += 1
             attempt_to_push_pixels if @dots == 6
@@ -61,19 +65,18 @@ module Akane
         end
 
         def attempt_to_push_pixels
-          @pixels_pushed = @ppu.bg_win_fifo.push?(@tile.pixels)
+          @pixels_pushed = @ppu.bg_win_fifo.push?(@tile_row[:pixels])
           @state = :pushing_pixels
           return unless @pixels_pushed
 
-          @bg_fetcher_x += 1
           @state = :sleep
         end
 
         def reset_cycle
           @dots = 0
+          @bg_fetcher_x += 1
           @state = :get_tile_index
-          @pixels_decoded = false
-          @pixels_pushed = false
+          @tile_row_pixels.clear
         end
 
         def reset_progress
@@ -83,12 +86,9 @@ module Akane
 
         def to_s
           if @mode == :bg
-            "#{@mode.upcase} " \
-              "#{@state.upcase} " \
+            "#{@mode} " \
+              "#{@state} " \
               "AT BG_X: #{@bg_fetcher_x} " \
-              "Tile Index: #{@tile_index} " \
-              "Tile Data Low: #{@tile_data_low} " \
-              "Tile Data High: #{@tile_data_high} " \
               "(##{@dots})"
           else
             "#{@mode.upcase} MODE: #{@state.upcase} AT W_X: #{@window_fetcher_x} (##{@dots})"

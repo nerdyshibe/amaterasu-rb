@@ -38,8 +38,8 @@ module Akane
         super(size: SIZE_IN_BYTES, offset: START_ADDRESS)
 
         @tile_data     = TileData.new(vram_data: @data)
-        @tile_map_low  = TileMap.new(vram_data: @data, offset: 0x1800)
-        @tile_map_high = TileMap.new(vram_data: @data, offset: 0x1C00)
+        @tile_map_low  = TileMap.new(vram_data: @data, base_offset: 0x1800)
+        @tile_map_high = TileMap.new(vram_data: @data, base_offset: 0x1C00)
       end
 
       def inspect

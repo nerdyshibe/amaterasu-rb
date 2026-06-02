@@ -5,45 +5,34 @@ module Akane
     class Ppu
       # Models the PPU Pixel FIFO from the original Game Boy (DMG).
       class PixelFifo
-        MAX_PIXELS    = 16
-        PUSHED_PIXELS = 8
+        MAX_PIXELS = 16
 
         attr_reader :pixels
 
         def initialize
-          @pixels = Array.new
-          @current_index = 0
+          @pixels = Array.new(MAX_PIXELS)
         end
 
-        def size
-          @pixels.size
-        end
-
+        # @return [true, false] If the push was successful or not.
         def push?(pixels)
-          return false if not_enough_room?
+          return false unless @pixels.empty?
 
-          pixels.each do |pixel|
-            @pixels[@current_index] = pixel
-            @current_index += 1
+          pixels.each_with_index do |pixel, index|
+            @pixels[index] = pixel
           end
 
           true
         end
 
-        # @return [Integer] 2 bit number
+        # @return [Integer] 2 bit number representing the color id of the pixel.
         def pop_pixel
           return if @pixels.empty?
 
-          popped = @pixels.shift
-          @current_index -= 1
-
-          popped
+          @pixels.shift
         end
 
-        private
-
-        def not_enough_room?
-          size + PUSHED_PIXELS > MAX_PIXELS
+        def clear
+          @pixels.clear
         end
       end
     end
