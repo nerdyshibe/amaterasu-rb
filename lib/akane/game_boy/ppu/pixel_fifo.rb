@@ -10,10 +10,10 @@ module Akane
         attr_reader :pixels
 
         def initialize
-          @pixels = Array.new(MAX_PIXELS)
+          @pixels = Array.new
         end
 
-        # @return [true, false] If the push was successful or not.
+        # @return [Boolean] If the push was successful or not.
         def push?(pixels)
           return false unless @pixels.empty?
 
