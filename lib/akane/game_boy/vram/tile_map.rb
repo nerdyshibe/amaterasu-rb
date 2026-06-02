@@ -46,7 +46,7 @@ module Akane
         # Fetches a Tile index from the Tile Map at a given (X, Y) position.
         #
         # Since the Memory is a flat array (single dimension) we need to
-        # offset the given Y value by the WIDTH to "jump over" the rows in
+        # offset the given Y value by the Grid WIDTH to "jump over" the rows in
         # between and reach the correct row.
         #
         # The X and Y values also need to wrap around 32 (0x1F). 0 -> 31 -> 0

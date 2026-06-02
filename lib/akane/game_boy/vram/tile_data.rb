@@ -5,59 +5,59 @@ module Akane
     class Vram
       # Models the Tile Data that lives in the VRAM.
       class TileData
-        UNSIGNED_BASE_POINTER = 0x8000
-        SIGNED_BASE_POINTER = 0x9000
-        UNSIGNED_BASE_OFFSET = 0x0000
-        SIGNED_BASE_OFFSET = 0x1000
+        START_ADDRESS = 0x8000
+        END_ADDRESS   = 0x97FF
+        TOTAL_SIZE    = (END_ADDRESS - START_ADDRESS) + 1
+        TILE_SIZE     = 16
+        TILE_ENTRIES  = TOTAL_SIZE / TILE_SIZE
+
+        attr_reader :block0_tiles, :block1_tiles, :block2_tiles
 
         # @param vram_data [Array] Original VRAM @data array object
-        # @param addressing_mode [Symbol] Either :signed or :unsigned
-        def initialize(vram_data:, addressing_mode:)
+        def initialize(vram_data:)
           @vram_data = vram_data
-          @addressing_mode = addressing_mode
 
-          @base_offset =
-            if addressing_mode == :unsigned
-              UNSIGNED_BASE_OFFSET
-            else
-              SIGNED_BASE_OFFSET
-            end
+          @addressing_mode = :unsigned
+          @base_pointer = 0x8000
+          @base_offset  = 0x0000
 
-          @tile_index = nil
+          @block0_tiles = Array.new(TILE_ENTRIES / 3) do |idx|
+            Tile.new(@vram_data, offset: idx * TILE_SIZE)
+          end
+          @block1_tiles = Array.new(TILE_ENTRIES / 3) do |idx|
+            Tile.new(@vram_data, offset: 0x0800 + (idx * TILE_SIZE))
+          end
+          @block2_tiles = Array.new(TILE_ENTRIES / 3) do |idx|
+            Tile.new(@vram_data, offset: 0x1000 + (idx * TILE_SIZE))
+          end
         end
 
-        # @param tile_index [Integer] 8-bit value that represents the Tile index
-        # @return [Integer] 8-bit value that represents the low byte of the Tile
-        def low_byte(tile_index)
-          @tile_index = tile_index
-          @tile_index = sign_value(tile_index) if @addressing_mode == :signed
-
-          @vram_data[@base_offset + @tile_index]
+        # @param mode [Symbol] Either :unsigned or :signed
+        def addressing_mode=(mode)
+          @addressing_mode = mode
+          @base_pointer = mode == :unsigned ? 0x8000 : 0x9000
+          @base_offset  = mode == :unsigned ? 0x0000 : 0x1000
         end
 
-        # @param tile_index [Integer] 8-bit value that represents the Tile index
-        # @return [Integer] 8-bit value that represents the high byte of the Tile
-        def high_byte(tile_index)
-          @tile_index = tile_index
-          @tile_index = sign_value(tile_index) if @addressing_mode == :signed
+        # Fetches a Tile based on a given index, if the addressing mode
+        # is set to :signed, we need to sign the value before fetching
+        # the tile.
+        #
+        # @param index [Integer] 8-bit value representing the tile index
+        # @return [Tile]
+        def tile(index)
+          return @block0_tiles[index] if @addressing_mode == :unsigned && index < 128
+          return @block1_tiles[index] if @addressing_mode == :unsigned && index >= 128
+          return @block1_tiles[index] if @addressing_mode == :signed && index >= 128
 
-          @vram_data[@base_offset + @tile_index + 1]
+          @block2_tiles[index]
         end
 
-        private
-
-        # @return [Integer] Signed value between -128 and +127
-        def sign_value(tile_index)
-          tile_index >= 128 ? tile_index - 256 : tile_index
-        end
-
-        # @return [String] Custom inspect method for debugging
         def inspect
-          '#<TileData ' \
-            "base_offset=$#{format('%04X', @base_offset)} " \
-            "tile_index=$#{format('%02X', @tile_index)} " \
-            "data_low=$#{format('%02X', low_byte)} " \
-            "data_high=$#{format('%02X', high_byte)}>"
+          "#<Vram::TileData \n" \
+            "@block0=#{@block0_tiles}\n" \
+            "@block1=#{@block1_tiles}\n" \
+            "@block2=#{@block2_tiles}>"
         end
       end
     end

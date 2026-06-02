@@ -14,8 +14,6 @@ module Akane
           @state = :get_tile_index
           @dots = 0
           @mode = :bg
-          @tile_pixels = Array.new
-          @pixels_decoded = false
           @pixels_pushed = false
         end
 
@@ -40,14 +38,15 @@ module Akane
             @dots += 1
             @state = :get_tile_data_low if @dots == 2
           when :get_tile_data_low
-            tile_data = @ppu.bg_win_tile_data
-            @tile_data_low = tile_data.low_byte(@tile_index)
+            @tile = @ppu.bg_win_tile_data.tile(@tile_index)
+            @current_y = (@ppu.registers.ly + @ppu.registers.scy) & 0b111
+
+            @tile_data_low = @tile.data_low(@current_y)
 
             @dots += 1
             @state = :get_tile_data_high if @dots == 4
           when :get_tile_data_high
-            tile_data = @ppu.bg_win_tile_data
-            @tile_data_high = tile_data.high_byte(@tile_index)
+            @tile_data_high = @tile.data_high(@current_y)
 
             @dots += 1
             attempt_to_push_pixels if @dots == 6
@@ -62,8 +61,7 @@ module Akane
         end
 
         def attempt_to_push_pixels
-          decode_pixels unless @pixels_decoded
-          @pixels_pushed = @ppu.bg_win_fifo.push?(@tile_pixels)
+          @pixels_pushed = @ppu.bg_win_fifo.push?(@tile.pixels)
           @state = :pushing_pixels
           return unless @pixels_pushed
 
@@ -74,7 +72,6 @@ module Akane
         def reset_cycle
           @dots = 0
           @state = :get_tile_index
-          @tile_pixels.clear
           @pixels_decoded = false
           @pixels_pushed = false
         end
@@ -84,23 +81,15 @@ module Akane
           @bg_fetcher_x = 0
         end
 
-        def decode_pixels
-          bit = 7
-
-          while bit >= 0
-            low_bit = (@tile_data_low >> bit) & 1
-            high_bit = (@tile_data_high >> bit) & 1
-            color_id = (high_bit << 1) | low_bit
-            @tile_pixels << @ppu.registers.pixel_shades[color_id]
-            bit -= 1
-          end
-
-          @pixels_decoded = true
-        end
-
         def to_s
           if @mode == :bg
-            "#{@mode.upcase} MODE: #{@state.upcase} AT BG_X: #{@bg_fetcher_x} (##{@dots})"
+            "#{@mode.upcase} " \
+              "#{@state.upcase} " \
+              "AT BG_X: #{@bg_fetcher_x} " \
+              "Tile Index: #{@tile_index} " \
+              "Tile Data Low: #{@tile_data_low} " \
+              "Tile Data High: #{@tile_data_high} " \
+              "(##{@dots})"
           else
             "#{@mode.upcase} MODE: #{@state.upcase} AT W_X: #{@window_fetcher_x} (##{@dots})"
           end

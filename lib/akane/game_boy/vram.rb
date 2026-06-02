@@ -15,19 +15,19 @@ module Akane
     #   - Each Tile Map is a 32 x 32 grid of Tile indices (each index is 1 byte)
     #   - So each Tile Map has exactly 1024 bytes (1 KiB)
     class Vram < Ram
+      # VRAM Start Address in the Memory Map
       START_ADDRESS = 0x8000
+
+      # VRAM End Address in the Memory Map
       END_ADDRESS   = 0x9FFF
-      SIZE_IN_BYTES = (END_ADDRESS - START_ADDRESS) + 1 #=> 8192 bytes (8 KiB)
 
-      TILE_DATA_START_ADDRESS = 0x8000
-      TILE_DATA_END_ADDRESS   = 0x97FF
-      TILE_DATA_SIZE_IN_BYTES = (TILE_DATA_END_ADDRESS - TILE_DATA_START_ADDRESS) + 1
+      # VRAM Size in bytes: 8192 bytes (8 KiB)
+      SIZE_IN_BYTES = (END_ADDRESS - START_ADDRESS) + 1
 
-      TILE_SIZE_IN_BYTES = 16
-      TILE_ENTRIES = TILE_DATA_SIZE_IN_BYTES / TILE_SIZE_IN_BYTES #=> 384 tiles
+      attr_accessor :data
 
-      attr_reader :unsigned_tile_data,
-                  :signed_tile_data,
+      # Exposes the tile data and maps to the PPU
+      attr_reader :tile_data,
                   :tile_map_low,
                   :tile_map_high
 
@@ -37,17 +37,16 @@ module Akane
       def initialize
         super(size: SIZE_IN_BYTES, offset: START_ADDRESS)
 
-        @unsigned_tile_data = TileData.new(
-          vram_data: @data,
-          addressing_mode: :unsigned
-        )
-        @signed_tile_data = TileData.new(
-          vram_data: @data,
-          addressing_mode: :signed
-        )
-
+        @tile_data     = TileData.new(vram_data: @data)
         @tile_map_low  = TileMap.new(vram_data: @data, offset: 0x1800)
         @tile_map_high = TileMap.new(vram_data: @data, offset: 0x1C00)
+      end
+
+      def inspect
+        '#<Vram ' \
+          "@tile_data=#{@tile_data} " \
+          "@tile_map_low=#{@tile_map_low} " \
+          "@tile_map_high=#{@tile_map_high}>"
       end
     end
   end

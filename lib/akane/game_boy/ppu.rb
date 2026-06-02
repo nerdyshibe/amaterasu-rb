@@ -139,14 +139,20 @@ module Akane
 
       # @return [TileData]
       def bg_win_tile_data
-        return @vram.unsigned_tile_data if @registers.lcdc.tile_data_at_0x8000?
+        @vram.tile_data.addressing_mode =
+          if @registers.lcdc.tile_data_at_0x8000?
+            :unsigned
+          else
+            :signed
+          end
 
-        @vram.signed_tile_data
+        @vram.tile_data
       end
 
       # @return [TileData]
       def obj_tile_data
-        @vram.unsigned_tile_data
+        @vram.tile_data.addressing_mode = :unsigned
+        @vram.tile_data
       end
 
       private
