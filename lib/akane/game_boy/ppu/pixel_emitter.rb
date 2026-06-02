@@ -20,7 +20,7 @@ module Akane
           popped_pixel = @ppu.bg_win_fifo.pop_pixel
           return if popped_pixel.nil?
 
-          @ppu.framebuffer << popped_pixel
+          @ppu.framebuffer << @ppu.registers.pixel_shades[popped_pixel]
           @pixels_emmited += 1
           return unless @pixels_emmited == PIXELS_PER_SCANLINE
 

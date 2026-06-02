@@ -34,7 +34,7 @@ module Akane
         def pop_pixel
           return if @pixels.empty?
 
-          popped = @pixels.pop
+          popped = @pixels.shift
           @current_index -= 1
 
           popped
