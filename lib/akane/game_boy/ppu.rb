@@ -5,7 +5,7 @@ module Akane
     # This class models the Pixel Processing Unit from the Original Game Boy.
     #
     # The Ppu outputs a 160x144 pixel framebuffer each frame.
-    # This framebuffer will be used by the rendered to display the graphics.
+    # This framebuffer will be used by the chosen Renderer to display the graphics.
     # The Ppu should not care about how the pixels are rendered, just output them.
     #
     # Specifications:
@@ -18,6 +18,8 @@ module Akane
     class Ppu
       include Utils::BitOps
 
+      PIXELS_PER_SCANLINE = 160
+      VISIBLE_SCANLINES = 144
       DOTS_PER_SCANLINE = 456
       MAX_SPRITES_PER_SCANLINE = 10
 
@@ -48,15 +50,11 @@ module Akane
         @registers     = Registers.new(skip_boot_rom:)
         @framebuffer   = Array.new
         @sprite_buffer = Array.new(MAX_SPRITES_PER_SCANLINE)
-        @dots          = 0
+        @pipeline      = Pipeline.new(self)
 
-        @sprite_fifo   = PixelFifo.new
-        @bg_win_fifo   = PixelFifo.new
-        @pixel_fetcher = PixelFetcher.new(ppu: self)
-        @pixel_emitter = PixelEmitter.new(ppu: self)
-
-        @modes = Modes.build_hash(@oam, ppu: self)
+        @modes = Modes.build_hash(self)
         @mode  = @modes[:disabled]
+        @dots  = 0
       end
 
       # Core PPU state machine.
@@ -65,21 +63,8 @@ module Akane
       # also switching to the next mode.
       def tick
         @mode.tick
-        @dots = (@dots + 1) % 456
-        log_state
-      end
-
-      def draw_frame
-        @display.draw(@framebuffer)
-      end
-
-      def request_interrupt(interrupt_type)
-        @interrupts.request(interrupt_type)
-      end
-
-      def reset_dots
-        @dots = 0
-        @registers.ly = 0x00
+        @dots = (@dots + 1) % DOTS_PER_SCANLINE
+        log_state if @trace_ppu
       end
 
       # Sets the current PPU mode to be ticked.
@@ -87,6 +72,21 @@ module Akane
       # @param mode [Symbol]
       def set_mode(mode)
         @mode = @modes[mode]
+      end
+
+      # Restarts the rendering pipeline state.
+      def reset_cycle
+        @dots = 0
+        @registers.ly = 0x00
+      end
+
+      # Delegates the draw to the chosen Renderer.
+      def draw_frame
+        @display.draw(@framebuffer)
+      end
+
+      def request_interrupt(interrupt_type)
+        @interrupts.request(interrupt_type)
       end
 
       def increment_ly
@@ -159,8 +159,6 @@ module Akane
 
       # Prints the current state of the PPU into the console for debugging.
       def log_state
-        return unless @trace_ppu
-
         $stdout.printf(
           '#%<dots>03d | ' \
           'LCDC: $%<lcdc>02X | ' \
