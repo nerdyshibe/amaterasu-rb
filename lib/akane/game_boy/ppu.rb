@@ -123,6 +123,10 @@ module Akane
         @oam.write_byte(address:, value:)
       end
 
+      def fetch_sprite_at(index)
+        @oam.sprite(index)
+      end
+
       # @return [TileMap]
       def window_tile_map
         return @vram.tile_map_high if @registers.lcdc.window_tile_map_high?

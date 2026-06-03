@@ -4,18 +4,17 @@ module Akane
   module GameBoy
     class Ppu
       module Modes
-        # Defines the behavior of the Ppu during OAM Scan mode.
+        # Defines the behavior of the PPU during OAM Scan mode.
         class OamScan
+          # Each Sprite takes 2 dots to scan.
           SCAN_DURATION_IN_DOTS = 80
 
           attr_reader :name, :number
 
-          # Creates the OamScan object that will be re-used by the Ppu.
-          #
-          # @param ppu [Akane::GameBoy::Ppu]
-          def initialize(ppu, oam)
+          # @param ppu [Akane::GameBoy::Ppu] Reference to the PPU instance.
+          # @param oam [Akane::GameBoy::Oam] Reference to the OAM instance.
+          def initialize(ppu)
             @ppu = ppu
-            @oam = oam
 
             @name = 'OAM SCAN'
             @number = 2
@@ -25,12 +24,12 @@ module Akane
             @current_sprite = nil
           end
 
-          # This method is called by the Ppu each dot (T-cycle).
-          # It takes exactly 80 dots to scan OAM which has 40 sprite entries.
-          # This means that it takes exactly 2 dots to scan each sprite.
+          # This method is called by the PPU each T-cycle
+          # for all visible scanlines (0 - 143) and when
+          # dots are between 0 and 79 (2 dots per Sprite entry).
           def tick
             if @ppu.dots.odd? && @sprite_count < Ppu::MAX_SPRITES_PER_SCANLINE
-              @current_sprite = @oam.sprite(@sprite_index)
+              @current_sprite = @ppu.fetch_sprite_at(@sprite_index)
               @sprite_index += 1
 
               if @current_sprite.y_pos + 16 == @ppu.registers.ly

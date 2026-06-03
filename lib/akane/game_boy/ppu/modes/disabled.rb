@@ -16,7 +16,7 @@ module Akane
           def tick
             return unless @ppu.registers.lcdc.lcd_enabled?
 
-            @ppu.reset_dots
+            @ppu.reset_cycle
             @ppu.set_mode(:oam_scan)
           end
         end
