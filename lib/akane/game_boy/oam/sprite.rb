@@ -7,6 +7,11 @@ module Akane
       class Sprite
         SIZE_IN_BYTES = 4
 
+        BG_WIN_PRIORITY_BIT_MASK = 1 << 7
+        Y_FLIPPED_BIT_MASK       = 1 << 6
+        X_FLIPPED_BIT_MASK       = 1 << 5
+        OBP1_PALETTE_BIT_MASK    = 1 << 4
+
         # @param oam_data [Array] Reference to the original OAM @data.
         # @param index [Integer] Sprite index within OAM (0 - 39).
         def initialize(oam_data:, index:)
@@ -34,7 +39,21 @@ module Akane
           @oam_data[@base_offset + 3]
         end
 
-        private
+        def bg_win_priority?
+          flags.any_bits?(BG_WIN_PRIORITY_BIT_MASK)
+        end
+
+        def y_flipped?
+          flags.any_bits?(Y_FLIPPED_BIT_MASK)
+        end
+
+        def x_flipped?
+          flags.any_bits?(X_FLIPPED_BIT_MASK)
+        end
+
+        def palette_from_obp1?
+          flags.any_bits?(OBP1_PALETTE_BIT_MASK)
+        end
 
         # @return [String] Custom inspect for easier debugging.
         def inspect
