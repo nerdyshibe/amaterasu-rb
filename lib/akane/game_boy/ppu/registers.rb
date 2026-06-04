@@ -16,7 +16,9 @@ module Akane
                     :obp1,
                     :wy,
                     :wx,
-                    :pixel_shades
+                    :bg_palettes,
+                    :sprite_palettes0,
+                    :sprite_palettes1
 
         # @param skip_boot_rom [Boolean]
         def initialize(skip_boot_rom: true)
@@ -32,11 +34,25 @@ module Akane
           @wy   = 0x00
           @wx   = 0x00
 
-          @pixel_shades = [
+          @bg_palettes = [
             @bgp & 0b11,
             (@bgp >> 2) & 0b11,
             (@bgp >> 4) & 0b11,
             (@bgp >> 6) & 0b11
+          ]
+
+          @sprite_palettes0 = [
+            @obp0 & 0b11,
+            (@obp0 >> 2) & 0b11,
+            (@obp0 >> 4) & 0b11,
+            (@obp0 >> 6) & 0b11
+          ]
+
+          @sprite_palettes1 = [
+            @obp1 & 0b11,
+            (@obp1 >> 2) & 0b11,
+            (@obp1 >> 4) & 0b11,
+            (@obp1 >> 6) & 0b11
           ]
         end
 
@@ -74,20 +90,30 @@ module Akane
         def bgp=(value)
           @bgp = value & 0xFF
 
-          @pixel_shades[0] = @bgp & 0b11
-          @pixel_shades[1] = (@bgp >> 2) & 0b11
-          @pixel_shades[2] = (@bgp >> 4) & 0b11
-          @pixel_shades[3] = (@bgp >> 6) & 0b11
+          @bg_palettes[0] = @bgp & 0b11
+          @bg_palettes[1] = (@bgp >> 2) & 0b11
+          @bg_palettes[2] = (@bgp >> 4) & 0b11
+          @bg_palettes[3] = (@bgp >> 6) & 0b11
         end
 
         # @param value [Integer]
         def obp0=(value)
           @obp0 = value & 0xFF
+
+          @sprite_palettes0[0] = @obp0 & 0b11
+          @sprite_palettes0[1] = (@obp0 >> 2) & 0b11
+          @sprite_palettes0[2] = (@obp0 >> 4) & 0b11
+          @sprite_palettes0[3] = (@obp0 >> 6) & 0b11
         end
 
         # @param value [Integer]
         def obp1=(value)
           @obp1 = value & 0xFF
+
+          @sprite_palettes1[0] = @obp1 & 0b11
+          @sprite_palettes1[1] = (@obp1 >> 2) & 0b11
+          @sprite_palettes1[2] = (@obp1 >> 4) & 0b11
+          @sprite_palettes1[3] = (@obp1 >> 6) & 0b11
         end
 
         # @param value [Integer]
