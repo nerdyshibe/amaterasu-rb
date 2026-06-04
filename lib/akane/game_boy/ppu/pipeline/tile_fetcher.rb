@@ -10,8 +10,7 @@ module Akane
         class TileFetcher
           TILE_PIXELS = 8
 
-          attr_accessor :bg_fetcher_x, :current_sprite
-          attr_reader :current_mode
+          attr_accessor :bg_fetcher_x, :current_sprite, :current_mode
 
           def initialize(ppu)
             @ppu = ppu
@@ -26,9 +25,10 @@ module Akane
           def get_tile_index
             return if @ppu.dots.odd?
 
-            if @current_mode == :sprite
-              sprite = @ppu.sprite_buffer.shift
-              return sprite.tile_index
+            if @current_mode == :sprite && @current_sprite
+              return @current_sprite.tile_index & 0xFB if @ppu.registers.lcdc.obj_size_8x16?
+
+              return @current_sprite.tile_index
             end
 
             current_tile_map.tile_index_at(

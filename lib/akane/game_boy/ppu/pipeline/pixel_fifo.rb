@@ -6,7 +6,7 @@ module Akane
       class Pipeline
         # Models the PPU Pixel FIFO from the original Game Boy (DMG).
         class PixelFifo
-          MAX_PIXELS = 16
+          MAX_PIXELS = 16 # or 8?
 
           # Array of raw color indices (0 - 3).
           attr_reader :pixels
@@ -40,6 +40,7 @@ module Akane
             @pixel_buffer.shift
           end
 
+          # Removes all current elements of the FIFO.
           def clear
             @pixel_buffer.clear
           end

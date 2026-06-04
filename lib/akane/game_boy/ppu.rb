@@ -44,7 +44,7 @@ module Akane
 
         @registers     = Registers.new(skip_boot_rom:)
         @framebuffer   = Array.new
-        @sprite_buffer = Array.new(MAX_SPRITES_PER_SCANLINE)
+        @sprite_buffer = Array.new(MAX_SPRITES_PER_SCANLINE).clear
 
         @modes = Modes.build_hash(self)
         @mode  = @modes[:disabled]

@@ -5,7 +5,7 @@ module Akane
     class Ppu
       # Responsible for orchestrating the PPU Rendering Pipeline.
       class Pipeline
-        attr_reader :pixel_producer, :pixel_consumer
+        attr_reader :tile_fetcher, :pixel_producer, :pixel_consumer
 
         def initialize(ppu)
           @ppu = ppu
@@ -27,15 +27,6 @@ module Akane
 
         def tile_within_scanline
           @pixel_producer.tile_fetcher.bg_fetcher_x
-        end
-
-        def overlapping_sprite?
-          return false unless @ppu.registers.lcdc.obj_enabled?
-          return false if @ppu.sprite_buffer.empty?
-          return false unless @ppu.sprite_buffer.first.x_screen_pos == tile_within_scanline
-
-          @pixel_producer.tile_fetcher.current_mode = :sprite
-          @ppu.sprite_buffer.first
         end
 
         def current_bg_pixel_y

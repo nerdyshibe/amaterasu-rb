@@ -17,6 +17,7 @@ module Akane
             @sprite_fifo = sprite_fifo
 
             @state = :popping_pixels
+            @sprite_encountered = nil
             @pixels_emitted = 0
           end
 
@@ -24,6 +25,8 @@ module Akane
           # Called each T-cycle.
           def tick
             return unless @pixels_emitted < PIXELS_PER_SCANLINE
+
+            check_overlapping_sprites
 
             @popped_sprite_pixel = @sprite_fifo.pop_pixel
             @popped_bg_win_pixel = @bg_win_fifo.pop_pixel
@@ -46,8 +49,11 @@ module Akane
           def define_pixel_priority
             return @ppu.registers.bg_palettes[@popped_bg_win_pixel] if show_bg_win?
 
-            # Need the sprite to get the bit for palette
-            @ppu.registers.sprite_palettes0[@popped_sprite_pixel]
+            if @sprite_encountered.palette_from_obp1?
+              @ppu.registers.sprite_palettes1[@popped_sprite_pixel]
+            else
+              @ppu.registers.sprite_palettes0[@popped_sprite_pixel]
+            end
           end
 
           def show_bg_win?
@@ -56,15 +62,16 @@ module Akane
               (@popped_bg_win_pixel != 0b00 && @ppu.registers.lcdc.bg_priority_set?)
           end
 
-          def overlapping_sprite?
-            return false unless @ppu.registers.lcdc.obj_enabled?
-            return false if @ppu.sprite_buffer.empty?
+          def check_overlapping_sprites
+            return unless @ppu.registers.lcdc.obj_enabled?
+            return if @ppu.sprite_buffer.empty?
+            return unless @pixels_emitted == @ppu.sprite_buffer.first.x_screen_pos
 
-            @current_sprite = @ppu.sprite_buffer.shift
-            return false unless @pixels_emitted == @current_sprite.x_screen_pos
+            @sprite_encountered = @ppu.sprite_buffer.shift
 
             @pipeline.pixel_producer.reset_cycle
             @pipeline.tile_fetcher.current_mode = :sprite
+            @pipeline.tile_fetcher.current_sprite = @sprite_encountered
           end
 
           def to_s

@@ -78,6 +78,8 @@ module Akane
           # Normal cycle reset.
           def reset_cycle
             @state = :get_tile_index
+            @tile_fetcher.current_mode = :bg
+            @tile_fetcher.current_sprite = nil
             reset_tile
             restart_counts
           end
