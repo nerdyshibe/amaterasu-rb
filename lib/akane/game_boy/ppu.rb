@@ -26,12 +26,7 @@ module Akane
       attr_reader :registers,
                   :dots,
                   :framebuffer,
-                  :sprite_buffer,
-                  :shades,
-                  :sprite_fifo,
-                  :bg_win_fifo,
-                  :pixel_fetcher,
-                  :pixel_emitter
+                  :sprite_buffer
 
       def initialize(
         vram,
@@ -50,7 +45,6 @@ module Akane
         @registers     = Registers.new(skip_boot_rom:)
         @framebuffer   = Array.new
         @sprite_buffer = Array.new(MAX_SPRITES_PER_SCANLINE)
-        @pipeline      = Pipeline.new(self)
 
         @modes = Modes.build_hash(self)
         @mode  = @modes[:disabled]

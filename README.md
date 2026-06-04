@@ -32,6 +32,7 @@ I'm heavily relying on the great work done by the community to document every po
 
 ### Other Emulators
 
+- **[SameBoy](https://github.com/LIJI32/SameBoy)**: Open source Game Boy (DMG) and Game Boy Color (CGB) emulator, written in portable C.
 - **[Mooneye GB](https://github.com/Gekkio/mooneye-gb)**: A Game Boy research project and emulator written in Rust.
 - **[LLD_gbemu](https://github.com/rockytriton/LLD_gbemu)**: A Game Boy emulator written in C as part of the Low Level Dev tutorial.
 - **[Rubyboy](https://github.com/sacckey/rubyboy)**: A Game Boy emulator written in Ruby.

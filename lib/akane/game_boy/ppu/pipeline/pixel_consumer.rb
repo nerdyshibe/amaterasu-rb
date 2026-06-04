@@ -8,8 +8,13 @@ module Akane
         class PixelConsumer
           PIXELS_PER_SCANLINE = 160
 
-          def initialize(ppu:)
+          attr_reader :pixels_emitted
+
+          def initialize(pipeline, ppu, bg_win_fifo, sprite_fifo)
+            @pipeline = pipeline
             @ppu = ppu
+            @bg_win_fifo = bg_win_fifo
+            @sprite_fifo = sprite_fifo
 
             @state = :popping_pixels
             @pixels_emitted = 0
@@ -20,22 +25,51 @@ module Akane
           def tick
             return unless @pixels_emitted < PIXELS_PER_SCANLINE
 
-            popped_pixel = @ppu.bg_win_fifo.pop_pixel
-            return if popped_pixel.nil?
+            @popped_sprite_pixel = @sprite_fifo.pop_pixel
+            @popped_bg_win_pixel = @bg_win_fifo.pop_pixel
+            return if @popped_sprite_pixel.nil? && @popped_bg_win_pixel.nil?
+
+            mixed_pixel = define_pixel_priority
 
             # TODO: Implement framebuffer fixed size
-            @ppu.framebuffer << @ppu.registers.pixel_shades[popped_pixel]
+            @ppu.framebuffer << mixed_pixel
             @pixels_emitted += 1
             return unless @pixels_emitted == PIXELS_PER_SCANLINE
 
             @pixels_emitted = 0
-            @ppu.pixel_fetcher.reset_progress
-            @ppu.bg_win_fifo.clear
+            @pipeline.pixel_producer.reset_for_scanline
+            @sprite_fifo.clear
+            @bg_win_fifo.clear
             @ppu.set_mode(:h_blank) # remove from here
           end
 
+          def define_pixel_priority
+            return @ppu.registers.bg_palettes[@popped_bg_win_pixel] if show_bg_win?
+
+            # Need the sprite to get the bit for palette
+            @ppu.registers.sprite_palettes0[@popped_sprite_pixel]
+          end
+
+          def show_bg_win?
+            @popped_sprite_pixel.nil? ||
+              @popped_sprite_pixel == 0b00 ||
+              (@popped_bg_win_pixel != 0b00 && @ppu.registers.lcdc.bg_priority_set?)
+          end
+
+          def overlapping_sprite?
+            return false unless @ppu.registers.lcdc.obj_enabled?
+            return false if @ppu.sprite_buffer.empty?
+
+            @current_sprite = @ppu.sprite_buffer.shift
+            return false unless @pixels_emitted == @current_sprite.x_screen_pos
+
+            @pipeline.pixel_producer.reset_cycle
+            @pipeline.tile_fetcher.current_mode = :sprite
+          end
+
           def to_s
-            "#{@state.upcase} Popped: #{@pixels_emitted}"
+            "\n\tPopping Pixels from BG WIN FIFO: #{@bg_win_fifo.pixels} | " \
+              "Pixel Popped: #{@popped_pixel} (##{format('%03d', @pixels_emitted)})"
           end
         end
       end

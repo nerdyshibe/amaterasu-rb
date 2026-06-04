@@ -18,18 +18,17 @@ module Akane
           attr_reader :name, :number
 
           def initialize(ppu)
-            @ppu = ppu
-
-            @pixel_fetcher = @ppu.pixel_fetcher
-            @pixel_emitter = @ppu.pixel_emitter
-
             @name = 'DRAWING'
             @number = 3
+            @pipeline = Pipeline.new(ppu)
           end
 
           def tick
-            @pixel_fetcher.tick
-            @pixel_emitter.tick
+            # fetcher.tick (bg, window or sprite)
+            # pusher.tick -> push to fifo
+            # popper.tick -> pop to lcd
+            @pipeline.pixel_producer.tick
+            @pipeline.pixel_consumer.tick
           end
 
           def inspect
@@ -39,7 +38,7 @@ module Akane
           end
 
           def to_s
-            "#{@name} (#{@number}) | #{format('%-30s', @pixel_fetcher)} | #{@pixel_emitter}"
+            "#{@name} (#{@number}) #{@pipeline.pixel_producer} #{@pipeline.pixel_consumer}"
           end
         end
       end

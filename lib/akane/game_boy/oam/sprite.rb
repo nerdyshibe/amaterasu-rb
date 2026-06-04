@@ -20,13 +20,21 @@ module Akane
         end
 
         # @return [Integer] Byte 0 of the Sprite.
-        def y_pos
+        def y
           @oam_data[@base_offset]
         end
 
+        def y_screen_pos
+          y - 16
+        end
+
         # @return [Integer] Byte 1 of the Sprite.
-        def x_pos
+        def x
           @oam_data[@base_offset + 1]
+        end
+
+        def x_screen_pos
+          x - 8
         end
 
         # @return [Integer] Byte 2 of the Sprite.
@@ -58,8 +66,8 @@ module Akane
         # @return [String] Custom inspect for easier debugging.
         def inspect
           '#<Sprite ' \
-            "y_pos=$#{format('%02X', y_pos)} " \
-            "x_pos=$#{format('%02X', x_pos)} " \
+            "y_pos=$#{format('%02X', y)} " \
+            "x_pos=$#{format('%02X', x)} " \
             "tile_index=$#{format('%02X', tile_index)} " \
             "flags=#{format('%08b', flags)}>"
         end

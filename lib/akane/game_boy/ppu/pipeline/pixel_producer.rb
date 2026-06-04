@@ -6,111 +6,115 @@ module Akane
       class Pipeline
         # Responsible for filling up the Pixel FIFO.
         class PixelProducer
-          def initialize(ppu:)
-            @ppu = ppu
+          attr_reader :tile_fetcher
 
-            @bg_fetcher_x = 0
-            @window_fetcher_x = 0
-            @window_fetcher_y = 0
+          def initialize(ppu, tile_fetcher, bg_win_fifo, sprite_fifo)
+            @ppu = ppu
+            @tile_fetcher = tile_fetcher
+            @bg_win_fifo = bg_win_fifo
+            @sprite_fifo = sprite_fifo
+
+            @tile_index = nil
+            @tile_data_low = nil
+            @tile_data_high = nil
+            @tile_pixels = nil
+
             @state = :get_tile_index
-            @dots = 0
-            @mode = :bg
-            @pixels_pushed = false
-            @tile_row_pixels = Array.new
             @warming_up = true
+            @sleep_duration = 2
+            @retry_attempts = 2
           end
 
           def tick
             case @state
             when :get_tile_index
-              tile_map = @mode == :bg ? @ppu.bg_tile_map : @ppu.window_tile_map
+              @tile_index = @tile_fetcher.get_tile_index
 
-              if @mode == :bg
-                current_x = (@ppu.registers.scx / 8) + @bg_fetcher_x
-                current_y = (@ppu.registers.ly + @ppu.registers.scy) / 8
-              else
-                current_x = @window_fetcher_x
-                current_y = @window_fetcher_y / 8
-              end
-
-              @tile_index = tile_map.tile_index(
-                tile_x: current_x,
-                tile_y: current_y
-              )
-
-              @dots += 1
-              @state = :get_tile_data_low if @dots == 2
+              @state = :get_tile_data_low unless @tile_index.nil?
             when :get_tile_data_low
-              @current_y = @ppu.registers.ly + @ppu.registers.scy
-              @tile_row = @ppu.bg_win_tile_data.tile_row(
-                @tile_index,
-                @current_y
-              )
+              @tile_data_low = @tile_fetcher.get_tile_data_low(@tile_index)
 
-              @tile_data_low = @tile_row[:low_byte]
-
-              @dots += 1
-              @state = :get_tile_data_high if @dots == 4
+              @state = :get_tile_data_high unless @tile_data_low.nil?
             when :get_tile_data_high
-              @tile_data_high = @tile_row[:high_byte]
+              @tile_data_high = @tile_fetcher.get_tile_data_high(@tile_index)
 
-              @dots += 1
-              if @dots == 6
+              unless @tile_data_high.nil?
+                @tile_pixels = @tile_fetcher.get_tile_pixels(
+                  @tile_index,
+                  @tile_data_low,
+                  @tile_data_high
+                )
+
                 @warming_up ? discard_pixels : attempt_to_push_pixels
               end
-            when :pushing_pixels
+            when :retry_push
               attempt_to_push_pixels
-
-              @dots += 1
+              @retry_attempts -= 1
+              next_cycle if @retry_attempts.zero?
             when :sleep
-              @dots += 1
-              reset_cycle if @dots == 8
+              @sleep_duration -= 1
+              next_cycle if @sleep_duration.zero?
             end
-          end
-
-          def attempt_to_push_pixels
-            if @warming_up
-              discard_pixels
-              return
-            end
-
-            @pixels_pushed = @ppu.bg_win_fifo.push?(@tile_row[:pixels])
-            @state = :pushing_pixels
-            return unless @pixels_pushed
-
-            @state = :sleep
           end
 
           # Hardware quirk: The initial Tile fetched pixels are discarded.
           def discard_pixels
-            @dots = 0
-            @state = :get_tile_index
-            @tile_row_pixels.clear
             @warming_up = false
-          end
-
-          def reset_cycle
-            @dots = 0
-            @bg_fetcher_x += 1
             @state = :get_tile_index
-            @tile_row_pixels.clear
+            reset_tile
           end
 
-          def reset_progress
+          def attempt_to_push_pixels
+            push_successful = @bg_win_fifo.push?(@tile_pixels)
+
+            if push_successful
+              @tile_pixels = nil
+              @state = :sleep
+            else
+              @state = :retry_push
+            end
+          end
+
+          # Normal cycle reset.
+          def reset_cycle
+            @state = :get_tile_index
+            reset_tile
+            restart_counts
+          end
+
+          # Normal cycle reset + Advances the tile count.
+          def next_cycle
             reset_cycle
-            @bg_fetcher_x = 0
+            @tile_fetcher.bg_fetcher_x += 1
+          end
+
+          # To be used after each scanline.
+          def reset_for_scanline
+            reset_cycle
             @warming_up = true
+            @tile_fetcher.bg_fetcher_x = 0
+          end
+
+          def reset_tile
+            @tile_index = nil
+            @tile_data_low = nil
+            @tile_data_high = nil
+            @tile_pixels = nil
+          end
+
+          def restart_counts
+            @sleep_duration = 2
+            @retry_attempts = 2
           end
 
           def to_s
-            if @mode == :bg
-              "#{@mode} " \
-                "#{@state} " \
-                "AT BG_X: #{@bg_fetcher_x} " \
-                "(##{@dots})"
-            else
-              "#{@mode.upcase} MODE: #{@state.upcase} AT W_X: #{@window_fetcher_x} (##{@dots})"
-            end
+            "\n\tProducing #{@tile_fetcher.current_mode.upcase} Pixels " \
+              "Step: #{@state} | " \
+              "Tile Index: #{@tile_index} | " \
+              "Tile Data Low: #{@tile_data_low} | " \
+              "Tile Data High: #{@tile_data_high} | " \
+              "Sleep: #{@sleep_duration} | " \
+              "Retries: #{@retry_attempts} | "
           end
         end
       end

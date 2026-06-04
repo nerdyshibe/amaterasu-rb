@@ -49,3 +49,6 @@ Style/EmptyLiteral:
 
 Style/NumericPredicate:
   Enabled: false
+
+Style/BitwisePredicate:
+  Enabled: false

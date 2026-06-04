@@ -32,7 +32,7 @@ module Akane
               @current_sprite = @ppu.fetch_sprite_at(@sprite_index)
               @sprite_index += 1
 
-              if @current_sprite.y_pos + 16 == @ppu.registers.ly
+              if sprite_within_current_scanline?
                 @ppu.sprite_buffer[@sprite_count] = @current_sprite
                 @sprite_count += 1
               end
@@ -43,6 +43,17 @@ module Akane
             @sprite_count = 0
             @sprite_index = 0
             @ppu.set_mode(:drawing)
+          end
+
+          def sprite_within_current_scanline?
+            sprite_height = sprite_16_height? ? 16 : 8
+
+            @ppu.registers.ly >= @current_sprite.y_screen_pos
+              && @ppu.registers.ly < @current_sprite.y_screen_pos + sprite_height
+          end
+
+          def sprite_16_height?
+            @ppu.registers.lcdc.obj_size_8x16?
           end
 
           # Custom inspect to prevent circular dependency issues.
