@@ -14,7 +14,7 @@ module Akane
         # Usage:
         #   Memory values: $3C (Low), $7E (High)
         #   PIXELS_LOOKUP[(0x7E << 8) | 0x3C] #=> [0, 2, 3, 3, 3, 3, 2, 0]
-        PIXELS_LOOKUP = Array.new(0xFFFF) do |idx|
+        PIXELS_LOOKUP = Array.new(65_536) do |idx|
           low_byte  = idx & 0xFF
           high_byte = (idx >> 8) & 0xFF
 
