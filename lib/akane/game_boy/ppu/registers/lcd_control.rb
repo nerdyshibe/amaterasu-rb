@@ -19,44 +19,37 @@ module Akane
 
           def initialize(skip_boot_rom:)
             @value = skip_boot_rom ? 0x91 : 0x00
+
+            update_derived_states
           end
 
+          # @param value [Integer] 8-bit value written into 0xFF40.
           def value=(value)
             @value = value & 0xFF
+
+            update_derived_states
           end
 
-          # @return [true, false]
-          def lcd_enabled?
-            @value.anybits?(BIT_MASK_LCD_ENABLE)
+          # Computes new state and caches the value on the Register write.
+          def update_derived_states
+            @lcd_enabled          = (@value & BIT_MASK_LCD_ENABLE) != 0
+            @window_tile_map_high = (@value & BIT_MASK_WINDOW_TILE_MAP) != 0
+            @window_enabled       = (@value & BIT_MASK_WINDOW_ENABLE) != 0
+            @tile_data_at_0x8000  = (@value & BIT_MASK_BG_WINDOW_TILES) != 0
+            @bg_tile_map_high     = (@value & BIT_MASK_BG_TILE_MAP) != 0
+            @obj_size_8x16        = (@value & BIT_MASK_OBJ_SIZE) != 0
+            @obj_enabled          = (@value & BIT_MASK_OBJ_ENABLE) != 0
+            @bg_priority_set      = (@value & BIT_MASK_BG_PRIORITY) != 0
           end
 
-          def window_tile_map_high?
-            @value.anybits?(BIT_MASK_WINDOW_TILE_MAP)
-          end
-
-          def window_enabled?
-            @value.anybits?(BIT_MASK_WINDOW_ENABLE)
-          end
-
-          def tile_data_at_0x8000?
-            @value.anybits?(BIT_MASK_BG_WINDOW_TILES)
-          end
-
-          def bg_tile_map_high?
-            @value.anybits?(BIT_MASK_BG_TILE_MAP)
-          end
-
-          def obj_size_8x16?
-            @value.anybits?(BIT_MASK_OBJ_SIZE)
-          end
-
-          def obj_enabled?
-            @value.anybits?(BIT_MASK_OBJ_ENABLE)
-          end
-
-          def bg_priority_set?
-            @value.anybits?(BIT_MASK_BG_PRIORITY)
-          end
+          def lcd_enabled?          = @lcd_enabled
+          def window_tile_map_high? = @window_tile_map_high
+          def window_enabled?       = @window_enabled
+          def tile_data_at_0x8000?  = @tile_data_at_0x8000
+          def bg_tile_map_high?     = @bg_tile_map_high
+          def obj_size_8x16?        = @obj_size_8x16
+          def obj_enabled?          = @obj_enabled
+          def bg_priority_set?      = @bg_priority_set
         end
       end
     end
