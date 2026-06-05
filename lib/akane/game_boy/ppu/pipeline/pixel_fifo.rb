@@ -32,13 +32,23 @@ module Akane
 
           # This is specific for Sprites.
           #
-          def merge(sprite_pixels)
-            idx = 0
+          def merge(sprite_pixels, in_reverse)
+            if in_reverse
+              idx = 8
 
-            while idx < 8
-              transparent = (@pixel_buffer[idx] & 0b11) == 0b00
-              @pixel_buffer[idx] = sprite_pixels[idx] if transparent || @pixel_buffer[idx].nil?
-              idx += 1
+              while idx > 0
+                transparent = @pixel_buffer[idx]&.color_id == 0b00
+                @pixel_buffer[idx] = sprite_pixels[idx] if transparent || @pixel_buffer[idx].nil?
+                idx -= 1
+              end
+            else
+              idx = 0
+
+              while idx < 8
+                transparent = @pixel_buffer[idx]&.color_id == 0b00
+                @pixel_buffer[idx] = sprite_pixels[idx] if transparent || @pixel_buffer[idx].nil?
+                idx += 1
+              end
             end
           end
 
@@ -55,6 +65,11 @@ module Akane
           # Removes all current elements of the FIFO.
           def clear
             @pixel_buffer.clear
+          end
+
+          # Removes all current elements of the FIFO.
+          def empty?
+            @pixel_buffer.empty?
           end
         end
       end
