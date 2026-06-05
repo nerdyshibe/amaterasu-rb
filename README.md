@@ -11,9 +11,15 @@ This is, at its core, a research project. I always loved the concept of emulatio
 
 I will try to document my progress as I try to create the emulator from the ground up (as cycle accurate as I can make it), this also helps me internalize some of the concepts about hardware emulation. I am finding it extremely challenging, but also very rewarding when your code actually behaves as the hardware would. I highly recommend for whoever is interested in learning those subjects.
 
+### Goals
+
+- Build a fully cycle-accurate emulator and try to replicate all the hardware quirks
+- Pass all the accuracy tests I can find and also document the progress of Passed/Failed tests
+- Try to optimize performance in all ways possible without losing code readability
+
 ## Resources
 
-I'm heavily relying on the great work done by the community to document every possible (and obscure) behaviours that can be found in the Game Boy. I'll place here all the resources I'm using and some other relevant ones I find.
+I'm heavily relying on the great work done by the community to document every possible (and obscure) behaviors that can be found in the Game Boy. I'll place here all the resources I'm using and some other relevant ones I find.
 
 ### Docs
 
