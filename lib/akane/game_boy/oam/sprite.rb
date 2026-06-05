@@ -24,6 +24,8 @@ module Akane
           @oam_data[@base_offset]
         end
 
+        # Where the top pixel starts at (top row).
+        #
         def y_screen_pos
           y - 16
         end
@@ -38,8 +40,14 @@ module Akane
         end
 
         # @return [Integer] Byte 2 of the Sprite.
-        def tile_index
-          @oam_data[@base_offset + 2]
+        def tile_index(obj_size_8x16, current_obj_y)
+          return @oam_data[@base_offset + 2] unless obj_size_8x16
+
+          if current_obj_y >= 0 && current_obj_y < 8
+            @oam_data[@base_offset + 2]
+          else
+            @oam_data[@base_offset + 2 + 1]
+          end
         end
 
         # @return [Integer] Byte 3 of the Sprite.
