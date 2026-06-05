@@ -5,7 +5,7 @@ module Akane
     class Ppu
       class Pipeline
         # Responsible for emitting pixels from the Pixel FIFO to the Display.
-        class PixelConsumer
+        class PixelEmitter
           PIXELS_PER_SCANLINE = 160
 
           attr_reader :pixels_emitted

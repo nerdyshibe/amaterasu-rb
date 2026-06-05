@@ -17,12 +17,10 @@ module Akane
 
           @bg_win_fifo    = PixelFifo.new
           @sprite_fifo    = PixelFifo.new
-          @tile_fetcher   = TileFetcher.new(ppu)
-          @pixel_producer = PixelProducer.new(ppu, @tile_fetcher, @bg_win_fifo, @sprite_fifo)
-          @pixel_consumer = PixelConsumer.new(self, ppu, @bg_win_fifo, @sprite_fifo)
 
           @bg_win_fetcher = BgWinFetcher.new(ppu, @bg_win_fifo)
           @sprite_fetcher = SpriteFetcher.new(ppu, @sprite_fifo)
+          @pixel_emitter = PixelEmitter.new(self, ppu, @bg_win_fifo, @sprite_fifo)
 
           @mode = :bg_win
           @lcd_x = 0
@@ -37,7 +35,7 @@ module Akane
             @mode = :bg_win if @sprite_fetcher.done?
           else
             @bg_win_fetcher.tick
-            @pixel_consumer.tick
+            @pixel_emitter.tick
             @lcd_x += 1
           end
         end
