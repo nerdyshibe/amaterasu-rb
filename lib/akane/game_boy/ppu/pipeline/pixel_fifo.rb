@@ -36,9 +36,8 @@ module Akane
             idx = 0
 
             while idx < 8
-              if @pixel_buffer[idx] == 0b00 || @pixel_buffer[idx].nil?
-                @pixel_buffer[idx] = sprite_pixels[idx]
-              end
+              transparent = (@pixel_buffer[idx] & 0b11) == 0b00
+              @pixel_buffer[idx] = sprite_pixels[idx] if transparent || @pixel_buffer[idx].nil?
               idx += 1
             end
           end
