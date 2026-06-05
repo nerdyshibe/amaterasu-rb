@@ -24,11 +24,11 @@ module Akane
           # TODO: Implement mixing logic from both Fifos.
           # Called each T-cycle.
           def tick
+            return if @bg_win_fifo.empty?
             return unless @pixels_emitted < PIXELS_PER_SCANLINE
 
             @popped_sprite_pixel = @sprite_fifo.pop_pixel
             @popped_bg_win_pixel = @bg_win_fifo.pop_pixel
-            return if @popped_sprite_pixel.nil? && @popped_bg_win_pixel.nil?
 
             mixed_pixel = define_pixel_priority
 
@@ -49,16 +49,16 @@ module Akane
           def define_pixel_priority
             return @ppu.registers.bg_palettes[@popped_bg_win_pixel] if show_bg_win?
 
-            if (@popped_sprite_pixel >> 2) & 1 == 1
-              @ppu.registers.sprite_palettes1[@popped_sprite_pixel & 0b11]
+            if @popped_sprite_pixel.obp1_palette
+              @ppu.registers.sprite_palettes1[@popped_sprite_pixel.color_id]
             else
-              @ppu.registers.sprite_palettes0[@popped_sprite_pixel & 0b11]
+              @ppu.registers.sprite_palettes0[@popped_sprite_pixel.color_id]
             end
           end
 
           def show_bg_win?
             @popped_sprite_pixel.nil? ||
-              (@popped_sprite_pixel & 0b11) == 0b00 ||
+              @popped_sprite_pixel.color_id == 0b00 ||
               (@popped_bg_win_pixel != 0b00 && @ppu.registers.lcdc.bg_priority_set?)
           end
 

@@ -159,13 +159,13 @@ module Akane
       def log_state
         $stdout.printf(
           '#%<dots>03d | ' \
-          'LCDC: $%<lcdc>02X | ' \
           'LY: $%<ly>02X (%<ly>d) | ' \
+          'LCDC: $%<lcdc>02X | ' \
           'STAT: $%<stat>02X | ' \
           "MODE: %<mode>s\n",
           dots: @dots,
-          lcdc: @registers.lcdc.value,
           ly: @registers.ly,
+          lcdc: @registers.lcdc.value,
           stat: @registers.stat.value,
           mode: @mode.to_s
         )

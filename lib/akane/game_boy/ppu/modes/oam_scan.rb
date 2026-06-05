@@ -70,13 +70,9 @@ module Akane
 
           # Custom to_s method to use in the Ppu#log_state method.
           def to_s
-            if @current_sprite.nil?
-              "#{@name} (#{@number}) | Sprite wasn't fetched yet"
-            else
-              "#{@name} (#{@number}) | " \
-                "#{@current_sprite.inspect} (##{format('%02d', @sprite_index)}) " \
-                "Count: #{@sprite_count}"
-            end
+            "#{@name} (##{@number}) | " \
+              "SCANNED: Sprite ##{format('%02d', @sprite_index)} | " \
+              "BUFFER: #{@ppu.sprite_buffer} (#{@ppu.sprite_buffer.size})"
           end
         end
       end

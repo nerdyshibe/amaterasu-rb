@@ -26,7 +26,7 @@ module Akane
             high_bit = (high_byte >> bit) & 1
 
             (high_bit << 1) | low_bit
-          end
+          end.freeze
         end.freeze
 
         attr_reader :data

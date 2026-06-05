@@ -24,8 +24,6 @@ module Akane
           end
 
           def tick
-            # @pipeline.pixel_producer.tick
-            # @pipeline.pixel_consumer.tick
             @pipeline.tick
           end
 
@@ -36,7 +34,14 @@ module Akane
           end
 
           def to_s
-            "#{@name} (#{@number}) #{@pipeline.bg_win_fetcher} #{@pipeline.sprite_fetcher} #{@pipeline.pixel_consumer}"
+            if @pipeline.mode == :fetch_bg
+              "#{@name} (##{@number}) | " \
+                "BG/WIN: #{@pipeline.bg_win_fetcher} | " \
+                "Popping: #{@pipeline.pixel_consumer}"
+            else
+              "#{@name} (##{@number}) | " \
+                "Sprite: #{@pipeline.sprite_fetcher}"
+            end
           end
         end
       end

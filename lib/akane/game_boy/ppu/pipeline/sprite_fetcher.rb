@@ -7,13 +7,15 @@ module Akane
         # Responsible for fetching Sprites tiles, decoding Sprite pixels
         # and outputting them into the Sprite FIFO.
         class SpriteFetcher
+          SpritePixel = Struct.new(:bg_win_priority, :obp1_palette, :color_id)
+
           def initialize(ppu, sprite_fifo)
             @ppu = ppu
             @sprite_fifo = sprite_fifo
 
             @step = :fetch_tile_index
             @completed = false
-            @duration = 6
+            @fetch_duration = 6
 
             @current_sprite = nil
 
@@ -22,12 +24,14 @@ module Akane
             @tile_data_low  = nil
             @tile_data_high = nil
             @tile_pixels    = nil
+            @encoded_pixels = Array.new(8)
           end
 
           def start_for(sprite)
             @current_sprite = sprite
             @step = :fetch_tile_index
             @completed = false
+            @fetch_duration = 6
           end
 
           # Core fetch state machine (Takes 2 dots per step).
@@ -48,32 +52,31 @@ module Akane
 
           # Fetches the Tile index of the current Sprite to be rendered.
           def fetch_tile_index
-            @duration -= 1
-            return unless @duration == 4
+            @fetch_duration -= 1
+            return unless @fetch_duration == 4
 
-            @tile_index = @current_sprite.tile_index
+            @tile_index = @current_sprite.tile_index(@ppu.registers.lcdc.obj_size_8x16?, current_obj_y)
             @step = :fetch_tile_data_low
           end
 
           # Fetches the low byte from the Tile Row overlapping the current LY.
           def fetch_tile_data_low
-            @duration -= 1
-            return unless @duration == 2
+            @fetch_duration -= 1
+            return unless @fetch_duration == 2
 
-            @tile_data_low = @obj_tile_data.tile_at(@tile_index).data_low(current_ly)
+            @tile_data_low = @obj_tile_data.tile_at(@tile_index).data_low(current_obj_y)
             @step = :fetch_tile_data_high
           end
 
           # Fetches the high byte from the Tile Row overlapping the current LY.
           def fetch_tile_data_high
-            @duration -= 1
-            return unless @duration == 0
+            @fetch_duration -= 1
+            return unless @fetch_duration == 0
 
-            @tile_data_high = @obj_tile_data.tile_at(@tile_index).data_high(current_ly)
+            @tile_data_high = @obj_tile_data.tile_at(@tile_index).data_high(current_obj_y)
             fetch_tile_pixels
             add_pixel_metadata
             merge_into_fifo
-            reset_steps
           end
 
           # @return [Array] Decodes 8 pixel color ids from the high | low bytes.
@@ -87,10 +90,12 @@ module Akane
           def add_pixel_metadata
             idx = 0
 
+            obp1_palette = @current_sprite.palette_from_obp1?
+            bg_win_priority = @current_sprite.bg_win_priority?
+
             while idx < 8
-              obp_palette = @current_sprite.palette_from_obp1? ? 1 : 0
-              bg_win_priority = @current_sprite.bg_win_priority? ? 1 : 0
-              @tile_pixels[idx] = (bg_win_priority << 3) | (obp_palette << 2) | @tile_pixels[idx]
+              pixel = SpritePixel.new(bg_win_priority, obp1_palette, @tile_pixels[idx])
+              @encoded_pixels[idx] = pixel
 
               idx += 1
             end
@@ -98,34 +103,21 @@ module Akane
 
           # Merges the 8 pixels into the Sprite FIFO.
           def merge_into_fifo
-            @tile_pixels.reverse! if @current_sprite.x_flipped?
-            @sprite_fifo.merge(@tile_pixels)
+            in_reverse = @current_sprite.x_flipped?
+            @sprite_fifo.merge(@encoded_pixels, in_reverse)
             @completed = true
           end
 
-          def reset_steps
-            @step = :fetch_tile_index
-            @duration = 6
-
-            @current_sprite = nil
-
-            @tile_index     = nil
-            @tile_data_low  = nil
-            @tile_data_high = nil
-            @tile_pixels    = nil
-          end
-
-          def current_ly
-            @ppu.registers.ly
+          def current_obj_y
+            @ppu.registers.ly - 16 # tile Y offset
           end
 
           def to_s
-            "\n\tProducing Sprite Pixels " \
-              "Step: #{@step} | " \
-              "Tile Index: #{@tile_index} | " \
-              "Tile Data Low: #{@tile_data_low} | " \
-              "Tile Data High: #{@tile_data_high} | " \
-              "Tile Pixels: #{@tile_pixels}"
+            "Step: #{format('%-10s', @action)} | " \
+              "IDX: #{@tile_index.nil? ? 'Nil' : format('%02X', @tile_index)} | " \
+              "DL: #{@tile_data_low.nil? ? 'Nil' : format('%02X', @tile_data_low)} | " \
+              "DH: #{@tile_data_high.nil? ? 'Nil' : format('%02X', @tile_data_high)} | " \
+              "PIX: #{@tile_pixels}"
           end
         end
       end

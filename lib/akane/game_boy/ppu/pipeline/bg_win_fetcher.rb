@@ -14,6 +14,7 @@ module Akane
             @bg_win_fifo = bg_win_fifo
 
             @step = :fetch_tile_index
+            @action = 'Fetch IDX'
             @bg_fetcher_x = 0
 
             @fetch_duration = 6
@@ -58,6 +59,7 @@ module Akane
             )
 
             @step = :fetch_tile_data_low
+            @action = 'Fetch DL'
           end
 
           # Fetches the BG Tile low byte.
@@ -68,6 +70,7 @@ module Akane
             @tile_data_low = current_tile_data.tile_at(@tile_index).data_low(current_bg_y)
 
             @step = :fetch_tile_data_high
+            @action = 'Fetch DH'
           end
 
           # Fetches the BG Tile high byte.
@@ -116,6 +119,7 @@ module Akane
 
           def reset_cycle
             @step = :fetch_tile_index
+            @action = 'Fetch IDX'
             @fetch_duration = 6
             @sleep_duration = 2
             @retry_attempts = 2
@@ -148,12 +152,11 @@ module Akane
           end
 
           def to_s
-            "\n\tProducing BG Pixels " \
-              "Step: #{@state} | " \
-              "Tile Index: #{@tile_index} | " \
-              "Tile Data Low: #{@tile_data_low} | " \
-              "Tile Data High: #{@tile_data_high} | " \
-              "Tile Pixels: #{@tile_pixels}"
+            "Step: #{format('%-10s', @action)} | " \
+              "IDX: #{@tile_index.nil? ? 'Nil' : format('%02X', @tile_index)} | " \
+              "DL: #{@tile_data_low.nil? ? 'Nil' : format('%02X', @tile_data_low)} | " \
+              "DH: #{@tile_data_high.nil? ? 'Nil' : format('%02X', @tile_data_high)} | " \
+              "PIX: #{@tile_pixels}"
           end
         end
       end
