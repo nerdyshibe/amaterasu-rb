@@ -47,19 +47,26 @@ module Akane
           end
 
           def define_pixel_priority
-            return shaded_bg_pixel if show_bg_win?
+            return shaded_sprite_pixel if show_sprite?
 
+            shaded_bg_pixel
+          end
+
+          def show_sprite?
+            return false unless @ppu.registers.lcdc.obj_enabled?
+            return false if @popped_sprite_pixel.nil?
+            return false if @popped_sprite_pixel.color_id == 0b00
+            return false if @popped_sprite_pixel.obj_behind_bg
+
+            true
+          end
+
+          def shaded_sprite_pixel
             if @popped_sprite_pixel.use_obp1_palette
               @ppu.registers.sprite_palettes1[@popped_sprite_pixel.color_id]
             else
               @ppu.registers.sprite_palettes0[@popped_sprite_pixel.color_id]
             end
-          end
-
-          def show_bg_win?
-            @popped_sprite_pixel.nil? ||
-              @popped_sprite_pixel.color_id == 0b00 ||
-              (@popped_bg_win_pixel != 0b00 && @popped_sprite_pixel.obj_behind_bg)
           end
 
           def shaded_bg_pixel
