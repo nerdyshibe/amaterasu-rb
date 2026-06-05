@@ -40,10 +40,22 @@ module Akane
         end
 
         # @return [Integer] Byte 2 of the Sprite.
-        def tile_index(obj_size_8x16)
+        def tile_index(obj_size_8x16, y_flipped, current_obj_y)
           return @oam_data[@base_offset + 2] unless obj_size_8x16
 
-          @oam_data[@base_offset + 2] & 0xFB
+          if current_obj_y >= 0 && current_obj_y < 8
+            y_flipped ? bottom_half : top_half
+          else
+            y_flipped ? top_half : bottom_half
+          end
+        end
+
+        def top_half
+          @oam_data[@base_offset + 2] & 0xFE
+        end
+
+        def bottom_half
+          @oam_data[@base_offset + 2] | 0x01
         end
 
         # @return [Integer] Byte 3 of the Sprite.

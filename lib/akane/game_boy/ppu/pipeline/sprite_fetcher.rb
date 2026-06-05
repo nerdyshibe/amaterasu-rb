@@ -55,7 +55,10 @@ module Akane
             @fetch_duration -= 1
             return unless @fetch_duration == 4
 
-            @tile_index = @current_sprite.tile_index(@ppu.registers.lcdc.obj_size_8x16?)
+            obj_size_8x16 = @ppu.registers.lcdc.obj_size_8x16?
+            y_flipped = @current_sprite.y_flipped?
+
+            @tile_index = @current_sprite.tile_index(obj_size_8x16, y_flipped, current_obj_y)
             @step = :fetch_tile_data_low
           end
 
@@ -103,13 +106,13 @@ module Akane
 
           # Merges the 8 pixels into the Sprite FIFO.
           def merge_into_fifo
-            in_reverse = @current_sprite.x_flipped?
-            @sprite_fifo.merge(@encoded_pixels, in_reverse)
+            @encoded_pixels.reverse! if @current_sprite.x_flipped?
+            @sprite_fifo.merge(@encoded_pixels)
             @completed = true
           end
 
           def current_obj_y
-            @ppu.registers.ly - 16 # tile Y offset
+            @ppu.registers.ly - @current_sprite.y_screen_pos
           end
 
           def to_s

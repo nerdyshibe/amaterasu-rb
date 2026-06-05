@@ -29,6 +29,7 @@ module Akane
         def tick
           if any_sprites? && @mode != :fetch_sprite
             @mode = :fetch_sprite
+            @sprite_found = @ppu.sprite_buffer.shift
             @sprite_fetcher.start_for(@sprite_found)
           elsif @mode == :fetch_sprite
             @sprite_fetcher.tick
@@ -44,7 +45,6 @@ module Akane
           return false unless @ppu.registers.lcdc.obj_enabled?
           return false unless @lcd_x == @ppu.sprite_buffer.first.x_screen_pos
 
-          @sprite_found = @ppu.sprite_buffer.shift
           true
         end
       end
