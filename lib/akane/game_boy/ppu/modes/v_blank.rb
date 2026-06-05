@@ -12,7 +12,7 @@ module Akane
             @ppu = ppu
 
             @name = 'VBLANK'
-            @number = 3
+            @number = 1
           end
 
           def tick

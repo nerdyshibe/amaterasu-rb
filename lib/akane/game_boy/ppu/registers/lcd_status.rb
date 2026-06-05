@@ -25,7 +25,7 @@ module Akane
 
           # @param ppu_mode [Integer] 2-bit value.
           def set_mode_bits(ppu_mode)
-            @value |= ppu_mode
+            @value = (@value & 0b11111100) | ppu_mode
           end
 
           def set_lyc_bit

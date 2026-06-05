@@ -19,7 +19,6 @@ module Akane
 
             @current_sprite = nil
 
-            @obj_tile_data  = @ppu.obj_tile_data
             @tile_index     = nil
             @tile_data_low  = nil
             @tile_data_high = nil
@@ -67,7 +66,8 @@ module Akane
             @fetch_duration -= 1
             return unless @fetch_duration == 2
 
-            @tile_data_low = @obj_tile_data.tile_at(@tile_index).data_low(current_obj_y)
+            obj_y = @current_sprite.y_flipped? ? (7 - current_obj_y) : current_obj_y
+            @tile_data_low = obj_tile_data.tile_at(@tile_index).data_low(obj_y)
             @step = :fetch_tile_data_high
           end
 
@@ -76,7 +76,8 @@ module Akane
             @fetch_duration -= 1
             return unless @fetch_duration == 0
 
-            @tile_data_high = @obj_tile_data.tile_at(@tile_index).data_high(current_obj_y)
+            obj_y = @current_sprite.y_flipped? ? (7 - current_obj_y) : current_obj_y
+            @tile_data_high = obj_tile_data.tile_at(@tile_index).data_high(obj_y)
             fetch_tile_pixels
             add_pixel_metadata
             merge_into_fifo
@@ -113,6 +114,10 @@ module Akane
 
           def current_obj_y
             @ppu.registers.ly - @current_sprite.y_screen_pos
+          end
+
+          def obj_tile_data
+            @ppu.obj_tile_data
           end
 
           def to_s
