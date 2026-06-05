@@ -7,7 +7,7 @@ module Akane
         # Responsible for fetching Sprites tiles, decoding Sprite pixels
         # and outputting them into the Sprite FIFO.
         class SpriteFetcher
-          SpritePixel = Struct.new(:bg_win_priority, :obp1_palette, :color_id)
+          SpritePixel = Struct.new(:obj_behind_bg, :use_obp1_palette, :color_id)
 
           def initialize(ppu, sprite_fifo)
             @ppu = ppu
@@ -55,7 +55,7 @@ module Akane
             @fetch_duration -= 1
             return unless @fetch_duration == 4
 
-            @tile_index = @current_sprite.tile_index(@ppu.registers.lcdc.obj_size_8x16?, current_obj_y)
+            @tile_index = @current_sprite.tile_index(@ppu.registers.lcdc.obj_size_8x16?)
             @step = :fetch_tile_data_low
           end
 
@@ -90,11 +90,11 @@ module Akane
           def add_pixel_metadata
             idx = 0
 
-            obp1_palette = @current_sprite.palette_from_obp1?
-            bg_win_priority = @current_sprite.bg_win_priority?
+            obj_behind_bg = @current_sprite.obj_behind_bg?
+            use_obp1_palette = @current_sprite.use_obp1_palette?
 
             while idx < 8
-              pixel = SpritePixel.new(bg_win_priority, obp1_palette, @tile_pixels[idx])
+              pixel = SpritePixel.new(obj_behind_bg, use_obp1_palette, @tile_pixels[idx])
               @encoded_pixels[idx] = pixel
 
               idx += 1

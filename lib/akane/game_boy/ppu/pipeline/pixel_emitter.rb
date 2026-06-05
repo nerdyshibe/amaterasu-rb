@@ -30,10 +30,10 @@ module Akane
             @popped_sprite_pixel = @sprite_fifo.pop_pixel
             @popped_bg_win_pixel = @bg_win_fifo.pop_pixel
 
-            mixed_pixel = define_pixel_priority
+            shaded_priority_pixel = define_pixel_priority
 
             # TODO: Implement framebuffer fixed size
-            @ppu.framebuffer << mixed_pixel
+            @ppu.framebuffer << shaded_priority_pixel
             @pixels_emitted += 1
             @pipeline.lcd_x += 1
             return unless @pixels_emitted == PIXELS_PER_SCANLINE
@@ -47,9 +47,9 @@ module Akane
           end
 
           def define_pixel_priority
-            return @ppu.registers.bg_palettes[@popped_bg_win_pixel] if show_bg_win?
+            return shaded_bg_pixel if show_bg_win?
 
-            if @popped_sprite_pixel.obp1_palette
+            if @popped_sprite_pixel.use_obp1_palette
               @ppu.registers.sprite_palettes1[@popped_sprite_pixel.color_id]
             else
               @ppu.registers.sprite_palettes0[@popped_sprite_pixel.color_id]
@@ -59,12 +59,18 @@ module Akane
           def show_bg_win?
             @popped_sprite_pixel.nil? ||
               @popped_sprite_pixel.color_id == 0b00 ||
-              (@popped_bg_win_pixel != 0b00 && @ppu.registers.lcdc.bg_priority_set?)
+              (@popped_bg_win_pixel != 0b00 && @popped_sprite_pixel.obj_behind_bg)
+          end
+
+          def shaded_bg_pixel
+            return 0b00 unless @ppu.registers.lcdc.bg_win_enabled?
+
+            @ppu.registers.bg_palettes[@popped_bg_win_pixel]
           end
 
           def to_s
-            "\n\tPopping Pixels from BG WIN FIFO: #{@bg_win_fifo.pixels} | " \
-              "Pixel Popped: #{@popped_pixel} (##{format('%03d', @pixels_emitted)})"
+            "BG WIN FIFO: #{@bg_win_fifo.pixels} | " \
+              "Popped: #{@popped_pixel} (##{format('%03d', @pixels_emitted)})"
           end
         end
       end

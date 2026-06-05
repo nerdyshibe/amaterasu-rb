@@ -7,10 +7,10 @@ module Akane
       class Sprite
         SIZE_IN_BYTES = 4
 
-        BG_WIN_PRIORITY_BIT_MASK = 1 << 7
-        Y_FLIPPED_BIT_MASK       = 1 << 6
-        X_FLIPPED_BIT_MASK       = 1 << 5
-        OBP1_PALETTE_BIT_MASK    = 1 << 4
+        BIT_MASK_OBJ_BEHIND_BG    = 1 << 7
+        BIT_MASK_OBJ_Y_FLIPPED    = 1 << 6
+        BIT_MASK_OBJ_X_FLIPPED    = 1 << 5
+        BIT_MASK_USE_OBP1_PALETTE = 1 << 4
 
         # @param oam_data [Array] Reference to the original OAM @data.
         # @param index [Integer] Sprite index within OAM (0 - 39).
@@ -40,35 +40,31 @@ module Akane
         end
 
         # @return [Integer] Byte 2 of the Sprite.
-        def tile_index(obj_size_8x16, current_obj_y)
+        def tile_index(obj_size_8x16)
           return @oam_data[@base_offset + 2] unless obj_size_8x16
 
-          if current_obj_y >= 0 && current_obj_y < 8
-            @oam_data[@base_offset + 2]
-          else
-            @oam_data[@base_offset + 2 + 1]
-          end
+          @oam_data[@base_offset + 2] & 0xFB
         end
 
         # @return [Integer] Byte 3 of the Sprite.
-        def flags
+        def attributes
           @oam_data[@base_offset + 3]
         end
 
-        def bg_win_priority?
-          flags.anybits?(BG_WIN_PRIORITY_BIT_MASK)
+        def obj_behind_bg?
+          (attributes & BIT_MASK_OBJ_BEHIND_BG) != 0
         end
 
         def y_flipped?
-          flags.anybits?(Y_FLIPPED_BIT_MASK)
+          (attributes & BIT_MASK_OBJ_Y_FLIPPED) != 0
         end
 
         def x_flipped?
-          flags.anybits?(X_FLIPPED_BIT_MASK)
+          (attributes & BIT_MASK_OBJ_X_FLIPPED) != 0
         end
 
-        def palette_from_obp1?
-          flags.anybits?(OBP1_PALETTE_BIT_MASK)
+        def use_obp1_palette?
+          (attributes & BIT_MASK_USE_OBP1_PALETTE) != 0
         end
 
         # @return [String] Custom inspect for easier debugging.
@@ -76,8 +72,8 @@ module Akane
           '#<Sprite ' \
             "y_pos=$#{format('%02X', y)} " \
             "x_pos=$#{format('%02X', x)} " \
-            "tile_index=$#{format('%02X', tile_index)} " \
-            "flags=#{format('%08b', flags)}>"
+            "tile_index=$#{format('%02X', tile_index(false))} " \
+            "attributes=#{format('%08b', attributes)}>"
         end
       end
     end

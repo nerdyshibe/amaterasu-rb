@@ -13,7 +13,7 @@ module Akane
           BIT_MASK_BG_TILE_MAP     = 1 << 3
           BIT_MASK_OBJ_SIZE        = 1 << 2
           BIT_MASK_OBJ_ENABLE      = 1 << 1
-          BIT_MASK_BG_PRIORITY     = 1 << 0
+          BIT_MASK_BG_WIN_ENABLED  = 1 << 0
 
           attr_reader :value
 
@@ -39,7 +39,7 @@ module Akane
             @bg_tile_map_high     = (@value & BIT_MASK_BG_TILE_MAP) != 0
             @obj_size_8x16        = (@value & BIT_MASK_OBJ_SIZE) != 0
             @obj_enabled          = (@value & BIT_MASK_OBJ_ENABLE) != 0
-            @bg_priority_set      = (@value & BIT_MASK_BG_PRIORITY) != 0
+            @bg_win_enabled       = (@value & BIT_MASK_BG_WIN_ENABLED) != 0
           end
 
           def lcd_enabled?          = @lcd_enabled
@@ -49,7 +49,7 @@ module Akane
           def bg_tile_map_high?     = @bg_tile_map_high
           def obj_size_8x16?        = @obj_size_8x16
           def obj_enabled?          = @obj_enabled
-          def bg_priority_set?      = @bg_priority_set
+          def bg_win_enabled?       = @bg_win_enabled
         end
       end
     end
