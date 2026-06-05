@@ -17,11 +17,10 @@ module Akane
 
           def tick
             @ppu.increment_ly if @ppu.dots == 455
-            return unless @ppu.registers.ly == 154
+            return unless @ppu.registers.ly == TOTAL_SCANLINES
 
-            @ppu.registers.ly = 0
             @ppu.draw_frame
-            @ppu.framebuffer.clear
+            @ppu.reset_states
             @ppu.set_mode(:oam_scan)
           end
 

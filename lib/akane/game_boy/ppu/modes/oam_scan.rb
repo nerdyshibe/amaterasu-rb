@@ -12,7 +12,6 @@ module Akane
           attr_reader :name, :number
 
           # @param ppu [Akane::GameBoy::Ppu] Reference to the PPU instance.
-          # @param oam [Akane::GameBoy::Oam] Reference to the OAM instance.
           def initialize(ppu)
             @ppu = ppu
 
@@ -34,11 +33,11 @@ module Akane
             if @ppu.dots.odd?
               @current_sprite = @ppu.fetch_sprite_at(@sprite_index) #=> 0 - 39
               @sprite_index += 1
-            end
 
-            if sprite_within_current_scanline? && @sprite_count < Ppu::MAX_SPRITES_PER_SCANLINE
-              @ppu.sprite_buffer << @current_sprite
-              @sprite_count += 1
+              if sprite_within_current_scanline? && @sprite_count < Ppu::MAX_SPRITES_PER_SCANLINE
+                @ppu.sprite_buffer << @current_sprite
+                @sprite_count += 1
+              end
             end
 
             return unless @ppu.dots == SCAN_DURATION_IN_DOTS

@@ -19,7 +19,7 @@ module Akane
           @base_offset = index * SIZE_IN_BYTES
         end
 
-        # @return [Integer] Byte 0 of the Sprite.
+        # @return [Integer] Screen Y position + 16.
         def y
           @oam_data[@base_offset]
         end

@@ -8,15 +8,16 @@ module Akane
         class Disabled
           def initialize(ppu)
             @ppu = ppu
+            @lcd_control = @ppu.registers.lcdc
 
             @name = 'DISABLED'
             @number = 0
           end
 
           def tick
-            return unless @ppu.registers.lcdc.lcd_enabled?
+            return unless @lcd_control.lcd_enabled?
 
-            @ppu.reset_cycle
+            @ppu.reset_states
             @ppu.set_mode(:oam_scan)
           end
         end

@@ -20,6 +20,7 @@ module Akane
 
       PIXELS_PER_SCANLINE = 160
       VISIBLE_SCANLINES = 144
+      TOTAL_SCANLINES = 154
       DOTS_PER_SCANLINE = 456
       MAX_SPRITES_PER_SCANLINE = 10
 
@@ -69,7 +70,7 @@ module Akane
       end
 
       # Restarts the rendering pipeline state.
-      def reset_cycle
+      def reset_states
         @dots = 0
         @registers.ly = 0x00
       end
@@ -77,6 +78,7 @@ module Akane
       # Delegates the draw to the chosen Renderer.
       def draw_frame
         @display.draw(@framebuffer)
+        @framebuffer.clear
       end
 
       def request_interrupt(interrupt_type)

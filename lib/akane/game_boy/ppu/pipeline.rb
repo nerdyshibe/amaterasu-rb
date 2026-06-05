@@ -26,11 +26,13 @@ module Akane
           @lcd_x = 0
         end
 
+        # TODO: Implement fine scroll logic @scx & 7
+        # TODO: Implement BG handoff after the current cycle finishes
         def tick
           if any_sprites? && @mode != :fetch_sprite
             @mode = :fetch_sprite
             @sprite_found = @ppu.sprite_buffer.shift
-            @sprite_fetcher.start_for(@sprite_found)
+            @sprite_fetcher.start_for(@sprite_found) unless sprite_offscreen?(@sprite_found)
           elsif @mode == :fetch_sprite
             @sprite_fetcher.tick
             @mode = :fetch_bg if @sprite_fetcher.done?
@@ -40,12 +42,17 @@ module Akane
           end
         end
 
+        # Need to handle sprites with X < 0
         def any_sprites?
           return false if @ppu.sprite_buffer.empty?
           return false unless @ppu.registers.lcdc.obj_enabled?
-          return false unless @lcd_x == @ppu.sprite_buffer.first.x_screen_pos
+          return false unless @lcd_x >= @ppu.sprite_buffer.first.x_screen_pos
 
           true
+        end
+
+        def sprite_offscreen?(sprite)
+          sprite.x < 0 || sprite.x >= 168 # @lcd_x stops at 160
         end
       end
     end
