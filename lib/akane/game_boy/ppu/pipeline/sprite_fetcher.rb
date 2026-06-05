@@ -24,7 +24,7 @@ module Akane
             @tile_pixels    = nil
           end
 
-          def start_fetching(sprite)
+          def start_for(sprite)
             @current_sprite = sprite
             @step = :fetch_tile_index
             @completed = false
@@ -61,7 +61,7 @@ module Akane
             return unless @duration == 2
 
             @tile_data_low = @obj_tile_data.tile_at(@tile_index).data_low(current_ly)
-            @step = :fetch_tile_data_low
+            @step = :fetch_tile_data_high
           end
 
           # Fetches the high byte from the Tile Row overlapping the current LY.
@@ -92,7 +92,7 @@ module Akane
               bg_win_priority = @current_sprite.bg_win_priority? ? 1 : 0
               @tile_pixels[idx] = (bg_win_priority << 3) | (obp_palette << 2) | @tile_pixels[idx]
 
-              ids += 1
+              idx += 1
             end
           end
 

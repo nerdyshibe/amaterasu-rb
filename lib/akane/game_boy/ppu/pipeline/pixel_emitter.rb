@@ -35,10 +35,12 @@ module Akane
             # TODO: Implement framebuffer fixed size
             @ppu.framebuffer << mixed_pixel
             @pixels_emitted += 1
+            @pipeline.lcd_x += 1
             return unless @pixels_emitted == PIXELS_PER_SCANLINE
 
             @pixels_emitted = 0
             @pipeline.bg_win_fetcher.reset_for_scanline
+            @pipeline.lcd_x = 0
             @sprite_fifo.clear
             @bg_win_fifo.clear
             @ppu.set_mode(:h_blank) # remove from here
@@ -56,7 +58,7 @@ module Akane
 
           def show_bg_win?
             @popped_sprite_pixel.nil? ||
-              (@popped_sprite_pixel & 0b00) == 0b00 ||
+              (@popped_sprite_pixel & 0b11) == 0b00 ||
               (@popped_bg_win_pixel != 0b00 && @ppu.registers.lcdc.bg_priority_set?)
           end
 
