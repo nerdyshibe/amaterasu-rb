@@ -48,19 +48,19 @@ module Akane
         end
 
         def bg_win_priority?
-          flags.any_bits?(BG_WIN_PRIORITY_BIT_MASK)
+          flags.anybits?(BG_WIN_PRIORITY_BIT_MASK)
         end
 
         def y_flipped?
-          flags.any_bits?(Y_FLIPPED_BIT_MASK)
+          flags.anybits?(Y_FLIPPED_BIT_MASK)
         end
 
         def x_flipped?
-          flags.any_bits?(X_FLIPPED_BIT_MASK)
+          flags.anybits?(X_FLIPPED_BIT_MASK)
         end
 
         def palette_from_obp1?
-          flags.any_bits?(OBP1_PALETTE_BIT_MASK)
+          flags.anybits?(OBP1_PALETTE_BIT_MASK)
         end
 
         # @return [String] Custom inspect for easier debugging.

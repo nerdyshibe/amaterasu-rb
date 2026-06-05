@@ -40,8 +40,8 @@ module Akane
         end
 
         def any_sprites?
-          return false if @ppu.registers.lcdc.obj_enabled?
           return false if @ppu.sprite_buffer.empty?
+          return false unless @ppu.registers.lcdc.obj_enabled?
           return false unless @lcd_x == @ppu.sprite_buffer.first.x_screen_pos
 
           @sprite_found = @ppu.sprite_buffer.shift

@@ -50,9 +50,9 @@ module Akane
             return @ppu.registers.bg_palettes[@popped_bg_win_pixel] if show_bg_win?
 
             if (@popped_sprite_pixel >> 2) & 1 == 1
-              @ppu.registers.sprite_palettes1[@popped_sprite_pixel]
+              @ppu.registers.sprite_palettes1[@popped_sprite_pixel & 0b11]
             else
-              @ppu.registers.sprite_palettes0[@popped_sprite_pixel]
+              @ppu.registers.sprite_palettes0[@popped_sprite_pixel & 0b11]
             end
           end
 
