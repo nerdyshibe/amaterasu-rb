@@ -22,6 +22,43 @@ module Akane
           def value=(value)
             @value = value & BIT_MASK_WRITABLE_BITS
           end
+
+          # @param ppu_mode [Integer] 2-bit value.
+          def set_mode_bits(ppu_mode)
+            @value |= ppu_mode
+          end
+
+          def set_lyc_bit
+            @value |= 0b100
+          end
+
+          def clear_lyc_bit
+            @value &= 0xFB
+          end
+
+          def lyc_interrupt_selected?
+            (@value & BIT_MASK_LYC_INTERRUPT_SELECT) != 0
+          end
+
+          def mode_2_interrupt_selected?
+            (@value & BIT_MASK_MODE_2_INTERRUPT_SELECT) != 0
+          end
+
+          def mode_1_interrupt_selected?
+            (@value & BIT_MASK_MODE_1_INTERRUPT_SELECT) != 0
+          end
+
+          def mode_0_interrupt_selected?
+            (@value & BIT_MASK_MODE_0_INTERRUPT_SELECT) != 0
+          end
+
+          # TODO: setup STAT Interrupt line
+          # Only fires on the rising edge
+          # Line is
+          # (lyc_int_selected? && lyc_bit_set?) ||
+          #   (mode2_int_selected? && in_mode_2?) ||
+          #   (mode1_int_selected? && in_mode_1?) ||
+          #   (mode0_int_selected? && in_mode_0?) ||
         end
       end
     end

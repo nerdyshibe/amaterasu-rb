@@ -19,7 +19,7 @@ module Akane
 
             @fetch_duration = 6
             @sleep_duration = 2
-            @retry_attempts = 2 # confirm
+            @retry_attempts = 2 # remove this
             @warming_up     = true
 
             @tile_index     = nil

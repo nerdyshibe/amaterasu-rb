@@ -48,7 +48,7 @@ module Akane
         @sprite_buffer = Array.new(MAX_SPRITES_PER_SCANLINE).clear
 
         @modes = Modes.build_hash(self)
-        @mode  = @modes[:disabled]
+        @mode  = set_mode(:disabled)
         @dots  = 0
       end
 
@@ -67,12 +67,17 @@ module Akane
       # @param mode [Symbol]
       def set_mode(mode)
         @mode = @modes[mode]
+        @registers.stat.set_mode_bits(@mode.number)
+
+        @mode
       end
 
       # Restarts the rendering pipeline state.
       def reset_states
         @dots = 0
         @registers.ly = 0x00
+
+        ly_compare
       end
 
       # Delegates the draw to the chosen Renderer.
@@ -87,6 +92,17 @@ module Akane
 
       def increment_ly
         @registers.ly += 1
+
+        ly_compare
+      end
+
+      def ly_compare
+        if @registers.ly == @registers.lyc
+          @registers.stat.set_lyc_bit
+          request_interrupt(:lcd_stat) if @registers.stat.lyc_interrupt_selected?
+        else
+          @registers.stat.clear_lyc_bit
+        end
       end
 
       # Returns a 8-bit value stored in VRAM in a given address.

@@ -6,6 +6,8 @@ module Akane
       module Modes
         # Defines the behavior of the PPU when LCD Control Bit 7 is 0.
         class Disabled
+          attr_reader :name, :number
+
           def initialize(ppu)
             @ppu = ppu
             @lcd_control = @ppu.registers.lcdc
