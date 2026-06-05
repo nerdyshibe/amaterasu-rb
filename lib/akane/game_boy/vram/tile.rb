@@ -5,6 +5,8 @@ module Akane
     class Vram
       # Models each Tile that lives in the VRAM.
       class Tile
+        PIXEL_HEIGHT  = 8
+        PIXEL_WIDTH   = 8
         SIZE_IN_BYTES = 16
         SIZE_BIT_MASK = 0b111
 

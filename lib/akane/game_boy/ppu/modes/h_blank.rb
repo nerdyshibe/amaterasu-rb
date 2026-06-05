@@ -22,6 +22,7 @@ module Akane
 
             if @ppu.registers.ly < 144
               @ppu.set_mode(:oam_scan)
+              @ppu.sprite_buffer.clear
             elsif @ppu.registers.ly == 144
               @ppu.set_mode(:v_blank)
               @ppu.request_interrupt(:v_blank)

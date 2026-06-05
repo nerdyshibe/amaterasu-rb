@@ -5,7 +5,12 @@ module Akane
     class Ppu
       # Responsible for orchestrating the PPU Rendering Pipeline.
       class Pipeline
-        attr_reader :tile_fetcher, :pixel_producer, :pixel_consumer
+        attr_reader :tile_fetcher,
+                    :bg_win_fetcher,
+                    :sprite_fetcher,
+                    :pixel_producer,
+                    :pixel_consumer,
+                    :mode
 
         def initialize(ppu)
           @ppu = ppu
@@ -15,22 +20,33 @@ module Akane
           @tile_fetcher   = TileFetcher.new(ppu)
           @pixel_producer = PixelProducer.new(ppu, @tile_fetcher, @bg_win_fifo, @sprite_fifo)
           @pixel_consumer = PixelConsumer.new(self, ppu, @bg_win_fifo, @sprite_fifo)
+
+          @bg_win_fetcher = BgWinFetcher.new(ppu, @bg_win_fifo)
+          @sprite_fetcher = SpriteFetcher.new(ppu, @sprite_fifo)
+
+          @mode = :bg_win
+          @lcd_x = 0
         end
 
-        def pixel_within_scanline
-          @pixel_consumer.pixels_emitted
+        def tick
+          # sprite <-> bg logic
+          @mode = :sprite if any_sprites_this_x?
+
+          if @mode == :sprite
+            @sprite_fetcher.tick
+            @mode = :bg_win if @sprite_fetcher.done?
+          else
+            @bg_win_fetcher.tick
+            @pixel_consumer.tick
+            @lcd_x += 1
+          end
         end
 
-        def current_scanline
-          @ppu.registers.ly
-        end
+        def any_sprites_this_x?
+          return false if @ppu.sprite_buffer.empty?
+          return false unless @lcd_x == @ppu.sprite_buffer.first.x_screen_pos
 
-        def tile_within_scanline
-          @pixel_producer.tile_fetcher.bg_fetcher_x
-        end
-
-        def current_bg_pixel_y
-          @ppu.registers.ly + @ppu.registers.scy
+          true
         end
       end
     end

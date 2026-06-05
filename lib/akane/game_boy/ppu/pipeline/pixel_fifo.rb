@@ -30,6 +30,19 @@ module Akane
             true
           end
 
+          # This is specific for Sprites.
+          #
+          def merge(sprite_pixels)
+            idx = 0
+
+            while idx < 8
+              if @pixel_buffer[idx] == 0b00 || @pixel_buffer[idx].nil?
+                @pixel_buffer[idx] = sprite_pixels[idx]
+              end
+              idx += 1
+            end
+          end
+
           # To follow the FIFO rules, elements need to be popped
           # from left to right, that is why we need to use Array#shift.
           #
