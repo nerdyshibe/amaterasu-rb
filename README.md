@@ -15,7 +15,8 @@ I will try to document my progress as I try to create the emulator from the grou
 
 - Build a fully cycle-accurate emulator and try to replicate all the hardware quirks
 - Pass all the accuracy tests I can find and also document the progress of Passed/Failed tests
-- Try to optimize performance in all ways possible without losing code readability
+- Try to reduce optimize code performance and memory usage as much as possible without losing code readability
+- Use a clean and idiomatic OOP approach for writing the code, extracting every self containing logic to a Class
 
 ## Resources
 
