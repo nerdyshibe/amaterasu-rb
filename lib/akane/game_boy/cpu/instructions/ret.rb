@@ -32,11 +32,10 @@ module Akane
           end
 
           # M-cycle 1: Fetches opcode.
-          # M-cycle 2: Spends 1 cycle to evaluate condition.
-          # ---------- This cycle is only for RET cc instructions.
+          # M-cycle 2: Spends 1 cycle to evaluate condition (Only for RET cc).
           # ---------- Returns early if condition not met.
-          # M-cycle 3: Pops the lsb from the Stack.
-          # M-cycle 4: Pops the msb from the Stack.
+          # M-cycle 3: Pops the LSB from the Stack.
+          # M-cycle 4: Pops the MSB from the Stack.
           # M-cycle 5: Jumps to the return address.
           def ret_cc(condition: true)
             @cpu.internal_processing
@@ -47,17 +46,17 @@ module Akane
           end
 
           # M-cycle 1: Fetches opcode.
-          # M-cycle 3: Pops the lsb from the Stack.
-          # M-cycle 4: Pops the msb from the Stack.
-          # M-cycle 5: Jumps to the return address.
+          # M-cycle 2: Pops the LSB from the Stack.
+          # M-cycle 3: Pops the MSB from the Stack.
+          # M-cycle 4: Jumps to the return address.
           def ret
             return_address = @cpu.stack_pop
             @cpu.jump_to(address: return_address)
           end
 
           # M-cycle 1: Fetches opcode.
-          # M-cycle 2: Pops the lsb from the Stack.
-          # M-cycle 3: Pops the msb from the Stack.
+          # M-cycle 2: Pops the LSB from the Stack.
+          # M-cycle 3: Pops the MSB from the Stack.
           # M-cycle 4: Jumps to the return address
           #            Enable interrupts (same cycle).
           def reti

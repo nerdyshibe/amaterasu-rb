@@ -23,7 +23,7 @@ module Akane
       #
       #     Y = 31    (0, 31)    (1, 31)    (2, 31)   ...  (31, 31)  <- Row 31
       #
-      #                  ↑          ↑          ↑              ↑
+      #                  ↑         ↑        ↑              ↑
       #
       #               Column 0   Column 1   Column 2  ...  Column 31
       #
@@ -55,7 +55,7 @@ module Akane
         #
         # @param tile_x [Integer] Which column in the grid.
         # @param tile_y [Integer] Which row in the grid.
-        # @return [Integer] 1 byte representing the Tile index at the given (X, Y)
+        # @return [Integer] 1 byte representing the Tile index at the given (X, Y).
         def tile_index_at(tile_x:, tile_y:)
           grid_row    = tile_y & BIT_MASK_WRAP_VALUE
           grid_column = tile_x & BIT_MASK_WRAP_VALUE

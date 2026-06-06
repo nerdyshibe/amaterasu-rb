@@ -30,8 +30,8 @@ module Akane
 
           # M-cycle 1: Fetches opcode.
           # M-cycle 2: Internal processing (dead cycle).
-          # M-cycle 2: Writes msb from reg16 into the stack.
-          # M-cycle 3: Writes lsb from reg16 into the stack.
+          # M-cycle 3: Writes msb from reg16 into the stack.
+          # M-cycle 4: Writes lsb from reg16 into the stack.
           def push(reg16)
             @cpu.internal_processing
             @cpu.stack_push(value: reg16)

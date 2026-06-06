@@ -10,7 +10,7 @@ module Akane
         SIZE_IN_BYTES = 16
         SIZE_BIT_MASK = 0b111
 
-        # Pre-computes all possible 8 pixel values
+        # Pre-computes all possible 8 pixel values given the low and high bytes
         # for the Game Boy address range (0x0000 - 0xFFFF).
         #
         # Usage:

@@ -19,7 +19,10 @@ module Akane
           @base_offset = index * SIZE_IN_BYTES
         end
 
-        # @return [Integer] Screen Y position + 16.
+        # Screen Y position + 16, this means if Y = 0
+        # the object top pixel is offscreen at (- 16).
+        #
+        # @return [Integer] First byte of the Sprite in OAM.
         def y
           @oam_data[@base_offset]
         end
@@ -63,18 +66,28 @@ module Akane
           @oam_data[@base_offset + 3]
         end
 
+        # If this bit is set in the Sprite attributes
+        # it means that the Background or Window should
+        # be displayed on top of the Sprite *UNLESS* the
+        # Background/Window pixel has color_id = 0b00,
+        # in which case the Sprite pixel is shown.
+        #
+        # @return [Boolean]
         def bg_win_priority_set?
           (attributes & BIT_MASK_BG_WIN_PRIORITY_SET) != 0
         end
 
+        # @return [Boolean] Whether or not the Sprite is flipped horizontally.
         def y_flipped?
           (attributes & BIT_MASK_OBJ_Y_FLIPPED) != 0
         end
 
+        # @return [Boolean] Whether or not the Sprite is flipped vertically.
         def x_flipped?
           (attributes & BIT_MASK_OBJ_X_FLIPPED) != 0
         end
 
+        # @return [Boolean] Selects which Color Palette to use for the Sprite pixels.
         def use_obp1_palette?
           (attributes & BIT_MASK_USE_OBP1_PALETTE) != 0
         end
