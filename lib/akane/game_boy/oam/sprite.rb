@@ -7,10 +7,10 @@ module Akane
       class Sprite
         SIZE_IN_BYTES = 4
 
-        BIT_MASK_OBJ_BEHIND_BG    = 1 << 7
-        BIT_MASK_OBJ_Y_FLIPPED    = 1 << 6
-        BIT_MASK_OBJ_X_FLIPPED    = 1 << 5
-        BIT_MASK_USE_OBP1_PALETTE = 1 << 4
+        BIT_MASK_BG_WIN_PRIORITY_SET = 1 << 7
+        BIT_MASK_OBJ_Y_FLIPPED       = 1 << 6
+        BIT_MASK_OBJ_X_FLIPPED       = 1 << 5
+        BIT_MASK_USE_OBP1_PALETTE    = 1 << 4
 
         # @param oam_data [Array] Reference to the original OAM @data.
         # @param index [Integer] Sprite index within OAM (0 - 39).
@@ -63,8 +63,8 @@ module Akane
           @oam_data[@base_offset + 3]
         end
 
-        def obj_behind_bg?
-          (attributes & BIT_MASK_OBJ_BEHIND_BG) != 0
+        def bg_win_priority_set?
+          (attributes & BIT_MASK_BG_WIN_PRIORITY_SET) != 0
         end
 
         def y_flipped?
@@ -84,7 +84,7 @@ module Akane
           '#<Sprite ' \
             "y_pos=$#{format('%02X', y)} " \
             "x_pos=$#{format('%02X', x)} " \
-            "tile_index=$#{format('%02X', tile_index(false))} " \
+            "tile_index=$#{format('%02X', top_half)} " \
             "attributes=#{format('%08b', attributes)}>"
         end
       end

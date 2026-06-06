@@ -57,7 +57,7 @@ module Akane
             return false unless @ppu.registers.lcdc.obj_enabled?
             return false if @popped_sprite_pixel.nil?
             return false if @popped_sprite_pixel.color_id == 0b00
-            return false if @popped_sprite_pixel.obj_behind_bg
+            return false if @popped_sprite_pixel.bg_win_priority_set && (@popped_bg_win_pixel != 0b00)
 
             true
           end
