@@ -9,6 +9,8 @@ module Akane
         #
         # Despite the similarity it behaves differently than the SpriteFetcher.
         class BgWinFetcher
+          attr_reader :fetch_mode
+
           def initialize(ppu, bg_win_fifo)
             @ppu = ppu
             @bg_win_fifo = bg_win_fifo
@@ -16,6 +18,8 @@ module Akane
             @step = :fetch_tile_index
             @action = 'Fetch IDX'
             @bg_fetcher_x = 0
+            @window_fetcher_x = 0
+            @fetch_mode = :bg
 
             @fetch_duration = 6
             @sleep_duration = 2
@@ -40,10 +44,25 @@ module Akane
             end
           end
 
+          def activate_window!
+            @bg_win_fifo.clear
+            @fetch_mode = :window
+            reset_cycle
+          end
+
+          def increment_window_y
+            return unless @window_drawed
+
+            @ppu.window_y_count += 1
+            @window_drawed = false
+          end
+
           def reset_for_scanline
             reset_cycle
+            @fetch_mode = :bg
             @warming_up = true
             @bg_fetcher_x = 0
+            @window_fetcher_x = 0
           end
 
           private
@@ -53,37 +72,44 @@ module Akane
             @fetch_duration -= 1
             return unless @fetch_duration == 4
 
+            tile_x = @fetch_mode == :bg ? current_bg_tile_x : current_window_tile_x
+            tile_y = @fetch_mode == :bg ? current_bg_tile_y : current_window_tile_y
+
             @tile_index = current_tile_map.tile_index_at(
-              tile_x: current_bg_tile_x,
-              tile_y: current_bg_tile_y
+              tile_x: tile_x,
+              tile_y: tile_y
             )
 
             @step = :fetch_tile_data_low
             @action = 'Fetch DL'
           end
 
-          # Fetches the BG Tile low byte.
+          # Fetches the low byte of the BG or Window Tile Row
+          # that overlaps with the current row/line being drawn.
           def fetch_tile_data_low
             @fetch_duration -= 1
             return unless @fetch_duration == 2
 
-            @tile_data_low = current_tile_data.tile_at(@tile_index).data_low(current_bg_y)
+            current_y = @fetch_mode == :bg ? current_bg_y : current_window_y
+            @tile_data_low = current_tile_data.tile_at(@tile_index).data_low(current_y)
 
             @step = :fetch_tile_data_high
             @action = 'Fetch DH'
           end
 
-          # Fetches the BG Tile high byte.
+          # Fetches the high byte of the BG or Window Tile Row
+          # that overlaps with the current row/line being drawn.
           def fetch_tile_data_high
             @fetch_duration -= 1
             return unless @fetch_duration == 0
 
-            @tile_data_high = current_tile_data.tile_at(@tile_index).data_high(current_bg_y)
+            current_y = @fetch_mode == :bg ? current_bg_y : current_window_y
+            @tile_data_high = current_tile_data.tile_at(@tile_index).data_high(current_y)
             fetch_tile_pixels
             @warming_up ? discard_pixels : attempt_push_into_fifo
           end
 
-          # Fetches the BG Tile pixels.
+          # Fetches the BG or Window Tile pixels.
           def fetch_tile_pixels
             @tile_pixels = Vram::Tile::PIXELS_LOOKUP[(@tile_data_high << 8) | @tile_data_low]
           end
@@ -97,13 +123,18 @@ module Akane
           def attempt_push_into_fifo
             push_successful = @bg_win_fifo.push?(@tile_pixels)
 
-            @step =
-              if push_successful
+            if push_successful
+              if @fetch_mode == :bg
                 @bg_fetcher_x += 1
-                :sleep
               else
-                :push
+                @window_fetcher_x += 1
+                @window_drawed = true
               end
+
+              @step = :sleep
+            else
+              @step = :push
+            end
           end
 
           def push
@@ -138,12 +169,24 @@ module Akane
           end
 
           def current_bg_tile_y
-            (@ppu.registers.ly + @ppu.registers.scy) / Vram::Tile::PIXEL_HEIGHT
+            current_bg_y / Vram::Tile::PIXEL_HEIGHT
+          end
+
+          def current_window_y
+            @ppu.window_y_count
+          end
+
+          def current_window_tile_x
+            @window_fetcher_x
+          end
+
+          def current_window_tile_y
+            @ppu.window_y_count / Vram::Tile::PIXEL_HEIGHT
           end
 
           # @return [Vram::TileMap]
           def current_tile_map
-            @ppu.bg_tile_map
+            @fetch_mode == :bg ? @ppu.bg_tile_map : @ppu.window_tile_map
           end
 
           # @return [Vram::TileData]
@@ -152,7 +195,8 @@ module Akane
           end
 
           def to_s
-            "Step: #{format('%-10s', @action)} | " \
+            "Mode: #{@fetch_mode.upcase} | " \
+              "Step: #{format('%-10s', @action)} | " \
               "IDX: #{@tile_index.nil? ? 'Nil' : format('%02X', @tile_index)} | " \
               "DL: #{@tile_data_low.nil? ? 'Nil' : format('%02X', @tile_data_low)} | " \
               "DH: #{@tile_data_high.nil? ? 'Nil' : format('%02X', @tile_data_high)} | " \

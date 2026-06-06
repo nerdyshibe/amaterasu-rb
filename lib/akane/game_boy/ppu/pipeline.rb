@@ -6,9 +6,10 @@ module Akane
       # Responsible for orchestrating the PPU Rendering Pipeline.
       class Pipeline
         attr_accessor :lcd_x
+
         attr_reader :bg_win_fetcher,
                     :sprite_fetcher,
-                    :pixel_consumer,
+                    :pixel_emitter,
                     :mode
 
         def initialize(ppu)
@@ -16,7 +17,6 @@ module Akane
 
           @bg_win_fifo    = PixelFifo.new
           @sprite_fifo    = PixelFifo.new
-
           @bg_win_fetcher = BgWinFetcher.new(ppu, @bg_win_fifo)
           @sprite_fetcher = SpriteFetcher.new(ppu, @sprite_fifo)
           @pixel_emitter  = PixelEmitter.new(self, ppu, @bg_win_fifo, @sprite_fifo)
@@ -37,12 +37,22 @@ module Akane
             @sprite_fetcher.tick
             @mode = :fetch_bg if @sprite_fetcher.done?
           else
+            @bg_win_fetcher.activate_window! if window_reached?
+
             @bg_win_fetcher.tick
             @pixel_emitter.tick
           end
         end
 
-        # Need to handle sprites with X < 0
+        def window_reached?
+          return false if @bg_win_fetcher.fetch_mode == :window
+          return false unless @ppu.wy_eq_ly
+          return false unless @ppu.registers.lcdc.window_enabled?
+          return false unless @lcd_x == @ppu.registers.wx - 7
+
+          true
+        end
+
         def any_sprites?
           return false if @ppu.sprite_buffer.empty?
           return false unless @ppu.registers.lcdc.obj_enabled?

@@ -24,6 +24,8 @@ module Akane
       DOTS_PER_SCANLINE = 456
       MAX_SPRITES_PER_SCANLINE = 10
 
+      attr_accessor :wy_eq_ly, :window_y_count
+
       attr_reader :registers,
                   :dots,
                   :framebuffer,
@@ -49,7 +51,9 @@ module Akane
 
         @modes = Modes.build_hash(self)
         @mode  = set_mode(:disabled)
-        @dots  = 0
+        @wy_eq_ly = false
+        @window_y_count = 0
+        @dots = 0
       end
 
       # Core PPU state machine.
@@ -76,6 +80,8 @@ module Akane
       def reset_states
         @dots = 0
         @registers.ly = 0x00
+        @wy_eq_ly = false # here?
+        @window_y_count = 0
 
         ly_compare
       end

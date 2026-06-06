@@ -39,6 +39,7 @@ module Akane
             return unless @pixels_emitted == PIXELS_PER_SCANLINE
 
             @pixels_emitted = 0
+            @pipeline.bg_win_fetcher.increment_window_y
             @pipeline.bg_win_fetcher.reset_for_scanline
             @pipeline.lcd_x = 0
             @sprite_fifo.clear

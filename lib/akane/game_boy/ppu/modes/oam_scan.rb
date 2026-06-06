@@ -45,7 +45,16 @@ module Akane
             sort_sprites_by_x_positions unless @ppu.sprite_buffer.empty?
             @sprite_count = 0
             @sprite_index = 0
+            @ppu.wy_eq_ly = true if window_triggered?
             @ppu.set_mode(:drawing)
+          end
+
+          def window_triggered?
+            return false unless @ppu.registers.lcdc.window_enabled?
+            return false unless @ppu.registers.ly == @ppu.registers.wy
+            return false if @ppu.wy_eq_ly
+
+            true
           end
 
           def sprite_within_current_scanline?

@@ -36,8 +36,8 @@ module Akane
           def to_s
             if @pipeline.mode == :fetch_bg
               "#{@name} (##{@number}) | " \
-                "BG/WIN: #{@pipeline.bg_win_fetcher} | " \
-                "Popping: #{@pipeline.pixel_consumer}"
+                "#{@pipeline.bg_win_fetcher} | " \
+                "#{@pipeline.pixel_emitter}"
             else
               "#{@name} (##{@number}) | " \
                 "Sprite: #{@pipeline.sprite_fetcher}"
