@@ -58,11 +58,6 @@ module Akane
         decode_instruction
         execute_instruction
         log_state(old_pc, old_cycles, @instruction)
-
-        # return unless @opcode == 0x40
-
-        # puts 'Mooney breakpoint reached'
-        # exit
       end
 
       # Reads a byte from the Bus at a given address.
@@ -80,6 +75,7 @@ module Akane
       end
 
       # Fetches the next immediate byte from memory pointed to by the Program Counter.
+      # Every time a byte is fetched, the PC is incremented by 1.
       def fetch_next_byte
         byte = bus_read(address: @registers.pc)
         @registers.pc += 1

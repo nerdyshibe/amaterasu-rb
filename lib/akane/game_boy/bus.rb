@@ -2,16 +2,16 @@
 
 module Akane
   module GameBoy
-    # | 0x0000-0x7FFF | 32 KB | Cartridge ROM | Bank 0 fixed, Bank N switchable |
-    # | 0x8000-0x9FFF | 8 KB | Video RAM (VRAM) | Tile data + tile maps |
-    # | 0xA000-0xBFFF | 8 KB | External RAM | Cartridge RAM, battery-backed |
-    # | 0xC000-0xDFFF | 8 KB | Work RAM (WRAM) | General purpose |
-    # | 0xE000-0xFDFF | ~8 KB | Echo RAM | Mirror of WRAM (0xC000-0xDDFF) |
-    # | 0xFE00-0xFE9F | 160 B | OAM | Sprite attribute table |
-    # | 0xFEA0-0xFEFF | 96 B | Unusable | Prohibited area |
-    # | 0xFF00-0xFF7F | 128 B | I/O Registers | Hardware control |
-    # | 0xFF80-0xFFFE | 127 B | High RAM (HRAM) | Fast RAM, accessible during DMA |
-    # | 0xFFFF | 1 B | IE Register | Interrupt Enable |
+    # | 0x0000-0x7FFF | 32 KiB | Cartridge ROM    | Bank 0 fixed, Bank N switchable |
+    # | 0x8000-0x9FFF | 8 KiB  | Video RAM (VRAM) | Tile data + tile maps           |
+    # | 0xA000-0xBFFF | 8 KiB  | External RAM     | Cartridge RAM, battery-backed   |
+    # | 0xC000-0xDFFF | 8 KiB  | Work RAM (WRAM)  | General purpose                 |
+    # | 0xE000-0xFDFF | ~8 KiB | Echo RAM         | Mirror of WRAM (0xC000-0xDDFF)  |
+    # | 0xFE00-0xFE9F | 160 B  | OAM              | Sprite attribute table          |
+    # | 0xFEA0-0xFEFF | 96 B   | Unusable         | Prohibited area                 |
+    # | 0xFF00-0xFF7F | 128 B  | I/O Registers    | Hardware control                |
+    # | 0xFF80-0xFFFE | 127 B  | High RAM (HRAM)  | Fast RAM, accessible during DMA |
+    # | 0xFFFF        | 1 B    | IE Register      | Interrupt Enable                |
     class Bus
       def wire_components(
         cartridge:,

@@ -20,6 +20,16 @@ module Akane
         QUIT                    = 0x100
         EVENT_SIZE              = 56
 
+        SCANCODE_UP    = 82
+        SCANCODE_DOWN  = 81
+        SCANCODE_LEFT  = 80
+        SCANCODE_RIGHT = 79
+
+        SCANCODE_Z = 29
+        SCANCODE_X = 27
+        SCANCODE_RETURN = 40
+        SCANCODE_RSHIFT = 229
+
         attach_function :init, :SDL_Init, [:uint32], :int
         attach_function :quit, :SDL_Quit, [], :void
         attach_function :get_error, :SDL_GetError, [], :string
@@ -40,6 +50,9 @@ module Akane
         attach_function :render_clear, :SDL_RenderClear, [:pointer], :int
 
         attach_function :poll_event, :SDL_PollEvent, [:pointer], :int
+
+        attach_function :get_keyboard_state, :SDL_GetKeyboardState, [:pointer], :pointer
+        attach_function :pump_events, :SDL_PumpEvents, [], :void
       end
     end
   end

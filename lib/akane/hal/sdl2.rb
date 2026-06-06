@@ -12,6 +12,8 @@ module Akane
 
       PALETTE = [0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000].freeze
 
+      attr_accessor :joypad
+
       def initialize
         LCD.init(LCD::INIT_VIDEO)
         @window = LCD.create_window(
@@ -56,10 +58,61 @@ module Akane
         while LCD.poll_event(@event) == 1
           # first 4 bytes of the event struct are the event type (uint32)
           type = @event.read_uint32
-          if type == LCD::QUIT
+          case type
+          when LCD::QUIT
             shutdown
             exit
           end
+        end
+
+        keyboard_state = LCD.get_keyboard_state(nil)
+
+        if keyboard_state.get_uint8(LCD::SCANCODE_UP) == 0
+          joypad.release_dpad(:up)
+        else
+          joypad.press_dpad(:up)
+        end
+
+        if keyboard_state.get_uint8(LCD::SCANCODE_DOWN) == 0
+          joypad.release_dpad(:down)
+        else
+          joypad.press_dpad(:down)
+        end
+
+        if keyboard_state.get_uint8(LCD::SCANCODE_RIGHT) == 0
+          joypad.release_dpad(:right)
+        else
+          joypad.press_dpad(:right)
+        end
+
+        if keyboard_state.get_uint8(LCD::SCANCODE_LEFT) == 0
+          joypad.release_dpad(:left)
+        else
+          joypad.press_dpad(:left)
+        end
+
+        if keyboard_state.get_uint8(LCD::SCANCODE_Z) == 0
+          joypad.release_face(:a)
+        else
+          joypad.press_face(:a)
+        end
+
+        if keyboard_state.get_uint8(LCD::SCANCODE_X) == 0
+          joypad.release_face(:b)
+        else
+          joypad.press_face(:b)
+        end
+
+        if keyboard_state.get_uint8(LCD::SCANCODE_RETURN) == 0
+          joypad.release_face(:start)
+        else
+          joypad.press_face(:start)
+        end
+
+        if keyboard_state.get_uint8(LCD::SCANCODE_RSHIFT) == 0
+          joypad.release_face(:select)
+        else
+          joypad.press_face(:select)
         end
       end
 
