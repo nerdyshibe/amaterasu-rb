@@ -19,12 +19,4 @@ if options[:profiling]
   end
 end
 
-if ENV['PROFILE']
-  require 'vernier'
-
-  Vernier.profile(out: 'tmp/vernier_allocs.json', allocation_interval: 1) do
-    Akane::Emulator.new(**options).start
-  end
-else
-  Akane::Emulator.new(**options).start
-end
+Akane::Emulator.new(**options).start

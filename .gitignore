@@ -10,3 +10,5 @@ notes/
 rdoc/
 roms/
 tmp/
+*.json
+*.dump
