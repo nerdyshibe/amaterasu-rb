@@ -41,6 +41,8 @@ module Akane
       end
     end
 
+    # This method is called every time the CPU spends
+    # exactly 1 M-cycle to advance other components.
     def advance_cycle
       stop if @cycles == @stop_cycles
 
@@ -49,6 +51,7 @@ module Akane
       @dma.tick
 
       i = 0
+
       while i < 4
         @ppu.tick
         i += 1

@@ -33,7 +33,7 @@ module Akane
       @ram.read_byte(address)
     end
 
-    # Delegates the read byte to the MBC (Not implemented yet).
+    # Delegates the write byte to the MBC (Not implemented yet).
     def write_ram(address, value); end
   end
 end
