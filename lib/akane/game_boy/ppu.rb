@@ -88,7 +88,7 @@ module Akane
 
       # Delegates the draw to the chosen Renderer.
       def draw_frame
-        @display.draw(@framebuffer)
+        @display&.draw(@framebuffer)
         @framebuffer.clear
       end
 
