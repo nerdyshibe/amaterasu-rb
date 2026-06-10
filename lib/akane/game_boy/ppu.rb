@@ -72,6 +72,7 @@ module Akane
       def set_mode(mode)
         @mode = @modes[mode]
         @registers.stat.set_mode_bits(@mode.number)
+        request_interrupt(:lcd_stat) if @registers.stat.rising_edge?
 
         @mode
       end
@@ -105,10 +106,11 @@ module Akane
       def ly_compare
         if @registers.ly == @registers.lyc
           @registers.stat.set_lyc_bit
-          request_interrupt(:lcd_stat) if @registers.stat.lyc_interrupt_selected?
         else
           @registers.stat.clear_lyc_bit
         end
+
+        request_interrupt(:lcd_stat) if @registers.stat.rising_edge?
       end
 
       # Returns a 8-bit value stored in VRAM in a given address.

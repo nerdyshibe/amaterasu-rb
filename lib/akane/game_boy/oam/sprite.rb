@@ -27,7 +27,7 @@ module Akane
           @oam_data[@base_offset]
         end
 
-        # Where the top pixel starts at (top row).
+        # Where the top-most pixel starts at (top row).
         #
         def y_screen_pos
           y - 16

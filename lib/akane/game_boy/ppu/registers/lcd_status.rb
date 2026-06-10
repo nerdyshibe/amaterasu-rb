@@ -17,6 +17,8 @@ module Akane
 
           def initialize(skip_boot_rom:)
             @value = skip_boot_rom ? 0x85 : 0x00
+
+            @interrupt_line_cache = interrupt_line_signal
           end
 
           def value=(value)
@@ -25,14 +27,17 @@ module Akane
 
           # @param ppu_mode [Integer] 2-bit value.
           def set_mode_bits(ppu_mode)
+            @interrupt_line_cache = interrupt_line_signal
             @value = (@value & 0b11111100) | ppu_mode
           end
 
           def set_lyc_bit
+            @interrupt_line_cache = interrupt_line_signal
             @value |= 0b100
           end
 
           def clear_lyc_bit
+            @interrupt_line_cache = interrupt_line_signal
             @value &= 0xFB
           end
 
@@ -52,13 +57,16 @@ module Akane
             (@value & BIT_MASK_MODE_0_INTERRUPT_SELECT) != 0
           end
 
-          # TODO: setup STAT Interrupt line
-          # Only fires on the rising edge
-          # Line is
-          # (lyc_int_selected? && lyc_bit_set?) ||
-          #   (mode2_int_selected? && in_mode_2?) ||
-          #   (mode1_int_selected? && in_mode_1?) ||
-          #   (mode0_int_selected? && in_mode_0?) ||
+          def interrupt_line_signal
+            (@value[6] && @value[2]) ||
+              (@value[5] && (@value & 0b11) == 0b10) ||
+              (@value[4] && (@value & 0b11) == 0b01) ||
+              (@value[3] && (@value & 0b11) == 0b00)
+          end
+
+          def rising_edge?
+            @interrupt_line_cache == 0 && interrupt_line_signal == 1
+          end
         end
       end
     end

@@ -37,6 +37,7 @@ module Akane
         @if | 0b11100000
       end
 
+      # TODO: convert to attr_reader
       # Returns the 8-bit value of the IE (Interrupt Enable) register.
       def ie_register
         @ie

@@ -24,8 +24,6 @@ module Akane
       # VRAM Size in bytes: 8192 bytes (8 KiB)
       SIZE_IN_BYTES = (END_ADDRESS - START_ADDRESS) + 1
 
-      attr_accessor :data
-
       # Exposes the tile data and maps to the PPU
       attr_reader :tile_data,
                   :tile_map_low,
