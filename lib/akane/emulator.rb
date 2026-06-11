@@ -34,7 +34,7 @@ module Akane
       load_components
 
       Kernel.loop do
-        stop if @steps == @stop_steps
+        stop if @stop_steps && @steps == @stop_steps
 
         @cpu.step
         @steps += 1
@@ -44,7 +44,7 @@ module Akane
     # This method is called every time the CPU spends
     # exactly 1 M-cycle to advance other components.
     def advance_cycle
-      stop if @cycles == @stop_cycles
+      stop if @stop_cycles && @cycles == @stop_cycles
 
       @timer.tick
       @apu.tick

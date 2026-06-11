@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-RubyVM::YJIT.enable if defined?(RubyVM::YJIT)
+# RubyVM::YJIT.enable if defined?(RubyVM::YJIT)
 
 require_relative '../lib/akane'
 
@@ -14,8 +14,7 @@ if options[:profiling]
 
   at_exit do
     StackProf.stop
-    results = StackProf.results
-    StackProf::Report.new(results).print_text(sort: true, limit: 30)
+    StackProf.results("tmp/#{Time.now.to_i}-emulator-results.dump")
   end
 end
 
