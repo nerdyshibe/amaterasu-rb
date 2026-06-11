@@ -14,7 +14,9 @@ if options[:profiling]
 
   at_exit do
     StackProf.stop
-    StackProf.results("tmp/#{Time.now.to_i}-emulator-results.dump")
+    StackProf.results(
+      "tmp/#{Time.now.to_i}-#{options[:profiling]}-emulator-results.dump"
+    )
   end
 end
 

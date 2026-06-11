@@ -46,7 +46,7 @@ module Akane
             @sprite_count = 0
             @sprite_index = 0
             @ppu.wy_eq_ly = true if window_triggered?
-            @ppu.set_mode(:drawing)
+            @ppu.set_mode(:rendering)
           end
 
           def window_triggered?

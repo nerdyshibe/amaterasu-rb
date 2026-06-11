@@ -118,7 +118,7 @@ module Akane
       # @param address [Integer]
       # @return [Integer]
       def read_vram(address:)
-        return 0xFF if @mode == @modes[:drawing]
+        return 0xFF if @mode == @modes[:rendering]
 
         @vram.read_byte(address:)
       end
@@ -133,7 +133,7 @@ module Akane
 
       # Returns a 8-bit value stored in OAM in a given address.
       def read_oam(address:)
-        return 0xFF if [@modes[:oam_scan], @modes[:drawing]].include?(@mode)
+        return 0xFF if [@modes[:oam_scan], @modes[:rendering]].include?(@mode)
 
         @oam.read_byte(address:)
       end

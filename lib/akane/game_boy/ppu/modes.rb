@@ -8,11 +8,11 @@ module Akane
         def self.build_hash(ppu)
           @modes = Hash.new
 
-          @modes[:disabled] = Disabled.new(ppu)
-          @modes[:h_blank]  = HBlank.new(ppu)
-          @modes[:v_blank]  = VBlank.new(ppu)
-          @modes[:oam_scan] = OamScan.new(ppu)
-          @modes[:drawing]  = Drawing.new(ppu)
+          @modes[:disabled]  = Disabled.new(ppu)
+          @modes[:h_blank]   = HBlank.new(ppu)
+          @modes[:v_blank]   = VBlank.new(ppu)
+          @modes[:oam_scan]  = OamScan.new(ppu)
+          @modes[:rendering] = Rendering.new(ppu)
 
           @modes.freeze
         end
