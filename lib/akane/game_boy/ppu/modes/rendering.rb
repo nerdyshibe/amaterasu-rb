@@ -15,9 +15,7 @@ module Akane
         # several scenarios in which "penalties" occur and this
         # causes the mode to take longer.
         class Rendering
-          attr_accessor :lcd_x
-
-          attr_reader :name, :number, :bg_win_fetcher
+          attr_reader :name, :number
 
           def initialize(ppu)
             @ppu = ppu
@@ -29,7 +27,7 @@ module Akane
             @sprite_fifo    = PixelFifo.new
             @bg_win_fetcher = BgWinFetcher.new(ppu, @bg_win_fifo)
             @sprite_fetcher = SpriteFetcher.new(ppu, @sprite_fifo)
-            @pixel_emitter  = PixelEmitter.new(self, ppu, @bg_win_fifo, @sprite_fifo)
+            @pixel_emitter  = PixelEmitter.new(ppu, @bg_win_fifo, @sprite_fifo)
 
             @sprite_found = nil
             @mode = :fetch_bg
@@ -48,8 +46,18 @@ module Akane
               @bg_win_fetcher.activate_window! if window_reached?
 
               @bg_win_fetcher.tick
-              @pixel_emitter.tick
+              pixel_drawn = @pixel_emitter.tick?
             end
+
+            @lcd_x += 1 if pixel_drawn
+            return unless @lcd_x == PIXELS_PER_SCANLINE && @bg_win_fetcher.step == :sleep
+
+            @bg_win_fetcher.reset_for_scanline
+            @pixel_emitter.reset_for_scanline
+            @lcd_x = 0
+            @sprite_fifo.clear
+            @bg_win_fifo.clear
+            @ppu.set_mode(:h_blank)
           end
 
           def inspect
@@ -61,10 +69,12 @@ module Akane
           def to_s
             if @mode == :fetch_bg
               "#{@name} (##{@number}) | " \
+                "LCD X: #{@lcd_x} | " \
                 "#{@bg_win_fetcher} | " \
                 "#{@pixel_emitter}"
             else
               "#{@name} (##{@number}) | " \
+                "LCD X: #{@lcd_x} | " \
                 "Sprite: #{@sprite_fetcher}"
             end
           end

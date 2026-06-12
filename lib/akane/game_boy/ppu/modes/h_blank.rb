@@ -16,14 +16,14 @@ module Akane
           end
 
           def tick
-            return unless @ppu.dots == 455
+            return unless @ppu.dots == DOTS_PER_SCANLINE
 
+            @ppu.reset_for_scanline
             @ppu.increment_ly
 
-            if @ppu.registers.ly < 144
+            if @ppu.registers.ly < VISIBLE_SCANLINES
               @ppu.set_mode(:oam_scan)
-              @ppu.sprite_buffer.clear
-            elsif @ppu.registers.ly == 144
+            elsif @ppu.registers.ly == VISIBLE_SCANLINES
               @ppu.set_mode(:v_blank)
               @ppu.request_interrupt(:v_blank)
             end
@@ -36,7 +36,7 @@ module Akane
           end
 
           def to_s
-            "#{@name} (#{@number}) | WAITING FOR SCANLINE TO FINISH"
+            "#{@name} (##{@number}) | WAITING FOR SCANLINE TO FINISH"
           end
         end
       end

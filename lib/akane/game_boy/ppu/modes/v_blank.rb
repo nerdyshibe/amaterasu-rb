@@ -16,7 +16,10 @@ module Akane
           end
 
           def tick
-            @ppu.increment_ly if @ppu.dots == 455
+            return unless @ppu.dots == DOTS_PER_SCANLINE
+
+            @ppu.reset_for_scanline
+            @ppu.increment_ly
             return unless @ppu.registers.ly == TOTAL_SCANLINES
 
             @ppu.draw_frame
@@ -31,7 +34,7 @@ module Akane
           end
 
           def to_s
-            "#{@name} (#{@number}) | WAITING UNTIL THE FRAME IS COMPLETED"
+            "#{@name} (##{@number}) | WAITING UNTIL THE FRAME IS COMPLETED"
           end
         end
       end

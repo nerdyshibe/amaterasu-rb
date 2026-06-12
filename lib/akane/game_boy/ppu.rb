@@ -62,8 +62,8 @@ module Akane
       # also switching to the next mode.
       def tick
         @mode.tick
-        @dots = (@dots + 1) % DOTS_PER_SCANLINE
         log_state if @trace_ppu
+        @dots += 1
       end
 
       # Sets the current PPU mode to be ticked.
@@ -77,12 +77,18 @@ module Akane
         @mode
       end
 
+      def reset_for_scanline
+        @dots = 0
+        @sprite_buffer.clear unless @sprite_buffer.empty?
+      end
+
       # Restarts the rendering pipeline state.
       def reset_states
-        @dots = 0
+        reset_for_scanline
         @registers.ly = 0x00
         @wy_eq_ly = false # here?
         @window_y_count = 0
+        @framebuffer.clear
 
         ly_compare
       end
@@ -90,7 +96,6 @@ module Akane
       # Delegates the draw to the chosen Renderer.
       def draw_frame
         @display&.draw(@framebuffer)
-        @framebuffer.clear
       end
 
       def request_interrupt(interrupt_type)

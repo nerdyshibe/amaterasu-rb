@@ -10,21 +10,19 @@ module Akane
           #
           # Despite the similarity it behaves differently than the SpriteFetcher.
           class BgWinFetcher
-            attr_reader :fetch_mode
+            attr_reader :fetch_mode, :step
 
             def initialize(ppu, bg_win_fifo)
               @ppu = ppu
               @bg_win_fifo = bg_win_fifo
 
               @step = :fetch_tile_index
-              @action = 'Fetch IDX'
               @bg_fetcher_x = 0
               @window_fetcher_x = 0
               @fetch_mode = :bg
 
               @fetch_duration = 6
               @sleep_duration = 2
-              @retry_attempts = 2 # remove this
               @warming_up     = true
 
               @tile_index     = nil
@@ -64,6 +62,7 @@ module Akane
               @warming_up = true
               @bg_fetcher_x = 0
               @window_fetcher_x = 0
+              increment_window_y
             end
 
             private
@@ -82,7 +81,6 @@ module Akane
               )
 
               @step = :fetch_tile_data_low
-              @action = 'Fetch DL'
             end
 
             # Fetches the low byte of the BG or Window Tile Row
@@ -95,7 +93,6 @@ module Akane
               @tile_data_low = current_tile_data.tile_at(@tile_index).data_low(current_y)
 
               @step = :fetch_tile_data_high
-              @action = 'Fetch DH'
             end
 
             # Fetches the high byte of the BG or Window Tile Row
@@ -139,9 +136,10 @@ module Akane
             end
 
             def push
-              attempt_push_into_fifo
-              @retry_attempts -= 1
-              reset_cycle if @retry_attempts == 0
+              push_successful = @bg_win_fifo.push?(@tile_pixels)
+              return unless push_successful
+
+              reset_cycle
             end
 
             def sleep
@@ -151,10 +149,8 @@ module Akane
 
             def reset_cycle
               @step = :fetch_tile_index
-              @action = 'Fetch IDX'
               @fetch_duration = 6
               @sleep_duration = 2
-              @retry_attempts = 2
               @tile_index     = nil
               @tile_data_low  = nil
               @tile_data_high = nil
@@ -197,10 +193,7 @@ module Akane
 
             def to_s
               "Mode: #{@fetch_mode.upcase} | " \
-                "Step: #{format('%-10s', @action)} | " \
-                "IDX: #{@tile_index.nil? ? 'Nil' : format('%02X', @tile_index)} | " \
-                "DL: #{@tile_data_low.nil? ? 'Nil' : format('%02X', @tile_data_low)} | " \
-                "DH: #{@tile_data_high.nil? ? 'Nil' : format('%02X', @tile_data_high)} | " \
+                "Step: #{@step.upcase} | " \
                 "PIX: #{@tile_pixels}"
             end
           end

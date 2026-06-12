@@ -10,6 +10,9 @@ module Akane
           class SpriteFetcher
             SpritePixel = Struct.new(:bg_win_priority_set, :use_obp1_palette, :color_id)
 
+            BIT_MASK_BG_WIN_PRIORITY_SET = 1 << 3
+            BIT_MASK_USE_OBP1_PALETTE    = 1 << 2
+
             def initialize(ppu, sprite_fifo)
               @ppu = ppu
               @sprite_fifo = sprite_fifo
@@ -92,14 +95,15 @@ module Akane
             # Encodes the current OBP color palette and BG/WIN priority into the pixel.
             # This data would be lost downstream (when rendering the pixels to the LCD)
             # if not encoded in this step.
+            #
+            # @return [void]
             def add_pixel_metadata
               idx = 0
 
-              bg_win_priority_set = @current_sprite.bg_win_priority_set?
-              use_obp1_palette = @current_sprite.use_obp1_palette?
-
               while idx < 8
-                pixel = SpritePixel.new(bg_win_priority_set, use_obp1_palette, @tile_pixels[idx])
+                pixel = @tile_pixels[idx]
+                pixel = BIT_MASK_BG_WIN_PRIORITY_SET | pixel if @current_sprite.bg_win_priority_set?
+                pixel = BIT_MASK_USE_OBP1_PALETTE | pixel if @current_sprite.use_obp1_palette?
                 @encoded_pixels[idx] = pixel
 
                 idx += 1
