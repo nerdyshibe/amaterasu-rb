@@ -63,7 +63,7 @@ module Akane
     private
 
     def load_cartridge
-      @cartridge = Cartridge.load_rom(@rom_path)
+      @cartridge = Cartridge.load_rom(@rom_path, trace_rom: @trace == 'rom')
     end
 
     def load_memory

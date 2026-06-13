@@ -5,17 +5,31 @@ module Akane
     # models the ROM inside the Game Boy cartridge.
     class Rom
       CARTRIDGE_TYPES = {
-        0x00 => :rom_only
+        0x00 => 'ROM ONLY',
+        0x01 => 'MBC1',
+        0x02 => 'MBC1+RAM',
+        0x03 => 'MBC1+RAM+BATTERY',
+        0x05 => 'MBC2'
       }.freeze
 
       ROM_SIZES = {
         0x00 => 32 * 1024,
         0x01 => 64 * 1024,
-        0x02 => 128 * 1024
+        0x02 => 128 * 1024,
+        0x03 => 256 * 1024,
+        0x04 => 512 * 1024,
+        0x05 => 1024 * 1024,
+        0x06 => 2 * 1024 * 1024,
+        0x07 => 4 * 1024 * 1024,
+        0x08 => 8 * 1024 * 1024
       }.freeze
 
       RAM_SIZES = {
-        0x00 => 0
+        0x00 => 0,
+        0x02 => 8 * 1024,
+        0x03 => 32 * 1024,
+        0x04 => 128 * 1024,
+        0x05 => 64 * 1024
       }.freeze
 
       def self.from_file(file_path)
