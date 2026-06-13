@@ -1,0 +1,26 @@
+# frozen_string_literal: true
+
+module Akane
+  module GameBoy
+    class Ppu
+      module Modes
+        class Rendering
+          attr_reader name: String
+          attr_reader number: Integer
+
+          def initialize: () -> void
+          def tick: () -> void
+
+          def to_s: () -> String
+          def inspect: () -> String
+
+          private
+
+          def any_sprites?: () -> bool
+          def sprite_offscreen?: (Oam::Sprite sprite) -> bool
+          def window_reached?: () -> bool
+        end
+      end
+    end
+  end
+end

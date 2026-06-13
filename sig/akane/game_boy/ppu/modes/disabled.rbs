@@ -1,0 +1,17 @@
+# frozen_string_literal: true
+
+module Akane
+  module GameBoy
+    class Ppu
+      module Modes
+        class Disabled
+          attr_reader name: String
+          attr_reader number: Integer
+
+          def initialize: () -> void
+          def tick: () -> void
+        end
+      end
+    end
+  end
+end

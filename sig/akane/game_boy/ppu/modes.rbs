@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+module Akane
+  module GameBoy
+    class Ppu
+      module Modes
+        type ppu_mode = Disabled | OamScan | Rendering | HBlank | VBlank
+
+        def self.build_hash: (ppu: Ppu) -> Hash[Symbol, ppu_mode]
+      end
+    end
+  end
+end

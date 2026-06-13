@@ -1,0 +1,28 @@
+# frozen_string_literal: true
+
+module Akane
+  module GameBoy
+    class Ppu
+      module Modes
+        class OamScan
+          SCAN_DURATION_IN_DOTS: Integer
+
+          attr_reader name: String
+          attr_reader number: Integer
+
+          def initialize: () -> void
+          def tick: () -> void
+
+          def to_s: () -> String
+          def inspect: () -> String
+
+          private
+
+          def window_triggered?: () -> bool
+          def sprite_within_current_scanline?: () -> bool
+          def sort_sprites_by_x_positions: () -> void
+        end
+      end
+    end
+  end
+end

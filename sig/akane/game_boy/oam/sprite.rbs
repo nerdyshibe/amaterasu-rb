@@ -1,0 +1,30 @@
+# frozen_string_literal: true
+
+module Akane
+  module GameBoy
+    class Oam
+      class Sprite
+        SIZE_IN_BYTES: Integer
+
+        BIT_MASK_BG_WIN_PRIORITY_SET: Integer
+        BIT_MASK_OBJ_Y_FLIPPED: Integer
+        BIT_MASK_OBJ_X_FLIPPED: Integer
+        BIT_MASK_USE_OBP1_PALETTE: Integer
+
+        def initialize: () -> void
+        
+        def x: () -> Integer
+        def x_screen_pos: () -> Integer
+        def y: () -> Integer
+        def y_screen_pos: () -> Integer
+
+        def bg_win_priority_set?: () -> bool
+        def y_flipped?: () -> bool
+        def x_flipped?: () -> bool
+        def use_obp1_palette?: () -> bool
+
+        def inspect: () -> String
+      end
+    end
+  end
+end
