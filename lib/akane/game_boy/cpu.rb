@@ -96,6 +96,8 @@ module Akane
       end
 
       # Pushes a 16-bit value into the Stack.
+      #
+      # @param value [Integer] 16-bit value to be stored in the Stack.
       def stack_push(value:)
         @registers.sp -= 1
         bus_write(address: @registers.sp, value: (value >> 8) & 0xFF)
@@ -114,12 +116,16 @@ module Akane
       end
 
       # Jumps execution to a given address by setting the address value into the PC.
+      #
+      # @param address [Integer] 16-bit memory address value.
       def jump_to(address:)
         @registers.pc = address
         internal_processing
       end
 
       # Converts an unsigned byte into a value between -128 to 127 to use as an offset.
+      #
+      # @param byte [Integer] 8-bit unsigned value.
       def sign_value(byte)
         byte >= 128 ? (byte - 256) : byte
       end
@@ -142,10 +148,12 @@ module Akane
         result
       end
 
+      # Used by the DI instruction.
       def disable_interrupts
         @ime = false
       end
 
+      # Used by the EI instruction.
       def enable_interrupts
         @ime_scheduled = true
       end
