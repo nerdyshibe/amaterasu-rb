@@ -21,9 +21,9 @@ module Akane
                     :sprite_palettes1
 
         # @param skip_boot_rom [Boolean]
-        def initialize(skip_boot_rom: true)
+        def initialize(interrupts, skip_boot_rom: true)
           @lcdc = LcdControl.new(skip_boot_rom:)
-          @stat = LcdStatus.new(skip_boot_rom:)
+          @stat = LcdStatus.new(interrupts, skip_boot_rom:)
           @scy  = 0x00
           @scx  = 0x00
           @ly   = 0x00

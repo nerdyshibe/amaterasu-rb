@@ -45,7 +45,7 @@ module Akane
         @interrupts = interrupts
         @trace_ppu = trace_ppu
 
-        @registers     = Registers.new(skip_boot_rom:)
+        @registers     = Registers.new(interrupts, skip_boot_rom:)
         @framebuffer   = Array.new
         @sprite_buffer = Array.new(MAX_SPRITES_PER_SCANLINE).clear
 
@@ -67,12 +67,13 @@ module Akane
       end
 
       # Sets the current PPU mode to be ticked.
+      # Updates STAT Bits 1-0 that reads the current PPU mode.
       #
       # @param mode [Symbol]
       def set_mode(mode)
         @mode = @modes[mode]
         @registers.stat.set_mode_bits(@mode.number)
-        request_interrupt(:lcd_stat) if @registers.stat.rising_edge?
+        # request_interrupt(:lcd_stat) if @registers.stat.rising_edge?
 
         @mode
       end
@@ -115,7 +116,7 @@ module Akane
           @registers.stat.clear_lyc_bit
         end
 
-        request_interrupt(:lcd_stat) if @registers.stat.rising_edge?
+        # request_interrupt(:lcd_stat) if @registers.stat.rising_edge?
       end
 
       # Returns a 8-bit value stored in VRAM in a given address.

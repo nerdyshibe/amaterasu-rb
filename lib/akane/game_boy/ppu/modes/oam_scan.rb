@@ -49,6 +49,23 @@ module Akane
             @ppu.set_mode(:rendering)
           end
 
+          # Custom inspect to prevent circular dependencies.
+          def inspect
+            '#<Akane::GameBoy::Ppu::Modes::OamScan ' \
+              "@name='#{@name}' " \
+              "@number=#{@number} " \
+              "@sprite_buffer=#{@sprite_buffer}"
+          end
+
+          # Custom to_s method to use in the Ppu#log_state method.
+          def to_s
+            "#{@name} (##{@number}) | " \
+              "SCANNED: Sprite ##{format('%02d', @sprite_index)} | " \
+              "BUFFER: #{@ppu.sprite_buffer} (#{@ppu.sprite_buffer.size})"
+          end
+
+          private
+
           def window_triggered?
             return false unless @ppu.registers.lcdc.window_enabled?
             return false unless @ppu.registers.ly == @ppu.registers.wy
@@ -64,23 +81,10 @@ module Akane
               && @ppu.registers.ly < @current_sprite.y_screen_pos + sprite_height
           end
 
+          # TODO: benchmark the performance of both
           def sort_sprites_by_x_positions
             @ppu.sprite_buffer.sort_by!(&:x)
-          end
-
-          # Custom inspect to prevent circular dependencies.
-          def inspect
-            '#<Akane::GameBoy::Ppu::Modes::OamScan ' \
-              "@name='#{@name}' " \
-              "@number=#{@number} " \
-              "@sprite_buffer=#{@sprite_buffer}"
-          end
-
-          # Custom to_s method to use in the Ppu#log_state method.
-          def to_s
-            "#{@name} (##{@number}) | " \
-              "SCANNED: Sprite ##{format('%02d', @sprite_index)} | " \
-              "BUFFER: #{@ppu.sprite_buffer} (#{@ppu.sprite_buffer.size})"
+            # @ppu.sprite_buffer.sort! { |a, b| a.x <=> b.x }
           end
         end
       end
