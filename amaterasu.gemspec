@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.metadata['rubygems_mfa_required'] = 'true'
 
   spec.files = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(bench|bin|features|spec|test)/})
+    f.match(%r{^(test|spec|features|bench|bin)/|^\.|^Gemfile|^Rakefile})
   end
 
   spec.bindir = 'exe'
