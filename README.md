@@ -3,6 +3,8 @@
   <p>A <s>cycle-accurate?</s> Game Boy emulator written in Ruby.</p>
 </div>
 
+[![Gem Version](https://img.shields.io/gem/v/amaterasu.svg)](https://rubygems.org/gems/amaterasu)
+[![Gem Downloads](https://img.shields.io/gem/dt/amaterasu.svg)](https://rubygems.org/gems/amaterasu)
 ---
 
 ## About
