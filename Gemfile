@@ -5,11 +5,10 @@ source 'https://rubygems.org'
 ruby '4.0.3'
 
 # gem 'curses'
-gem 'ffi'
 # gem 'gosu'
 # gem 'raylib-bindings'
-# gem 'sdl2-bindings'
-gem 'zeitwerk'
+
+gemspec
 
 group :development do
   gem 'benchmark-ips'
