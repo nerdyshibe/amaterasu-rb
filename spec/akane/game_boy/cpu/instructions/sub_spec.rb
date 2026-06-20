@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-describe Akane::GameBoy::Cpu::Instructions::Sub do
+describe Amaterasu::GameBoy::Cpu::Instructions::Sub do
   include CpuHelper
 
   let(:rom_data) { Array.new(0x8000, 0x00) }

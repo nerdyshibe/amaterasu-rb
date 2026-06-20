@@ -1,4 +1,4 @@
-module Akane
+module Amaterasu
   module GameBoy
     class Joypad
       FACE_BUTTONS: Hash[Symbol, Integer]

@@ -1,4 +1,4 @@
-module Akane
+module Amaterasu
   module GameBoy
     class Apu
       def tick: () -> void

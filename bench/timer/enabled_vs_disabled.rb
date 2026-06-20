@@ -2,11 +2,11 @@
 
 require 'benchmark/ips'
 
-require_relative '../../lib/akane'
+require_relative '../../lib/amaterasu'
 
-interrupts = Akane::GameBoy::Interrupts.new
-enabled_timer = Akane::GameBoy::Timer.new(interrupts, trace_timer: false)
-disabled_timer = Akane::GameBoy::Timer.new(interrupts, trace_timer: false)
+interrupts = Amaterasu::GameBoy::Interrupts.new
+enabled_timer = Amaterasu::GameBoy::Timer.new(interrupts, trace_timer: false)
+disabled_timer = Amaterasu::GameBoy::Timer.new(interrupts, trace_timer: false)
 
 enabled_timer.tac = 0x05
 disabled_timer.tac = 0x00

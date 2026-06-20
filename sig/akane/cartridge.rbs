@@ -1,4 +1,4 @@
-module Akane
+module Amaterasu
   class Cartridge
     def self.load_rom: (String file_path) -> Cartridge
 

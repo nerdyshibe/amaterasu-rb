@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Akane
+module Amaterasu
   module Utils
     module BitOps
       def self?.set_bit: (Integer value, Integer pos) -> Integer

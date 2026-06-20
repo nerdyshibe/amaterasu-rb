@@ -1,0 +1,114 @@
+# frozen_string_literal: true
+
+module Amaterasu
+  module GameBoy
+    # Models the RAM chip within the Game Boy.
+    #
+    # On the real Game Boy, the CPU and DMA share the same physical bus.
+    # During DMA, the DMA controller physically takes over the bus lines — the CPU is
+    # electrically disconnected from the bus (except HRAM, which is on a separate internal path).
+    class Dma
+      OAM_START_ADDRESS = 0xFE00
+      DMA_START_DELAY = 1
+      DMA_TOTAL_CYCLES = 160 + DMA_START_DELAY
+
+      attr_reader :internal_latch
+
+      def initialize(bus, trace_dma: false)
+        @bus = bus
+        @trace_dma = trace_dma
+
+        @internal_latch = 0xFF
+        @source_address = nil
+        @target_address = OAM_START_ADDRESS
+        @status = :inactive
+        @active = false
+        @cycles = 0
+      end
+
+      # This method is called once per M-cycle, CPU drives this.
+      #
+      # - DMA transfer 1 byte per M-cycle, totalling 160 bytes.
+      # - It fills the OAM memory range from 0xFE00 - 0xFE9F.
+      def tick
+        case @status
+        when :inactive then nil
+        when :pending
+          log_state if @trace_dma
+          @cycles += 1
+          start_transfer
+        when :transferring
+          @active = true
+          source_byte = bus_read(address: @source_address)
+          bus_write(address: @target_address, value: source_byte)
+
+          log_state if @trace_dma
+
+          @source_address += 1
+          @target_address += 1
+          @cycles += 1
+
+          complete_transfer if @cycles == DMA_TOTAL_CYCLES
+        when :completed
+          @cycles = 0
+          @source_address = nil
+          @target_address = OAM_START_ADDRESS
+          @status = :inactive
+          @active = false
+        end
+      end
+
+      # When a value is written to 0xFF46, it means a DMA transfer was requested.
+      # The value represents the upper byte of the source address.
+      # This value is saved (latched), if there is a read from 0xFF46, it should return this value.
+      # Requesting a transfer with value 0x80, means the source address is 0x8000.
+      # You can multiple the given value by 0x100 to get the source address.
+      #
+      # @param source_value [Integer] A 8-bit value that represents the upper byte of the source address.
+      def request_transfer(source_value:)
+        @internal_latch = source_value
+        @source_address = source_value * 0x100
+        @status = :pending
+        @cycles = 0
+      end
+
+      # @return [Boolean] Checks if the DMA transfer is in progress.
+      def active?
+        @active
+      end
+
+      private
+
+      def start_transfer
+        @status = :transferring
+      end
+
+      def complete_transfer
+        @status = :completed
+      end
+
+      def bus_read(address:)
+        @bus.read_byte(address:)
+      end
+
+      def bus_write(address:, value:)
+        @bus.write_byte(address:, value:)
+      end
+
+      def log_state
+        if @cycles.zero?
+          puts 'DMA: #000 || START DELAY'
+        else
+          $stdout.printf(
+            "DMA: #%<n>03d || $%<sa>04X ($%<sb>02X) -> $%<ta>04X ($%<tb>02X)\n",
+            n: @cycles,
+            sa: @source_address,
+            sb: @bus.read_byte(address: @source_address),
+            ta: @target_address,
+            tb: @bus.read_byte(address: @target_address)
+          )
+        end
+      end
+    end
+  end
+end

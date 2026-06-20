@@ -1,4 +1,4 @@
-module Akane
+module Amaterasu
   module GameBoy
     class Ram
       def initialize: (size: Integer, offset: Integer) -> void

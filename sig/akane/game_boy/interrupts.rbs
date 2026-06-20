@@ -1,4 +1,4 @@
-module Akane
+module Amaterasu
   module GameBoy
     class Interrupts
       type interrupt_types = :v_blank | :lcd_stat | :timer | :serial | :joypad

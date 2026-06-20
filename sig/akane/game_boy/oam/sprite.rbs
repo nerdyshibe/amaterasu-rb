@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Akane
+module Amaterasu
   module GameBoy
     class Oam
       class Sprite

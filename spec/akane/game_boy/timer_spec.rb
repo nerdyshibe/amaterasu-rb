@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-describe Akane::GameBoy::Timer do
+describe Amaterasu::GameBoy::Timer do
   subject(:timer) { described_class.new(interrupts, skip_boot_rom: false) }
 
-  let(:interrupts) { Akane::GameBoy::Interrupts.new }
+  let(:interrupts) { Amaterasu::GameBoy::Interrupts.new }
 
   let(:t_cycles_per_tick) { 4 }
   let(:div_increment_ticks) { (2**8) / t_cycles_per_tick }
@@ -90,7 +90,8 @@ describe Akane::GameBoy::Timer do
       expect(timer.tima).to eq(0x00)
     end
 
-    it 'does not reload TIMA or request interrupt if TIMA is written the same cycle it overflowed', :aggregate_failures do
+    it 'does not reload TIMA or request interrupt if TIMA is written the same cycle it overflowed',
+       :aggregate_failures do
       interrupts.if_register = 0b11100000
       timer.tac = 0b00000101
       timer.tma = 0x12

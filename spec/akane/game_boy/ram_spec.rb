@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-describe Akane::GameBoy::Ram do
+describe Amaterasu::GameBoy::Ram do
   describe '#size' do
     it 'returns the memory size in bytes' do
       wram = described_class.new(size: 8192, offset: 0)

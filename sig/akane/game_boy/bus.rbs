@@ -1,8 +1,8 @@
-module Akane
+module Amaterasu
   module GameBoy
     class Bus
       def initialize: (
-        cartridge: Akane::Cartridge,
+        cartridge: Amaterasu::Cartridge,
         ppu: Ppu,
         apu: Apu,
         wram: Ram,

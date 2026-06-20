@@ -2,10 +2,10 @@
 
 require 'stackprof'
 
-require_relative '../../lib/akane'
+require_relative '../../lib/amaterasu'
 
-interrupts = Akane::GameBoy::Interrupts.new
-timer = Akane::GameBoy::Timer.new(interrupts, trace_timer: false)
+interrupts = Amaterasu::GameBoy::Interrupts.new
+timer = Amaterasu::GameBoy::Timer.new(interrupts, trace_timer: false)
 timer.tac = 0x05 # enable
 
 StackProf.run(mode: :cpu, out: 'bench/timer/results/ticking-enabled.dump') do

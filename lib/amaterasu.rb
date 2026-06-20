@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+require 'zeitwerk'
+require 'debug'
+
+loader = Zeitwerk::Loader.for_gem
+loader.inflector.inflect('cli' => 'CLI')
+loader.inflector.inflect('hal' => 'HAL')
+loader.inflector.inflect('sdl2' => 'SDL2')
+loader.setup
+
+# Base module to mirror the emulator name and group everything.
+module Amaterasu
+  VERSION = '0.1'
+end

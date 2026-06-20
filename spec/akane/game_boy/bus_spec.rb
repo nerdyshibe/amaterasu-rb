@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-describe Akane::GameBoy::Bus do
+describe Amaterasu::GameBoy::Bus do
   subject(:bus) do
     described_class.new(
       cartridge: cartridge,
@@ -21,15 +21,15 @@ describe Akane::GameBoy::Bus do
     data[0x7FFF] = 0x34
     data
   end
-  let(:cartridge) { Akane::Cartridge.new(rom: Akane::Cartridge::Rom.new(rom_data)) }
-  let(:ppu) { Akane::GameBoy::Ppu.new(interrupts) }
-  let(:apu) { Akane::GameBoy::Apu.new }
-  let(:wram) { Akane::GameBoy::Ram.new(size: 8192, offset: 0x8000) }
-  let(:hram) { Akane::GameBoy::Ram.new(size: 127, offset: 0xFF80) }
-  let(:interrupts) { Akane::GameBoy::Interrupts.new(skip_boot_rom: false) }
-  let(:timer) { Akane::GameBoy::Timer.new(interrupts) }
-  let(:serial) { Akane::GameBoy::Serial.new(interrupts) }
-  let(:joypad) { Akane::GameBoy::Joypad.new(interrupts) }
+  let(:cartridge) { Amaterasu::Cartridge.new(rom: Amaterasu::Cartridge::Rom.new(rom_data)) }
+  let(:ppu) { Amaterasu::GameBoy::Ppu.new(interrupts) }
+  let(:apu) { Amaterasu::GameBoy::Apu.new }
+  let(:wram) { Amaterasu::GameBoy::Ram.new(size: 8192, offset: 0x8000) }
+  let(:hram) { Amaterasu::GameBoy::Ram.new(size: 127, offset: 0xFF80) }
+  let(:interrupts) { Amaterasu::GameBoy::Interrupts.new(skip_boot_rom: false) }
+  let(:timer) { Amaterasu::GameBoy::Timer.new(interrupts) }
+  let(:serial) { Amaterasu::GameBoy::Serial.new(interrupts) }
+  let(:joypad) { Amaterasu::GameBoy::Joypad.new(interrupts) }
 
   describe '#read_byte' do
     context 'when in the 0x0000 - 0x7FFF (Cartridge ROM) range' do

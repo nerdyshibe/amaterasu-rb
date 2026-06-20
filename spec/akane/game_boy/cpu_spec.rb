@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-describe Akane::GameBoy::Cpu do
+describe Amaterasu::GameBoy::Cpu do
   include CpuHelper
 
   subject(:cpu) { build_cpu(rom_data) }

@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# RubyVM::YJIT.enable if defined?(RubyVM::YJIT)
+
+require_relative '../lib/amaterasu'
+
+options = Amaterasu::CLI.parse(ARGV)
+
+if options[:profiling]
+  require 'stackprof'
+
+  StackProf.start(mode: options[:profiling].to_sym)
+
+  at_exit do
+    StackProf.stop
+    StackProf.results(
+      "tmp/#{Time.now.to_i}-#{options[:profiling]}-emulator-results.dump"
+    )
+  end
+end
+
+Amaterasu::Emulator.new(**options).start

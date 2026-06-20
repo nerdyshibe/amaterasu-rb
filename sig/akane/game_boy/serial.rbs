@@ -1,4 +1,4 @@
-module Akane
+module Amaterasu
   module GameBoy
     class Serial
       attr_reader sb: Integer

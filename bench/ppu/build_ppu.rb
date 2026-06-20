@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require_relative '../../lib/akane'
+require_relative '../../lib/amaterasu'
 
 def build_ppu
-  vram = Akane::GameBoy::Vram.new
-  oam  = Akane::GameBoy::Oam.new
-  interrupts = Akane::GameBoy::Interrupts.new
+  vram = Amaterasu::GameBoy::Vram.new
+  oam  = Amaterasu::GameBoy::Oam.new
+  interrupts = Amaterasu::GameBoy::Interrupts.new
 
-  Akane::GameBoy::Ppu.new(vram, oam, nil, interrupts, trace_ppu: false)
+  Amaterasu::GameBoy::Ppu.new(vram, oam, nil, interrupts, trace_ppu: false)
 end

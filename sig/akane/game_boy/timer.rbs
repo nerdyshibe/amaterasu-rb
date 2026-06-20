@@ -1,4 +1,4 @@
-module Akane
+module Amaterasu
   module GameBoy
     class Timer
       T_CYCLES: Integer

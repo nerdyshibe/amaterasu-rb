@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-describe Akane::GameBoy::Cpu::Registers do
+describe Amaterasu::GameBoy::Cpu::Registers do
   subject(:registers) { described_class.new(skip_boot_rom: true) }
 
   describe 'initialize' do

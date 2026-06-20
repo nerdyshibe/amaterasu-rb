@@ -1,5 +1,5 @@
 <div align="center">
-  <h1 style="font-size: 3em; font-weight: bold;">Akane</h1>
+  <h1 style="font-size: 3em; font-weight: bold;">Amaterasu</h1>
   <p>A <s>cycle-accurate?</s> Game Boy emulator written in Ruby.</p>
 </div>
 
