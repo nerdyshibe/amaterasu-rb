@@ -9,7 +9,7 @@ module Amaterasu
       profiling: String,
       steps: Integer,
       trace: String,
-      video: String,
+      renderer: String,
       rom_path: String
     ) -> void
     def start: (CLI::emulator_options options) -> void

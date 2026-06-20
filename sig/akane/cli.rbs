@@ -7,7 +7,7 @@ module Amaterasu
       profile: Symbol?,
       steps: Integer?,
       trace: Array[String]?,
-      video: String?,
+      renderer: String?,
       rom_path: String
     }
 

@@ -11,11 +11,11 @@ module Amaterasu
       profiling:,
       steps:,
       trace:,
-      video:,
+      renderer:,
       rom_path:
     )
       @audio = audio
-      @video = video
+      @renderer = renderer
       @stop_cycles = cycles
       @stop_steps = steps
       @profiling_mode = profiling
@@ -75,7 +75,7 @@ module Amaterasu
 
     def load_components
       @bus = GameBoy::Bus.new
-      @sdl2 = HAL::SDL2.new unless @video == 'null'
+      @sdl2 = HAL::SDL2.new unless @renderer == 'null'
       @apu = GameBoy::Apu.new
       @dma = GameBoy::Dma.new(@bus, trace_dma: @trace == 'dma')
       @interrupts = GameBoy::Interrupts.new

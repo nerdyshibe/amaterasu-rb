@@ -13,7 +13,7 @@ module Amaterasu
         profiling: nil,
         steps: nil,
         trace: nil,
-        video: nil,
+        renderer: nil,
         rom_path: nil
       }
 
@@ -37,6 +37,10 @@ module Amaterasu
           options[:profiling] = mode.to_sym
         end
 
+        parser.on('-r', '--renderer=RENDERER', 'Define the renderer backend') do |renderer|
+          options[:renderer] = renderer
+        end
+
         parser.on('-s', '--steps=n', Integer, 'Amount of CPU steps to run') do |n|
           options[:steps] = n
         end
@@ -45,8 +49,9 @@ module Amaterasu
           options[:trace] = component
         end
 
-        parser.on('-v', '--video=VIDEO', 'Define the video backend') do |video|
-          options[:video] = video
+        parser.on('-v', '--version', 'Displays the current emulator version') do |component|
+          puts Amaterasu::VERSION
+          exit(0)
         end
       end
 
