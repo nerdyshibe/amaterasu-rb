@@ -5,6 +5,8 @@
 
 [![Gem Version](https://img.shields.io/gem/v/amaterasu.svg)](https://rubygems.org/gems/amaterasu)
 [![Gem Downloads](https://img.shields.io/gem/dt/amaterasu.svg)](https://rubygems.org/gems/amaterasu)
+![GitHub repo size](https://img.shields.io/github/repo-size/nerdyshibe/amaterasu-rb)
+
 ---
 
 ## About
