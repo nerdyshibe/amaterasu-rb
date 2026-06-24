@@ -3,7 +3,6 @@
 require 'simplecov'
 SimpleCov.start
 
-require 'debug'
 require_relative '../lib/amaterasu'
 
 Dir[File.join(__dir__, 'support', '**', '*.rb')].each { |f| require f }

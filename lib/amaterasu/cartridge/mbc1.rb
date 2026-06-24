@@ -20,6 +20,7 @@ module Amaterasu
         @rom_banking_reg2 = 0b00
       end
 
+      # TODO: Split write_byte into write_rom and write_ram
       def write_byte(address, value)
         if address <= 0x1FFF
           @ram_enabled = true if (value & 0xF) == 0xA
@@ -37,6 +38,7 @@ module Amaterasu
         end
       end
 
+      # TODO: Split read_byte into read_rom and read_ram
       # TODO: Implement banking mode logic for reads
       def read_byte(address)
         if address <= 0x3FFF

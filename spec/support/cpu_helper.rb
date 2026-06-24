@@ -5,12 +5,14 @@ module CpuHelper
   def build_cpu(rom_data)
     rom = Amaterasu::Cartridge::Rom.new(rom_data)
     cartridge = Amaterasu::Cartridge.new(rom: rom)
+    vram = Amaterasu::GameBoy::Vram.new
+    oam = Amaterasu::GameBoy::Oam.new
     wram = Amaterasu::GameBoy::Ram.new(size: 8192, offset: 0x8000)
     hram = Amaterasu::GameBoy::Ram.new(size: 127, offset: 0xFF80)
     apu = Amaterasu::GameBoy::Apu.new
     interrupts = Amaterasu::GameBoy::Interrupts.new
 
-    ppu = Amaterasu::GameBoy::Ppu.new(interrupts)
+    ppu = Amaterasu::GameBoy::Ppu.new(vram, oam, nil, interrupts, trace_ppu: false)
     timer = Amaterasu::GameBoy::Timer.new(interrupts)
     serial = Amaterasu::GameBoy::Serial.new(interrupts)
     joypad = Amaterasu::GameBoy::Joypad.new(interrupts)
