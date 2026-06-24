@@ -1,3 +1,10 @@
+PATH
+  remote: .
+  specs:
+    amaterasu (0.6.2)
+      ffi (>= 1.15.5)
+      zeitwerk (>= 2.8.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -156,7 +163,6 @@ PLATFORMS
   arm-linux-gnu
   arm-linux-musl
   arm64-darwin
-  ruby
   x86-linux-gnu
   x86-linux-musl
   x86_64-darwin
@@ -164,9 +170,9 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  amaterasu!
   benchmark-ips
   debug
-  ffi
   memory_profiler
   pastel
   rake
@@ -180,9 +186,9 @@ DEPENDENCIES
   steep
   vernier
   yard
-  zeitwerk
 
 CHECKSUMS
+  amaterasu (0.6.2)
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   benchmark-ips (2.14.0) sha256=b72bc8a65d525d5906f8cd94270dccf73452ee3257a32b89fbd6684d3e8a9b1d
   benchmark-malloc (0.2.0) sha256=37c68f0435261634026f584d79956a35325a3027e3e6b4cc8d7575aa10537e6b
