@@ -81,7 +81,7 @@ module Amaterasu
         elsif address <= 0x9FFF
           @ppu.write_vram(address:, value:)
         elsif address <= 0xBFFF
-          @cartridge.write_ram(address - 0xA000, value)
+          @cartridge.write_ram(address, value)
         elsif address <= 0xDFFF
           @wram.write_byte(address:, value:)
         elsif address <= 0xFDFF

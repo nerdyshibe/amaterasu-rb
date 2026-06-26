@@ -7,6 +7,11 @@ module Amaterasu
     RAM_BANK_SIZE = 8 * 1024
 
     # Loads a Rom from a file path.
+    #
+    # @param file_path [String]
+    # @param trace_rom [Boolean]
+    # @return [Cartridge] New Cartridge object.
+    #
     def self.load_rom(file_path, trace_rom:)
       rom = Rom.from_file(file_path)
 
@@ -40,29 +45,53 @@ module Amaterasu
       @ram = GameBoy::Ram.new(size: @rom.ram_size, offset: 0xA000)
     end
 
-    # Delegates the read byte to either the ROM or the MBC (Not implemented yet).
+    # Reads a 8-bit value from a given address in Cartrige ROM,
+    # if the Cartridge has more than 32KiB (not ROM-ONLY),
+    # the MBC needs to be involved for bank switching.
+    #
+    # @param address [Integer] 16-bit address value.
+    # @return [Integer] 8-bit value stored at that address.
+    #
     def read_rom(address)
-      @mbc.nil? ? @rom.read_byte(address) : @mbc.read_byte(address)
+      @mbc.nil? ? @rom.read_byte(address) : @mbc.read_rom(address:)
     end
 
-    # Delegates the read byte to the MBC (Not implemented yet).
+    # Writes a 8-bit value into Cartridge ROM,
+    # this is only possible if a MBC is present.
+    #
+    # @param address [Integer] 16-bit memory address to write to.
+    # @param value [Integer] 8-bit value to be written.
+    # @return [void]
+    #
     def write_rom(address, value)
       return unless @mbc
 
-      @mbc.write_byte(address, value)
+      @mbc.write_rom(address:, value:)
     end
 
+    # Reads a 8-bit value from a given address in Cartrige RAM,
+    # if the Cartridge doesn't have RAM, returns 0xFF.
+    #
+    # @param address [Integer] 16-bit address value.
+    # @return [Integer] 8-bit value stored at that address.
+    #
     def read_ram(address)
       return 0xFF if @ram.nil?
 
-      @mbc.nil? ? @ram.read_byte(address) : @mbc.read_byte(address)
+      @mbc.nil? ? @ram.read_byte(address) : @mbc.read_ram(address:)
     end
 
-    # Delegates the write byte to the MBC (Not implemented yet).
+    # Writes a 8-bit value into Cartridge RAM,
+    # this is only possible if a MBC is present.
+    #
+    # @param address [Integer] 16-bit memory address to write to.
+    # @param value [Integer] 8-bit value to be written.
+    # @return [void]
+    #
     def write_ram(address, value)
       return unless @mbc
 
-      @mbc.write_byte(address, value)
+      @mbc.write_ram(address:, value:)
     end
   end
 end
