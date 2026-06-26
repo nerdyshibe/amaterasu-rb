@@ -2,13 +2,12 @@
 
 module Amaterasu
   module GameBoy
-    # Models the RAM chip within the Game Boy.
+    # Models the DMA (Direct Memory Access) Transfer.
     #
-    # On the real Game Boy, the CPU and DMA share the same physical bus.
-    # During DMA, the DMA controller physically takes over the bus lines — the CPU is
-    # electrically disconnected from the bus (except HRAM, which is on a separate internal path).
+    # When the DMA Transfer is active, the CPU is "locked out" of the Bus,
+    # due to how the physical hardware is layed out.
+    # Bus reads performed by the CPU during DMA should return 0xFF (garbage).
     class Dma
-      OAM_START_ADDRESS = 0xFE00
       DMA_START_DELAY = 1
       DMA_TOTAL_CYCLES = 160 + DMA_START_DELAY
 
@@ -20,7 +19,7 @@ module Amaterasu
 
         @internal_latch = 0xFF
         @source_address = nil
-        @target_address = OAM_START_ADDRESS
+        @target_address = Oam::START_ADDRESS
         @status = :inactive
         @active = false
         @cycles = 0
@@ -52,7 +51,7 @@ module Amaterasu
         when :completed
           @cycles = 0
           @source_address = nil
-          @target_address = OAM_START_ADDRESS
+          @target_address = Oam::START_ADDRESS
           @status = :inactive
           @active = false
         end
@@ -95,6 +94,10 @@ module Amaterasu
         @bus.write_byte(address:, value:)
       end
 
+      # Logs current DMA state if it's being traced.
+      #
+      # @return [void]
+      #
       def log_state
         if @cycles.zero?
           puts 'DMA: #000 || START DELAY'
