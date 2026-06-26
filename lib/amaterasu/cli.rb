@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
+# TODO: include as a dependency?
 require 'optparse'
 
 module Amaterasu
   # Handles arguments parsing when launching the emulator.
   class CLI
+    # TODO: break it down into smaller commands?
     def self.parse(arguments)
       # @type var options: emulator_options
       options = {
@@ -49,7 +51,7 @@ module Amaterasu
           options[:trace] = component
         end
 
-        parser.on('-v', '--version', 'Displays the current emulator version') do |component|
+        parser.on('-v', '--version', 'Displays the current emulator version') do
           puts Amaterasu::VERSION
           exit(0)
         end
