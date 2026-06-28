@@ -40,9 +40,7 @@ module Amaterasu
       # Delegates the read to the proper component based on the address
       # and returns the 8-bit value that was stored there.
       def read_byte(address:, caller: nil)
-        return 0xFF if @dma.active?
-          && caller.is_a?(Cpu)
-          && address < 0xFF00
+        return 0xFF if @dma.active? && caller.is_a?(Cpu) && address < 0xFF00
 
         if address <= 0x7FFF
           @cartridge.read_rom(address)
@@ -72,9 +70,7 @@ module Amaterasu
       # Delegates the write to the proper component based on the address
       # and stores a 8-bit value at that location.
       def write_byte(address:, value:, caller: nil)
-        return if @dma.active?
-          && caller.is_a?(Cpu)
-          && address < 0xFF00
+        return if @dma.active? && caller.is_a?(Cpu) && address < 0xFF00
 
         if address <= 0x7FFF
           @cartridge.write_rom(address, value)
@@ -114,6 +110,14 @@ module Amaterasu
         when 0xFF06 then @timer.tma
         when 0xFF07 then @timer.tac
         when 0xFF0F then @interrupts.if_register
+        when 0xFF10 then @apu.channel1.nr10
+        when 0xFF11 then @apu.channel1.nr11
+        when 0xFF12 then @apu.channel1.nr12
+        when 0xFF13 then @apu.channel1.nr13
+        when 0xFF14 then @apu.channel1.nr14
+        when 0xFF24 then @apu.nr50
+        when 0xFF25 then @apu.nr51
+        when 0xFF26 then @apu.nr52
         when 0xFF40 then @ppu.registers.lcdc.value
         when 0xFF41 then @ppu.registers.stat.value
         when 0xFF42 then @ppu.registers.scy
@@ -142,6 +146,14 @@ module Amaterasu
         when 0xFF06 then @timer.tma = value
         when 0xFF07 then @timer.tac = value
         when 0xFF0F then @interrupts.if_register = value
+        when 0xFF10 then @apu.channel1.nr10 = value
+        when 0xFF11 then @apu.channel1.nr11 = value
+        when 0xFF12 then @apu.channel1.nr12 = value
+        when 0xFF13 then @apu.channel1.nr13 = value
+        when 0xFF14 then @apu.channel1.nr14 = value
+        when 0xFF24 then @apu.nr50 = value
+        when 0xFF25 then @apu.nr51 = value
+        when 0xFF26 then @apu.nr52 = value
         when 0xFF40 then @ppu.registers.lcdc = value
         when 0xFF41 then @ppu.registers.stat = value
         when 0xFF42 then @ppu.registers.scy = value
